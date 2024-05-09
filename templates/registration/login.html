@@ -1,0 +1,109 @@
+{% load static %}
+
+{% block content %}
+<style>
+    /* CSS styles for form container */
+    .form-container {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        max-width: 450px; /* Increased max-width */
+        padding: 50px; /* Increased padding */
+        background: linear-gradient(135deg, #287bb5, #1e5092); /* Gradient background */
+        border: 1px solid #ccc;
+        border-radius: 20px; /* Rounded corners */
+        font-size: 20px; /* Increased font size */
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Increased box shadow */
+    }
+
+    /* Additional styles for login text */
+    .login-text {
+        text-align: center;
+        margin-bottom: 30px; /* Increased margin-bottom */
+        font-size: 28px; /* Increased font size */
+        color: #fff; /* Change the color to white */
+    }
+
+    /* Increase the font size of input fields and buttons */
+    .form-container input[type="text"],
+    .form-container input[type="password"],
+    .form-container button {
+        font-size: 20px; /* Increased font size */
+        padding: 15px; /* Increased padding */
+        width: 100%; /* Make input fields and buttons full width */
+        box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        margin-bottom: 20px; /* Increased margin-bottom */
+        border-radius: 15px; /* Rounded corners */
+        border: none; /* Remove border */
+        background-color: #fff; /* White background for input fields */
+        color: #333; /* Default text color */
+    }
+
+    /* Add margin between submit button and password field */
+    .form-container button[type="submit"] {
+        margin-top: 20px; /* Increased margin-top */
+        background-color: #1e5092; /* Change button background color */
+        color: #fff; /* Change button text color */
+        border: none; /* Remove button border */
+        cursor: pointer; /* Change cursor to pointer on hover */
+        border-radius: 15px; /* Rounded corners */
+        padding: 15px; /* Increased padding */
+    }
+
+    /* Change button color on hover */
+    .form-container button[type="submit"]:hover {
+        background-color: #174075; /* Darken button color on hover */
+    }
+
+    /* Set font color of username and password placeholder text to white */
+    .form-container input[type="text"]::placeholder,
+    .form-container input[type="password"]::placeholder {
+        color: #fff; /* White text color for placeholder */
+    }
+
+    /* Set font color of "Username" and "Password" labels to white */
+    .form-container label {
+        color: #fff; /* White text color for labels */
+    }
+    .logo-circle {
+        text-align: center;
+        margin-bottom: 30px;
+    }
+    
+    .logo-circle img {
+        width: 100px; /* Adjust the width as needed */
+        height: 100px; /* Adjust the height as needed */
+        border-radius: 50%; /* Make it a circle */
+    }
+    .logo-text {
+        margin-left: 10px; /* Adjust the spacing between the logo and the text */
+        font-size: 35px; /* Adjust the font size as needed */
+        font-weight: bold
+    }
+    .form-container button[type="submit"] {
+        margin-top: 15px; /* Adjust the margin as needed */
+        background-color: green; /* Change button background color to green */
+        color: #fff; /* Change button text color to white */
+        border: none; /* Remove button border */
+        cursor: pointer; /* Change cursor to pointer on hover */
+    }
+    
+    
+</style>
+<div class="logo-circle">
+    <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+    <div class="logo-text">
+        Algobulls
+    </div>
+</div>
+<div class="form-container">
+    <form method="POST">
+        {% csrf_token %}
+        <div class="login-text">Login to your account</div>
+        {{ form }}
+        <button type="submit">Submit</button>
+    </form>
+</div>
+
+{% endblock content %}
