@@ -1,1 +1,2945 @@
-hi
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Select Roles {% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css" integrity="sha512-tHu2sQosTzPvjjsHrGSnpNVyWj/rqZUWWvJHjDDqXKSj1tqDmvl3V0DC9pXhpAUIsnNgnJ3KlaB7qmshDsJy4A==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+        margin: 0;
+        font-family: "Lato", sans-serif;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 150px;
+            background-color: lightwhite;
+            position: fixed;
+            height: 90%;
+            overflow: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
+            border-radius: 0 0 100px 0; /* Curved bottom-right corner */
+        }
+        
+        .sidebar-item {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow border */
+            padding: 10px;
+            margin-bottom: 10px; /* Add some space between items */
+        }        
+        
+        .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+        
+        .sidebar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .sidebar a:hover:not(.active) {
+            background-color: #5b72e3bf;
+            color: white;
+        }
+        .sidebar::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Adjust the height as needed */
+            background-color: #2679c2bf; /* Set the color to blue */
+            border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
+        }
+        
+
+        div.content {
+            margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+            padding: 20px; /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 700px) {
+            .sidebar {
+              width: 100%;
+              height: auto;
+              position: relative;
+            }
+            .sidebar a {float: left;}
+            div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 400px) {
+            .sidebar a {
+              text-align: center;
+              float: none;
+            }
+          }
+
+          .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 550px; /* Maximum height for vertical scroll */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 20px; /* Add margin at the top for spacing */
+            margin-left: 270px; /* Add margin to the left side */
+          }
+          
+          /* Adjust other styles as needed */
+            
+        </style>
+    
+    
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+            
+<header>
+    <style>
+        .navbar {
+            min-height: 50px; /* Adjust the value as needed */
+        }
+    </style>
+    
+    <style>
+        #sales-leads-table th,
+        #sales-leads-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #support-table th,
+        #support-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #strategies-table th,
+        #strategies-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 20px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        #build-table th,
+        #build-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #tech-task-table th,
+        #tech-task-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 8px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Make it circular */
+            overflow: hidden; /* Hide overflow */
+            margin-right: 10px; /* Adjust margin as needed */
+        }
+        
+        .logo-circle img {
+            width: 100%; /* Make the image fill the circle */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .editable-12,
+        .editable-13,
+        .editable-14,
+        .editable-15,
+        .editable-16 {
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-support{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-build{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-tech-task{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-strategies{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .sidebar-link.active {
+            background-color: green;
+            color: white; /* Change text color to white for better contrast */
+        }
+        
+        
+    </style>
+    
+    <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+        <div class="container-fluid">
+            <!-- Logo with man inside circle -->
+            <a class="navbar-brand" href="#">
+                <div class="logo-circle">
+                    <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+                </div>
+            </a>
+            <!-- Name -->
+            <a class="navbar-brand" href="#">Algobulls</a>
+            <!-- Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                    </li>
+                </ul>
+                <!-- User Name -->
+                <div class="d-flex align-items-center">
+                    <div class="logo-circle">
+                        <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                    </div>
+                    <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    
+    <div class="sidebar">
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can view Sales" %}
+                <div class="sidebar-item" id="sales-leads-btn">
+                    <a herf="#" onclick="showTable('sales-leads', this)" class="sidebar-link">Sales</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can view Build" %}
+                <div class="sidebar-item" id="build-btn">
+                    <a href="#" onclick="showTable('build', this)" class="sidebar-link">Build</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can view Tech Task" %}
+                <div class="sidebar-item" id="tech-task-btn">
+                    <a href="#" onclick="showTable('tech-task', this)" class="sidebar-link">Tech Task</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can view Support" %}
+                <div class="sidebar-item" id="support-btn">
+                    <a href="#" onclick="showTable('support', this)" class="sidebar-link">Support</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can view Strategies" %}
+                <div class="sidebar-item" id="strategies-btn">
+                    <a href="#" onclick="showTable('strategies', this)" class="sidebar-link">Strategies</a>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>    
+    
+    {% block content %}
+    <div>
+        {% if role_name == 'Support Head' %}
+        <script>
+            // Call the showTables function when the page loads
+            window.onload = function() {
+              showTables('Support Head');
+            };
+        </script>
+        <button onclick="showTables('Support Head')">Support Head</button>
+        {% elif role_name == 'Support Employee' %}
+        <script>
+            // Call the showTables function when the page loads
+            window.onload = function() {
+              showTables('Support Employee');
+            };
+        </script>
+        <button onclick="showTables('Support Employee')">Support Employee</button>
+        {% elif role_name == 'Sales Head' %}
+        <script>
+            // Call the showTables function when the page loads
+            window.onload = function() {
+              showTables('Sales Head');
+            };
+        </script>
+        {% elif role_name == 'Sales Employee' %}
+        <script>
+            // Call the showTables function when the page loads
+            window.onload = function() {
+              showTables('Sales Employee', '{{ employee_id }}');
+            };
+        </script>
+        {% elif role_name == 'Branch Employee' %}
+        <script>
+            // Call the showTables function when the page loads
+            window.onload = function() {
+              showTables('Branch Employee', '{{ employee_id }}');
+            };
+        </script>
+        {% endif %}
+        
+        <div class="container">
+        <table id="issue-history-table" class="hidden">
+            <thead>
+                <tr>
+                    <th>History ID</th>
+                    <th>Issue ID</th>
+                    <th>Date</th>
+                    <th>Status</th>
+                    <th>Comment</th>
+                    <th>Assigned To</th>
+                    <th>Changed By</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for history in issue_histories %}
+                <tr>
+                    <td>{{ history.history_id }}</td>
+                    <td>{{ history.issue_id }}</td>
+                    <td>{{ history.date }}</td>
+                    <td>{{ history.status }}</td>
+                    <td>{{ history.comment }}</td>
+                    <td>{{ history.assigned_to }}</td>
+                    <td>{{ history.changed_by }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <table id="issues-table" class="hidden table table-hover" class="table-container">
+            <!-- Issues Table Content -->
+            <thead>
+                <tr class="table-info">
+                    <th scope="col">Issue ID</th>
+                    <th scope="col">Division Assigned To</th>
+                    <th scope="col">Date</th>
+                    <th scope="col">Name</th>
+                    <th scope="col">Contact Number</th>
+                    <th scope="col">Broking ID</th>
+                    <th scope="col">Email ID</th>
+                    <th scope="col">Strategy Code</th>
+                    <th scope="col">Strategy Instrument</th>
+                    <th scope="col">Customer Type</th>
+                    <th scope="col">Priority</th>
+                    <th scope="col">Issue</th>
+                    <th scope="col">Comment</th>
+                    <th scope="col">Status</th>
+                    <th scope="col">Date of Closing</th>
+                    <th scope="col">Branch Employee ID</th>
+                    <th scope="col">Employee Assigned To</th>
+                    <th scope="col">Sales Employee Assigned To</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for issue in issues %}
+                <tr class="table-light">
+                    <td scope="row">{{ issue.issue_id }}</td>
+                    <td>{{ issue.division_assigned_to }}</td>
+                    <td>{{ issue.date }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.name }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.contact_number }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.broking_id }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.email_id }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.strategy_code }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.strategy_instrument }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.customer_type }}</td>
+                    <td class="editable-5" contenteditable="false">{{ issue.priority }}</td>
+                    <td class="editable-10" contenteditable="false">{{ issue.issue }}</td>
+                    <td class="editable-6" contenteditable="false">{{ issue.comment }}</td>
+                    <td class="editable-7" contenteditable="false">{{ issue.status }}</td>
+                    <td class="editable-7" contenteditable="false">{{ issue.date_of_closing }}</td>
+                    <td class="editable-branch_employee_id" contenteditable="false">{{ issue.branch_employee_id.employee_id }}</td>
+                    <td class="issue-id hidden">{{ issue.issue_id }}</td>
+                    <td class="editable" contenteditable="false">{{ issue.employee_assigned_to.employee_id }}</td>
+                    <td class="editable-sales_employee_assigned_to" contenteditable="false">{{ issue.sales_employee_assigned_to }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% comment %} <div id="build-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Build</h2>
+        </div> {% endcomment %}
+        <table id="build-table" class="table table-hover" class="table-container" style="display: none;">
+            <!-- Build Table Content -->
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Build ID field of Build" %}
+                            <th scope="col">Build ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Name field of Build" %}
+                            <th scope="col">Strategist Name</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Number field of Build" %}
+                            <th scope="col">Strategist Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Build" %}
+                            <th scope="col">Email ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Build" %}
+                            <th scope="col">Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy field of Build" %}
+                            <th scope="col">Strategy</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Document field of Build" %}
+                            <th scope="col">Document</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Date field of Build" %}
+                            <th scope="col">Payment Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Amount field of Build" %}
+                            <th scope="col">Payment Amount</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Delivery Date field of Build" %}
+                            <th scope="col">Delivery Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Remarks field of Build" %}
+                            <th scope="col">Remarks</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Build" %}
+                            <th scope="col">Status</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source field of Build" %}
+                            <th scope="col">Source</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Assign From field of Build" %}
+                            <th scope="col">Assign From</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Manage By field of Build" %}
+                            <th scope="col">Manage By</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Build" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for build in builds %}
+                <tr class="table-light">
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Build ID field of Build" %}
+                            <td scope="row" class="editable-build" data-field="build_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Build ID field of Build" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Build ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ build.build_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Name field of Build" %}
+                            <td class="editable-build" data-field="strategist_name.employee_id">
+                                {% if "Can edit the Strategist Name field of Build" not in permissions_name %}
+                                    {{ build.strategist_name.name }}
+                                {% else %}
+                                    <select class="strategist_name-dropdown">
+                                        {% for strategist_name in sales_employees %}
+                                            <option value="{{ strategist_name.employee_id }}" {% if strategist_name.employee_id == build.strategist_name.employee_id %} selected {% endif %}>{{ strategist_name.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Number field of Build" %}
+                            <td class="editable-build" data-field="strategist_number"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategist Number field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategist Number field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.strategist_number }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Build" %}
+                            <td class="editable-build" data-field="email_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategist Number field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategist Number field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.email_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Build" %}
+                            <td class="editable-build" data-field="date"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Date field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.date }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy field of Build" %}
+                            <td class="editable-build" data-field="strategy"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategy field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategy field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.strategy }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Document field of Build" %}
+                            <td class="editable-build" data-field="document"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Document field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Document field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.document }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Date field of Build" %}
+                            <td class="editable-build" data-field="payment_date"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Payment Date field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Payment Date field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.payment_date }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Amount field of Build" %}
+                            <td class="editable-build" data-field="payment_amount"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Payment Amount field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Payment Amount field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.payment_amount }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Delivery Date field of Build" %}
+                            <td class="editable-build" data-field="delivery_date"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Delivery Date field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Delivery Date field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.delivery_date }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Remarks field of Build" %}
+                            <td class="editable-build" data-field="remarks"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Remarks field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Remarks field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.remarks }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Build" %}
+                            <td class="editable-build" data-field="status"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Status field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Status field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.status }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source field of Build" %}
+                            <td class="editable-build" data-field="source"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Source field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Source field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.source }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Assign From field of Build" %}
+                            <td class="editable-build" data-field="assign_from"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Assign From field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Assign From of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.assign_from }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Manage By field of Build" %}
+                            <td class="editable-build" data-field="manage_by"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Manage By field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Manage By of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.manage_by }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Build" %}
+                            <td>
+                                <button onclick="deleteBuildAndRedirect('{{ build.build_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                    <div style="font-size: 20px;">
+                                        <i class="fa fa-trash"></i>
+                                      </div> <!-- Font Awesome trash icon -->
+                                </button>
+                                <script>
+                                    function deleteBuildAndRedirect(buildId) {
+                                        deleteBuild(buildId);  // Call the deleteBuild function
+                                        redirectToThisURL();   // Call the redirectToURL function
+                                    }
+                                    
+                                    function redirectToThisURL() {
+                                        // Redirect to the specified URL
+                                        window.location.href = '';
+                                    }
+                                    
+                                    function deleteBuild(buildId) {
+                                        var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                        
+                                        $.ajax({
+                                            url: '/delete_build/',
+                                            type: 'POST',
+                                            data: {
+                                                csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                build_id: buildId
+                                            },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    // If the deletion is successful, you can perform any necessary UI updates
+                                                    alert('Build deleted successfully');
+                                                    // Optionally, you can remove the deleted row from the table
+                                                    // Example: $('#build_row_' + buildId).remove();
+                                                } else {
+                                                    alert('Failed to delete Build: ' + response.error);
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {
+                                                alert('Failed to delete Build: ' + error);
+                                            }
+                                        });
+                                    }
+                                </script>                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        {% comment %} <div id="tech-task-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Tech Task</h2>
+        </div> {% endcomment %}
+        <table id="tech-task-table" class="table table-hover" class="table-container" style="display: none;">
+            <!-- Tech Task Table Content -->
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task ID field of Tech Task" %}
+                            <th scope="col">Task ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Employee ID field of Tech Task" %}
+                            <th scope="col">Employee ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Tech Task" %}
+                            <th scope="col">Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task field of Tech Task" %}
+                            <th scope="col">Task</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Nature field of Tech Task" %}
+                            <th scope="col">Nature</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task Status field of Tech Task" %}
+                            <th scope="col">Task Status</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Priority field of Tech Task" %}
+                            <th scope="col">Priority</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
+                            <th scope="col">Date of Closing</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Number Of Days field of Tech Task" %}
+                            <th scope="col">Number Of Days</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comments field of Tech Task" %}
+                            <th scope="col">Comments</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Tech Task" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tech_tasks %}
+                <tr class="table-light">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task ID field of Tech Task" %}
+                            <td scope="row" class="editable-tech-task" data-field="task_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Task ID field of Tech Task" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Task ID field of Tech Task" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ task.task_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Employee ID field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="employee_id.employee_id">
+                                {% if "Can edit the Employee ID field of Tech Task" not in permissions_name %}
+                                    {{ task.employee_id.employee_id }}
+                                {% else %}
+                                    <select class="employee-id-dropdown">
+                                        {% for employee_id in sales_employees %}
+                                            <option value="{{ employee_id.employee_id }}" {% if employee_id.employee_id == task.employee_id.employee_id %} selected {% endif %}>{{ employee_id.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="date"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Date field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.date }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="task"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Task field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Task field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.task }}</td>
+                        {% endif %}
+                    {% endfor %} 
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Nature field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="nature"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Nature field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Nature field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.nature }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task Status field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="task_status"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Task Status field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Task Status field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.task_status }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Priority field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="priority"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Priority field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Priority field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.priority }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="date_of_closing"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date of Closing field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Date of Closing field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.date_of_closing }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Number Of Days field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="number_of_days"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Number Of Days field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Number Of Days field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.number_of_days }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comments field of Tech Task" %}
+                            <td class="editable-tech-task" data-field="comments"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Comments field of Tech Task" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Comments field of Tech Task" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ task.comments }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Tech Task" %}
+                            <td>
+                                <button onclick="deleteTechTaskAndRedirect('{{ task.task_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                    <div style="font-size: 20px;">
+                                        <i class="fa fa-trash"></i>
+                                    </div> <!-- Font Awesome trash icon -->
+                                </button>
+                                <script>
+                                    function deleteTechTaskAndRedirect(taskId) {
+                                        deletetechtask(taskId);  // Call the deleteLead function
+                                        redirectToThisURL();     // Call the redirectToURL function
+                                    }
+                                    function redirectToThisURL() {
+                                        // Redirect to the specified URL
+                                        window.location.href = '';
+                                    }
+                                    function deletetechtask(taskId) {
+                                        var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                        
+                                        $.ajax({
+                                            url: '/delete_tech_task/',
+                                            type: 'POST',
+                                            data: {
+                                                csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                task_id: taskId
+                                            },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    // If the deletion is successful, you can perform any necessary UI updates
+                                                    alert('Tech Task deleted successfully');
+                                                    // Optionally, you can remove the deleted row from the table
+                                                    // Example: $('#task_row_' + taskId).remove();
+                                                } else {
+                                                    alert('Failed to delete Tech Task: ' + response.error);
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {
+                                                alert('Failed to delete Tech Task: ' + error);
+                                            }
+                                        });
+                                    }
+                                    
+                                </script>
+                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>        
+        
+        {% comment %} <div id="support-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Support</h2>
+        </div> {% endcomment %}
+        <table id="support-table" class="table table-hover" class="table-container" style="display: none;">
+            <!-- Support Table Content -->
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Ticket Number field of Support" %}
+                            <th scope="col">Ticket Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Branch Employee ID field of Support" %}
+                            <th scope="col">Branch Employee ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Support" %}
+                            <th scope="col">Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking ID field of Support" %}
+                            <th scope="col">Broking ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Support" %}
+                            <th scope="col">Name</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Contact Number field of Support" %}
+                            <th scope="col">Contact Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Support" %}
+                            <th scope="col">Email ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date Of Error field of Support" %}
+                            <th scope="col">Date Of Error</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy Code field of Support" %}
+                            <th scope="col">Strategy Code</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy Instrument field of Support" %}
+                            <th scope="col">Strategy Instrument</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Customer Type field of Support" %}
+                            <th scope="col">Customer Type</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Priority field of Support" %}
+                            <th scope="col">Priority</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Issue field of Support" %}
+                            <th scope="col">Issue</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comment field of Support" %}
+                            <th scope="col">Comment</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Support Employee field of Support" %}
+                            <th scope="col">Support Employee</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Division Employee field of Support" %}
+                            <th scope="col">Division Employee</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Support" %}
+                            <th scope="col">Status</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date of Closing field of Support" %}
+                            <th scope="col">Date of Closing</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Support" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                </tr>
+            </thead>
+            <tbody>
+                {% for support in supports %}
+                <tr class="table-light">
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Ticket Number field of Support" %}
+                            <td scope="row" class="editable-support" data-field="ticket_number"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Ticket Number field of Support" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Ticket Number field of Support" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ support.ticket_number }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Branch Employee ID field of Support" %}
+                            <td class="editable-support" data-field="branch_employee_id.branch_employee_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Branch Employee ID field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Branch Employee ID field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.branch_employee_id.name }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Support" %}
+                            <td class="editable-support" data-field="date"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Date field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.date }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking ID field of Support" %}
+                            <td class="editable-support" data-field="broking_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Broking ID field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Broking ID field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.broking_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Support" %}
+                            <td class="editable-support" data-field="name"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Name field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Name field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.name }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Contact Number field of Support" %}
+                            <td class="editable-support" data-field="contact_number"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Contact Number field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Contact Number field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.contact_number }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Support" %}
+                            <td class="editable-support" data-field="email_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Email ID field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Email ID field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.email_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date Of Error field of Support" %}
+                            <td class="editable-support" data-field="date_of_error"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date Of Error field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Date Of Error field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.date_of_error }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy Code field of Support" %}
+                            <td class="editable-support" data-field="strategy_code"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategy Code field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategy Code field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.strategy_code }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy Instrument field of Support" %}
+                            <td class="editable-support" data-field="strategy_instrument"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategy Instrument field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategy Instrument field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.strategy_instrument }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Customer Type field of Support" %}
+                            <td class="editable-support" data-field="customer_type">
+                            {% if "Can edit the Customer Type field of Support" not in permissions_name %}
+                                {{ support.customer_type }}
+                            {% else %}
+                                <select id="support_customer_type" name="support_customer_type">
+                                    <option value="Choose" {% if support.customer_type == 'Choose' %} selected {% endif %}>Choose</option>
+                                    <option value="Build" {% if support.customer_type == 'Build' %} selected {% endif %}>Build</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Priority field of Support" %}
+                            <td class="editable-support" data-field="priority">
+                            {% if "Can edit the Priority field of Support" not in permissions_name %}
+                                {{ support.priority }}
+                            {% else %}
+                                <select id="support_priority" name="support_priority">
+                                    <option value="High" {% if support.priority == 'High' %} selected {% endif %}>High</option>
+                                    <option value="Medium" {% if support.priority == 'Medium' %} selected {% endif %}>Medium</option>
+                                    <option value="Low" {% if support.priority == 'Low' %} selected {% endif %}>Low</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Issue field of Support" %}
+                            <td class="editable-support" data-field="priority">
+                            {% if "Can edit the Issue field of Support" not in permissions_name %}
+                                {{ support.issue }}
+                            {% else %}
+                                <select id="support_issue" name="support_issue">
+                                    <option value="Strategy Development" {% if support.issue == 'Strategy Development' %} selected {% endif %}>Strategy Development</option>
+                                    <option value="Live Trading and RMS" {% if support.issue == 'Live Trading and RMS' %} selected {% endif %}>Live Trading and RMS</option>
+                                    <option value="Package and Funds" {% if support.issue == 'Package and Funds' %} selected {% endif %}>Package and Funds</option>
+                                    <option value="Front End Issues" {% if support.issue == 'Front End Issues' %} selected {% endif %}>Front End Issues</option>
+                                    <option value="General Info" {% if support.issue == 'General Info' %} selected {% endif %}>General Info</option>
+                                    <option value="Hold" {% if support.issue == 'Hold' %} selected {% endif %}>Hold</option>
+                                    <option value="Resolved" {% if support.issue == 'Resolved' %} selected {% endif %}>Resolved</option>
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comment field of Support" %}
+                            <td class="editable-support" data-field="comment"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Comment field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Comment field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.comment }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Support Employee field of Support" %}
+                            <td class="editable-support" data-field="support_employee.employee_id">
+                                {% if "Can edit the Support Employee field of Support" not in permissions_name %}
+                                    {{ support.support_employee.employee_id }}
+                                {% else %}
+                                    <select class="support-employee-dropdown">
+                                        {% for support_employee in sales_employees %}
+                                            <option value="{{ support_employee.employee_id }}" {% if support_employee.employee_id == support.support_employee.employee_id %} selected {% endif %}>{{ support_employee.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Division Employee field of Support" %}
+                            <td class="editable-support" data-field="division_employee.employee_id">
+                                {% if "Can edit the Division Employee field of Support" not in permissions_name %}
+                                    {{ support.division_employee.employee_id }}
+                                {% else %}
+                                    <select class="division-employee-dropdown">
+                                        {% for division_employee in sales_employees %}
+                                            <option value="{{ division_employee.employee_id }}" {% if division_employee.employee_id == support.division_employee.employee_id %} selected {% endif %}>{{ division_employee.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Support" %}
+                            <td class="editable-support" data-field="status">
+                            {% if "Can edit the Status field of Support" not in permissions_name %}
+                                {{ support.status }}
+                            {% else %}
+                                <select id="support_status" name="support_status">
+                                    <option value="Open" {% if support.status == 'Open' %} selected {% endif %}>Open</option>
+                                    <option value="In Progress" {% if support.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                    <option value="Hold" {% if support.status == 'Hold' %} selected {% endif %}>Hold</option>
+                                    <option value="Resolved" {% if support.status == 'Resolved' %} selected {% endif %}>Resolved</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date of Closing field of Support" %}
+                            <td class="editable-support" data-field="date_of_closing"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date of Closing field of Support" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Date of Closing field of Support" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ support.date_of_closing }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Support" %}
+                            <td>
+                                <button onclick="deleteSupportAndRedirect('{{ support.ticket_number }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                    <div style="font-size: 20px;">
+                                        <i class="fa fa-trash"></i>
+                                    </div> <!-- Font Awesome trash icon -->
+                                </button>
+                                <script>
+                                    function deleteSupportAndRedirect(ticketNumber) {
+                                        deleteSupport(ticketNumber);  // Call the deleteSupport function
+                                        redirectToThisURL();           // Call the redirectToURL function
+                                    }
+                                
+                                    function deleteSupport(ticketNumber) {
+                                        var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                
+                                        $.ajax({
+                                            url: '/delete_support/',         // URL to send the request
+                                            type: 'POST',                    // HTTP method
+                                            data: {
+                                                csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                ticket_number: ticketNumber      // Ticket number to be deleted
+                                            },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    // If the deletion is successful, you can perform any necessary UI updates
+                                                    alert('Support deleted successfully');
+                                                    // Optionally, you can remove the deleted row from the table
+                                                    // Example: $('#support_row_' + ticketNumber).remove();
+                                                } else {
+                                                    alert('Failed to delete support: ' + response.error);
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {
+                                                alert('Failed to delete support: ' + error);
+                                            }
+                                        });
+                                    }
+                                
+                                    function redirectToThisURL() {
+                                        // Redirect to the specified URL
+                                        window.location.href = '';  // You can specify the URL here
+                                    }
+                                </script>                                
+                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>    
+        
+        {% comment %} <div id="strategies-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Strategies</h2>
+        </div> {% endcomment %}
+        
+        <table id="strategies-table" class="table table-hover" class="table-container" style="display: none;">
+            <!-- Strategies Table Content -->
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy ID field of Strategies" %}
+                            <th scope="col">Strategy ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Employee ID field of Strategies" %}
+                            <th scope="col">Employee ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Strategies" %}
+                            <th scope="col">Name</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Mobile Number field of Strategies" %}
+                            <th scope="col">Mobile Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking House field of Strategies" %}
+                            <th scope="col">Broking House</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Client ID field of Strategies" %}
+                            <th scope="col">Client ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Strategies" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for strategy in strategies %}
+                    <tr class="table-light">
+                        
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Strategy ID field of Strategies" %}
+                                <td scope="row" class="editable-strategies" data-field="strategy_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategy ID field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategy ID field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.strategy_id }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Employee ID field of Strategies" %}
+                                <td class="editable-strategies" data-field="employee_id.employee_id">
+                                    {% if "Can edit the Employee ID field of Strategies" not in permissions_name %}
+                                        {{ strategy.employee_id.employee_id }}
+                                    {% else %}
+                                        <select class="strategies-employee-id-dropdown">
+                                            {% for sales_employee in sales_employees %}
+                                                <option value="{{ sales_employee.employee_id }}" {% if sales_employee.employee_id == strategy.employee_id.employee_id %} selected {% endif %}>{{ sales_employee.name }}</option>
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Name field of Strategies" %}
+                                <td class="editable-strategies" data-field="name"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Name field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Name field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.name }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Mobile Number field of Strategies" %}
+                                <td class="editable-strategies" data-field="mobile_number"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Mobile Number field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Mobile Number field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.mobile_number }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Broking House field of Strategies" %}
+                                <td class="editable-strategies" data-field="broking_house"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Broking House field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Broking House field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.broking_house }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Client ID field of Strategies" %}
+                                <td class="editable-strategies" data-field="client_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Client ID field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Client ID field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.client_id }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can delete Strategies" %}
+                                <td>
+                                    <button onclick="deleteStrategiesAndRedirect('{{ strategy.strategy_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                        <div style="font-size: 20px;">
+                                            <i class="fa fa-trash"></i>
+                                        </div> <!-- Font Awesome trash icon -->
+                                    </button>
+                                    <script>
+                                        function deleteStrategiesAndRedirect(strategyId) {
+                                            deleteStrategy(strategyId);  // Call the deleteStrategy function
+                                            redirectToThisURL();         // Call the redirectToURL function
+                                        }
+                                    
+                                        function deleteStrategy(strategyId) {
+                                            var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                    
+                                            $.ajax({
+                                                url: '/delete_strategy/',       // URL to send the request
+                                                type: 'POST',                   // HTTP method
+                                                data: {
+                                                    csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                    strategy_id: strategyId          // Strategy ID to be deleted
+                                                },
+                                                success: function(response) {
+                                                    if (response.success) {
+                                                        // If the deletion is successful, you can perform any necessary UI updates
+                                                        alert('Strategy deleted successfully');
+                                                        // Optionally, you can remove the deleted row from the table
+                                                        // Example: $('#strategy_row_' + strategyId).remove();
+                                                    } else {
+                                                        alert('Failed to delete strategy: ' + response.error);
+                                                    }
+                                                },
+                                                error: function(xhr, status, error) {
+                                                    alert('Failed to delete strategy: ' + error);
+                                                }
+                                            });
+                                        }
+                                    
+                                        function redirectToThisURL() {
+                                            // Redirect to the specified URL
+                                            window.location.href = '';  // You can specify the URL here
+                                        }
+                                    </script>
+                                    
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>               
+        </table>
+        
+
+        {% comment %} <div id="sales-leads-text"style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Sales</h2>
+        </div> {% endcomment %}
+        <table id="sales-leads-table" class="table table-hover" class="table-container" style="display: none;">
+            <thead>
+                <tr class="table-info">
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Lead ID field of Sales" %}
+                            <th scope="col">Lead ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Branch Employee ID field of Sales" %}
+                            <th scope="col">Branch Employee</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Sales Employee ID field of Sales" %}
+                            <th scope="col">Sales Employee</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking ID field of Sales" %}
+                            <th scope="col">Broking ID</th>
+                        {% endif %}
+                    {% endfor %}
+                  
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Sales" %}
+                            <th scope="col">Name</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Contact Number field of Sales" %}
+                            <th scope="col">Contact Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Sales" %}
+                            <th scope="col">Email ID</th>
+                        {% endif %}
+                    {% endfor %}
+                   
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source Type field of Sales" %}
+                            <th scope="col">Source Type</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Category field of Sales" %}
+                            <th scope="col">Category</th>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Risk Appetite field of Sales" %}
+                            <th scope="col">Risk Appetite</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comments field of Sales" %}
+                        <th scope="col">Comments</th>
+                        {% endif %}
+                    {% endfor %}
+                      
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Amount field of Sales" %}
+                            <th scope="col">Amount</th>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %} 
+                        {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                            <th scope="col">Purchase Date</th>
+                        {% endif %}
+                    {% endfor %}
+                           
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Sales" %}
+                            <th scope="col">Status</th>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Reason For Dropped field of Sales" %}
+                            <th scope="col">Reason For Dropped</th>
+                        {% endif %}
+                    {% endfor %}
+                                       
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Sales" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+        
+                </tr>
+            </thead>
+            <tbody>
+                {% for lead in sales_leads %}
+                <tr class="table-light">
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Lead ID field of Sales" %}
+                            <td scope="row"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Lead ID field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Lead ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.lead_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                      
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Branch Employee ID field of Sales" %}
+                            <td class="editable-15" data-field="branch_employee_id.branch_employee_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Branch Employee ID field of Sales" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Branch Employee ID field of Sales" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ lead.branch_employee_id.name }}</td>
+                        {% endif %}
+                    {% endfor %}
+                      
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Sales Employee ID field of Sales" %}
+                            <td class="editable-15" data-field="sales_employee_id.employee_id">
+                                {% if "Can edit the Sales Employee ID field of Sales" not in permissions_name %}
+                                    {{ lead.sales_employee_id.name }}
+                                {% else %}
+                                    <select class="sales-employee-dropdown">
+                                        {% for sales_employee in sales_employees %}
+                                            <option value="{{ sales_employee.employee_id }}" {% if sales_employee.employee_id == lead.sales_employee_id.employee_id %} selected {% endif %}>{{ sales_employee.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                      
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking ID field of Sales" %}
+                            <td class="editable-12" data-field="broking_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Broking ID field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Broking ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.broking_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                                          
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Sales" %}
+                            <td class="editable-12" data-field="name"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Name field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Name field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.name }}</td>
+                        {% endif %}
+                    {% endfor %}
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Contact Number field of Sales" %}
+                            <td class="editable-12" data-field="contact_number"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Contact Number field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Contact Number field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.contact_number }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                      
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Sales" %}
+                            <td class="editable-12" data-field="email_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Email ID field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Email ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.email_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source Type field of Sales" %}
+                            <td class="editable-12" data-field="source_type">
+                            {% if "Can edit the Source Type field of Sales" not in permissions_name %}
+                                {{ lead.source_type }}
+                            {% else %}
+                                <select id="lead_source_type" name="lead_source_type">
+                                    <option value="Webinar" {% if lead.source_type == 'Webinar' %} selected {% endif %}>Webinar</option>
+                                    <option value="Branch" {% if lead.source_type == 'Branch' %} selected {% endif %}>Branch</option>
+                                    <option value="CP/AP" {% if lead.source_type == 'CP/AP' %} selected {% endif %}>CP/AP</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <td class="lead-id hidden">{{ lead.lead_id }}</td>
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Category field of Sales" %}
+                            <td class="editable-13" data-field="category">
+                            {% if "Can edit the Category field of Sales" not in permissions_name %}
+                                {{ lead.category }}
+                            {% else %}
+                                <select id="lead_category" name="lead_category">
+                                    <option value="Retail" {% if lead.category == 'Retail' %} selected {% endif %}>Retail</option>
+                                    <option value="HNI" {% if lead.category == 'HNI' %} selected {% endif %}>HNI</option>
+                                    <option value="Ultra HNI" {% if lead.category == 'Ultra HNI' %} selected {% endif %}>Ultra HNI</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Risk Appetite field of Sales" %}
+                            <td class="editable-13" data-field="risk_appetite">
+                            {% if "Can edit the Risk Appetite field of Sales" not in permissions_name %}
+                                {{ lead.risk_appetite }}
+                            {% else %}
+                                <select id="lead_risk_appetite" name="lead_risk_appetite">
+                                    <option value="Low" {% if lead.risk_appetite == 'Low' %} selected {% endif %}>Low</option>
+                                    <option value="Medium" {% if lead.risk_appetite == 'Medium' %} selected {% endif %}>Medium</option>
+                                    <option value="High" {% if lead.risk_appetite == 'High' %} selected {% endif %}>High</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                      
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comments field of Sales" %}
+                            <td class="editable-13" data-field="comments"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Comments field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Comments field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                         {% endif %}
+                            >{{ lead.comments }}</td>
+                        {% endif %}
+                    {% endfor %}
+                                         
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Amount field of Sales" %}
+                            <td class="editable-14" data-field="amount"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Amount field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Amount field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.amount }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                            <td class="editable-14" data-field="purchase_date"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Purchase Date field of Sales" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Purchase Date field of Sales" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}>
+                                        {% comment %} <input type="date" id="purchase_date" name="purchase_date" value="{{ lead.purchase_date|date:'Y-m-d' }}"><br><br> {% endcomment %}
+                                        {{lead.purchase_date}}
+                                    {% comment %} {% else %}
+                                        {{ lead.purchase_date|date:'Y-m-d' }}<br><br> {% endcomment %}
+                                    {% comment %} {% endif %}
+                                {% endfor %} {% endcomment %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                
+                                   
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Sales" %}
+                            <td class="editable-16" data-field="status">
+                            {% if "Can edit the Status field of Sales" not in permissions_name %}
+                                {{ lead.status }}
+                            {% else %}
+                                <select id="lead_status" name="lead_status">
+                                    <option value="converted" {% if lead.status == 'converted' %} selected {% endif %}>Converted</option>
+                                    <option value="Dropped" {% if lead.status == 'Dropped' %} selected {% endif %}>Dropped</option>
+                                    <option value="Follow up" {% if lead.status == 'Follow up' %} selected {% endif %}>Follow up</option>
+                                    <option value="No Answer" {% if lead.status == 'No Answer' %} selected {% endif %}>No Answer</option>
+                                    <option value="Not Interested" {% if lead.status == 'Not Interested' %} selected {% endif %}>Not Interested</option>
+                                    <option value="In Progress" {% if lead.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Reason For Dropped field of Sales" %}   
+                            <td class="editable-14" data-field="reason_for_dropped"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Reason For Dropped field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Reason For Dropped field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.reason_for_dropped }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Sales" %}
+                            <td>
+                                <button  onclick="deleteLeadAndRedirect('{{ lead.lead_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                    <div style="font-size: 20px;">
+                                        <i class="fa fa-trash"></i>
+                                      </div> <!-- Font Awesome trash icon -->
+                                </button>
+                                <script>
+                                    function deleteLeadAndRedirect(leadId) {
+                                        deletesales(leadId);  // Call the deleteLead function
+                                        redirectToThisURL();     // Call the redirectToURL function
+                                    }
+                                    function redirectToThisURL() {
+                                        // Redirect to the specified URL
+                                        window.location.href = '';
+                                    }
+                                </script>
+                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                  
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        
+        <form id="update-sales-leads-form" class="btn-submit-sales-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-sales-leads-btn" type="button" onclick="submitSalesAndRedirect()" class="btn btn-success" style="display: none;">Submit Sales</button>
+            <script>
+                function submitSalesAndRedirect(leadId) {
+                    submitSalesLeads();  // Call the deleteLead function
+                    redirectToThisURL();     // Call the redirectToURL function
+                }
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+                function submitSalesLeads() {
+                    var editableCells = document.querySelectorAll('.editable-12, .editable-13, .editable-14, .editable-15, .editable-16');
+                    var updatedData = {};
+                
+                    // Iterate over all editable cells and gather their values
+                    editableCells.forEach(function(cell) {
+                        var leadId = cell.parentElement.querySelector('.lead-id').innerText.trim();
+                        var field = cell.getAttribute('data-field');
+                        var value;
+                
+                        if (field === "status") {
+                            value = cell.parentElement.querySelector('#lead_status').value;
+                        } else if (field === "source_type") {
+                            value = cell.parentElement.querySelector('#lead_source_type').value;
+                        } else if (field === "category") {
+                            value = cell.parentElement.querySelector('#lead_category').value;
+                        } else if (field === "risk_appetite") {
+                            value = cell.parentElement.querySelector('#lead_risk_appetite').value;
+                        } else if (field === "branch_employee_id" || field === "sales_employee_id") {
+                            // For branch employee ID and sales employee ID, get the selected value from the dropdown
+                            value = cell.parentElement.querySelector('.' + field + '-dropdown').value;
+                        } else {
+                            value = cell.innerText.trim();
+                        }
+                        console.log(value);
+                
+                        if (!updatedData.hasOwnProperty(leadId)) {
+                            updatedData[leadId] = {};
+                        }
+                
+                        updatedData[leadId][field] = value;
+                    });
+                
+                    // Serialize the updatedData object and send it to the server
+                    $.ajax({
+                        url: '/update_sales_leads/',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Sales updated successfully:', response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating Sales:', error);
+                        }
+                    });
+                }
+            </script>
+        </form>
+
+        <form id="update-build-form" class="btn-submit-build-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-build-btn" type="button" onclick="submitBuildAndRedirect()" class="btn btn-success" style="display: none;">Submit Build</button>
+            <script>
+                function submitBuildAndRedirect() {
+                    submitBuild();          // Call the submitBuild function
+                    redirectToThisURL();    // Call the redirectToThisURL function
+                }
+                
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+                
+                function submitBuild(buildId) {
+                    var editedCells = document.querySelectorAll('.editable-build');  // Select all editable cells
+                    var updatedData = {};  // Initialize an empty object to store updated data
+                
+                    // Iterate over each edited cell
+                    editedCells.forEach(function(cell) {
+                        var buildId = cell.parentElement.querySelector('.editable-build').innerText.trim();  // Get the build ID
+                        var fieldName = cell.getAttribute('data-field');  // Get the data field name
+                        var newValue = cell.innerText.trim();  // Get the new value of the cell
+                
+                        // Store the updated data in the updatedData object
+                        if (!updatedData.hasOwnProperty(buildId)) {
+                            updatedData[buildId] = {};  // Initialize an object for the build ID if not present
+                        }
+                        updatedData[buildId][fieldName] = newValue;  // Store the new value for the field
+                    });
+                
+                    // Send the updated data to the backend using AJAX
+                    $.ajax({
+                        url: '/update_build/',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Build updated successfully:', response);
+                            redirectToThisURL();  // Redirect to the specified URL after successful update
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating Build:', error);
+                        }
+                    });
+                }                
+            </script>            
+        </form>
+
+        <form id="update-tech-task-form" class="btn-submit-tech-task-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-tech-task-btn" type="button" onclick="submitTechTaskAndRedirect()" class="btn btn-success" style="display: none;">Submit Tech Task</button>
+            <script>
+                function submitTechTaskAndRedirect() {
+                    submitTechTask();          // Call the submitTechTask function
+                    redirectToThisURL();    // Call the redirectToThisURL function
+                }
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+                function submitTechTask() {
+                    var editedCells = document.querySelectorAll('.editable-tech-task');  // Select all editable cells
+                    var updatedData = {};  // Initialize an object to store updated data
+                    
+                    // Iterate over each edited cell
+                    editedCells.forEach(function(cell) {
+                        var taskId = cell.closest('tr').querySelector('.editable-tech-task').innerText.trim();  // Get the task ID from the closest row
+                        var fieldName = cell.getAttribute('data-field');  // Get the data field name
+                        var newValue = cell.innerText.trim();  // Get the new value of the cell
+                        
+                        // Store the updated data in the object
+                        if (!updatedData.hasOwnProperty(taskId)) {
+                            updatedData[taskId] = {};  // Initialize an object for the task ID if not present
+                        }
+                        updatedData[taskId][fieldName] = newValue;  // Store the new value for the field
+                    });
+            
+                    // Send the updated data to the backend using AJAX
+                    $.ajax({
+                        url: '/update_tech_task/',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')  // Assuming getCookie function retrieves the CSRF token
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Tech task updated successfully:', response);
+                            redirectToThisURL();  // Redirect to the specified URL after successful update
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating tech task:', error);
+                        }
+                    });
+                }
+            </script>            
+        </form>
+
+        <form id="update-support-form" class="btn-submit-support-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-support-btn" type="button" onclick="submitSupportAndRedirect()" class="btn btn-success" style="display: none;">Submit Support</button>
+            <script>
+                function submitSupportAndRedirect() {
+                    submitSupport();  // Call the submitSupport function
+                    redirectToThisURL();     // Call the redirectToThisURL function
+                }
+            
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+                
+                function submitSupport() {
+                    var editableCells = document.querySelectorAll('.editable-support'); // Select all editable rows
+                    var updatedData = {}; // Initialize an object to store updated data
+                
+                    // Iterate over all editable cells and gather their values
+                    editableCells.forEach(function(cell) {
+                        var ticketNumber = cell.parentElement.querySelector('.editable-support').innerText.trim();
+                        var field = cell.getAttribute('data-field');
+                        var value;
+                
+                        // For dropdowns, get the selected value from the dropdown
+                        if (field === "customer_type" ) {
+                            value = cell.parentElement.querySelector('#support_customer_type' ).value;
+                        } else if (field === "priority" ) {
+                            value = cell.parentElement.querySelector('#support_priority' ).value;
+                        } else if (field === "issue" ) {
+                            value = cell.parentElement.querySelector('#support_issue' ).value;
+                        } else if (field === "status" ) {
+                            value = cell.parentElement.querySelector('#support_status' ).value;
+                        } else {
+                            value = cell.innerText.trim();
+                        }
+                
+                        if (!updatedData.hasOwnProperty(ticketNumber)) {
+                            updatedData[ticketNumber] = {};
+                        }
+                
+                        updatedData[ticketNumber][field] = value;
+                    });
+                
+                    // Send the updated data to the backend using AJAX
+                    $.ajax({
+                        url: '/update_support/',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Support updated successfully:', response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating Support:', error);
+                        }
+                    });
+                }
+                
+                                
+            </script>            
+        </form>
+
+        <form id="update-strategies-form" class="btn-submit-strategies-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-strategies-btn" type="button" onclick="submitStrategiesAndRedirect()" class="btn btn-success" style="display: none;">Submit Strategies</button>
+            <script>
+                function submitStrategiesAndRedirect() {
+                    submitStrategies();  // Call the submitStrategies function
+                    redirectToThisURL(); // Call the redirectToThisURL function
+                }
+            
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+            
+                function submitStrategies() {
+                    var editedCells = document.querySelectorAll('.editable-strategies'); // Select all editable rows
+                    var updatedData = {}; // Initialize an object to store updated data
+            
+                    editedCells.forEach(function(cell) {
+                        var strategyId = cell.closest('tr').querySelector('.editable-strategies').innerText.trim(); // Get the strategy ID from the closest row
+                        var fieldName = cell.getAttribute('data-field'); // Get the data field name
+                        var newValue = cell.innerText.trim(); // Get the new value of the cell
+            
+                        // Iterate over each edited row
+                        if (!updatedData.hasOwnProperty(strategyId)) {
+                            updatedData[strategyId] = {}; // Initialize an object for the strategy ID if not present
+                        }
+                        updatedData[strategyId][fieldName] = newValue; // Store the new value for the field
+                    });
+            
+                    // Send the updated data to the backend using AJAX
+                    $.ajax({
+                        url: '/update_strategies/',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Strategies updated successfully:', response);
+                            redirectToThisURL(); // Redirect to the specified URL after successful update
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating strategies:', error);
+                        }
+                    });
+                }
+            </script>            
+        </form>
+        
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Sales" %}
+                <div class="btn-new-sales-container">
+                    <button id="new-sales-leads-btn" onclick="redirectToURL()" class="btn btn-primary" style="display: none;">New Sales</button>    
+                </div>
+                <script>
+                    function redirectToURL() {
+                        // Redirect to the specified URL
+                        window.location.href = 'add_sales_leads';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Build" %}
+                <div class="btn-new-build-container">
+                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary" style="display: none;">New Build</button>    
+                </div>
+                <script>
+                    function redirectToNewBuildURL() {
+                        // Redirect to the specified URL
+                        window.location.href = 'add_build';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Tech Task" %}
+                <div class="btn-new-tech-task-container">
+                    <button id="new-tech-task-btn" onclick="redirectToNewTechTaskURL()" class="btn btn-primary" style="display: none;">New Tech Task</button>    
+                </div>
+                <script>
+                    function redirectToNewTechTaskURL() {
+                        // Redirect to the specified URL
+                        window.location.href = 'add_tech_task';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Support" %}
+                <div class="btn-new-support-container">
+                    <button id="new-support-btn" onclick="redirectToNewSupportURL()" class="btn btn-primary" style="display: none;">New Support</button>    
+                </div>
+                <script>
+                    function redirectToNewSupportURL() {
+                        // Redirect to the specified URL
+                        window.location.href = 'add_support';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Strategies" %}
+                <div class="btn-new-strategies-container">
+                    <button id="new-strategies-btn" onclick="redirectToNewStrategiesURL()" class="btn btn-primary" style="display: none;">New Strategies</button>    
+                </div>
+                <script>
+                    function redirectToNewStrategiesURL() {
+                        // Redirect to the specified URL
+                        window.location.href = 'add_strategies';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        <style>
+            .btn-submit-sales-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-build-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-tech-task-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-support-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-strategies-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-sales-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-build-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-tech-task-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-support-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-strategies-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+        </style>
+        
+        </div>
+        
+    </div>
+    
+    {% endblock content %}
+    
+</header>
+<form id="update-sales-leads-form" class="hidden" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="updated_data" id="updated-data">
+    <button type="button" onclick="submitSalesLeads()" class="btn btn-success">Submit Sales</button>
+</form>
+<form id="new-entry-form" class="hidden" method="post">
+    {% csrf_token %}
+    <input type="hidden" name="updated_row" id="updated-data">
+    <button type="button" onclick="addNewRow()" class="btn btn-primary" style="{background-color}">New Entry</button>
+</form>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    {% comment %} function showTables(role, employee_id) {
+        var issueHistoryTable = document.getElementById('issue-history-table');
+        var issuesTable = document.getElementById('issues-table');
+        var rolesTable = document.getElementById('roles-table');
+        var salesLeadsTable = document.getElementById('sales-leads-table');
+        var buildTable = document.querySelectorAll('build-table');
+        var submitForm = document.getElementById('update-form');
+        var submitFormComments = document.getElementById('update-comments-form');
+        var submitFormCategory = document.getElementById('update-category-form');
+        var submitFormSalesLeads = document.getElementById('update-sales-leads-form');
+        var submitFormIssues = document.getElementById('update-issues-form');
+        var editableCells = document.querySelectorAll('.editable');
+        var editablePriority = document.querySelectorAll('.editable-priority');
+        var editable5 = document.querySelectorAll('.editable-5');
+        var editable6 = document.querySelectorAll('.editable-6');
+        var editable10 = document.querySelectorAll('.editable-10');
+        var editable12 = document.querySelectorAll('.editable-12');
+        var editable13 = document.querySelectorAll('.editable-13');
+        var editable14 = document.querySelectorAll('.editable-14');
+        var editable15 = document.querySelectorAll('.editable-15');
+        var newEntryForm = document.getElementById('new-entry-form');
+        
+
+        if (role === 'Support Head') {
+            issueHistoryTable.classList.remove('hidden');
+            issuesTable.classList.remove('hidden');
+            salesLeadsTable.classList.add('hidden');
+            submitForm.classList.remove('hidden');
+            submitFormCategory.classList.add('hidden');
+            submitFormComments.classList.remove('hidden');
+            submitFormSalesLeads.classList.add('hidden');
+            submitFormIssues.classList.remove('hidden');
+            newEntryForm.classList.add('hidden');
+            editableCells.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+            editablePriority.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+        } else if (role === 'Support Employee') {
+            issueHistoryTable.classList.add('hidden');
+            issuesTable.classList.remove('hidden');
+            salesLeadsTable.classList.add('hidden');
+            submitForm.classList.add('hidden');
+            submitFormComments.classList.remove('hidden');
+            submitFormCategory.classList.add('hidden');
+            submitFormSalesLeads.classList.add('hidden');
+            submitFormIssues.classList.add('hidden');
+            newEntryForm.classList.add('hidden');
+            editableCells.forEach(function(cell) {
+                cell.contentEditable = false;
+            });
+        } else if (role === 'Sales Head') {
+            issueHistoryTable.classList.add('hidden');
+            issuesTable.classList.add('hidden');
+            salesLeadsTable.classList.remove('hidden');
+            buildTable.classList.remove('hidden');
+            submitForm.classList.add('hidden');
+            submitFormComments.classList.add('hidden');
+            submitFormCategory.classList.add('hidden');
+            submitFormSalesLeads.classList.remove('hidden');
+            submitFormIssues.classList.add('hidden');
+            newEntryForm.classList.add('hidden');
+            var rows = salesLeadsTable.getElementsByTagName('tr');
+            for (var i = 0; i < rows.length; i++) {
+                rows[i].classList.remove('hidden'); // Show all rows
+            }
+            
+        } else if (role === 'Sales Employee') {
+            issueHistoryTable.classList.add('hidden');
+            issuesTable.classList.add('hidden');
+            salesLeadsTable.classList.remove('hidden');
+            submitForm.classList.add('hidden');
+            submitFormComments.classList.add('hidden');
+            submitFormCategory.classList.add('hidden');
+            submitFormSalesLeads.classList.remove('hidden');
+            submitFormIssues.classList.add('hidden');
+            newEntryForm.classList.add('hidden');
+            var rows = salesLeadsTable.getElementsByTagName('tr');
+            console.log(employee_id);
+            var rows = salesLeadsTable.getElementsByTagName('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var salesEmployeeIDCell = rows[i].getElementsByTagName('td')[2]; // Assuming Sales Employee ID is the third column
+                if (salesEmployeeIDCell && salesEmployeeIDCell.innerText.trim() !== employee_id) {
+                    rows[i].classList.add('hidden');
+                } else {
+                    rows[i].classList.remove('hidden');
+                }
+            }
+            
+        } else if (role === 'Branch Employee') {
+            issueHistoryTable.classList.add('hidden');
+            issuesTable.classList.add('hidden');
+            salesLeadsTable.classList.remove('hidden');
+            submitForm.classList.add('hidden');
+            submitFormComments.classList.add('hidden');
+            submitFormCategory.classList.add('hidden');
+            submitFormSalesLeads.classList.remove('hidden');
+            submitFormIssues.classList.add('hidden');
+            newEntryForm.classList.remove('hidden');
+            var rows = issuesTable.getElementsByTagName('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var branchEmployeeIDCell = rows[i].getElementsByTagName('td')[15]; // Assuming Branch Employee ID is the 16th column
+                if (branchEmployeeIDCell && branchEmployeeIDCell.innerText.trim() !== employee_id) {
+                    rows[i].classList.add('hidden'); // Hide rows where Branch Employee ID is not 11
+                } else {
+                    rows[i].classList.remove('hidden');
+                }
+            }
+            var rows = salesLeadsTable.getElementsByTagName('tr');
+            for (var i = 0; i < rows.length; i++) {
+                var branchEmployeeIDCell = rows[i].getElementsByTagName('td')[1]; // Assuming Branch Employee ID is the 16th column
+                if (branchEmployeeIDCell && branchEmployeeIDCell.innerText.trim() !== employee_id) {
+                    rows[i].classList.add('hidden'); // Hide rows where Branch Employee ID is not 11
+                } else {
+                    rows[i].classList.remove('hidden');
+                }
+            }
+            editable5.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+            editable6.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+            editable10.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+            editable12.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+            editable13.forEach(function(cell) {
+                cell.contentEditable = true;
+            });
+        }
+    } {% endcomment %}
+
+    function addNewRow() {
+        var table = document.getElementById('sales-leads-table');
+        var newRow = table.insertRow(table.rows.length); // Insert a new row at the end of the table
+        
+        // Add cells for each column
+        var columns = ['lead_id', 'branch_employee_id','sales_employee_id', 'broking_id', 'name', 'contact_number', 'email_id', 'source_type', 'category', 'risk_appetite', 'comments', 'amount','purchase_date','status','reason_for_dropped'];
+        for (var i = 0; i < columns.length; i++) {
+            var cell = newRow.insertCell(i);
+            cell.setAttribute('contenteditable', 'true'); // Allow editing for the new cells
+            cell.classList.add('editable-' + columns[i].toLowerCase().replace(/\s/g, '_')); // Add a class to identify editable cells
+        }
+    }
+    
+
+    function submitValues() {
+        var editableCells = document.querySelectorAll('.editable');
+        var updatedValues = {};
+    
+        // Iterate over all editable cells and gather their values
+        editableCells.forEach(function(cell) {
+            var issueId = cell.parentElement.querySelector('.issue-id').innerText.trim();
+            var newValue = cell.innerText.trim();
+            updatedValues[issueId] = newValue;
+        });
+    
+        // Serialize the updatedValues object and send it to the server
+        $.ajax({
+            url: '/update_employee_assigned_to/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                'updated_values': JSON.stringify(updatedValues)
+            },
+            success: function(response) {
+                console.log('Column updated successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating column:', error);
+            }
+        });
+    }   
+    
+    function submitPriority() {
+        var editablePriorities = document.querySelectorAll('.editable-priority');
+        var updatedPriorities = {};
+    
+        editablePriorities.forEach(function(cell) {
+            var issueId = cell.parentElement.querySelector('.issue-id').innerText.trim();
+            var newValue = cell.innerText.trim();
+            updatedPriorities[issueId] = newValue;
+        });
+    
+        var csrftoken = getCookie('csrftoken');
+    
+        $.ajax({
+            url: '/update_priority/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: {
+                'updated_priorities': JSON.stringify(updatedPriorities)
+            },
+            success: function(response) {
+                console.log('Priority values updated successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating priority values:', error);
+            }
+        });
+    }
+
+    function submitComments() {
+        var editableComments = document.querySelectorAll('.editable-comment');
+        var updatedComments = {};
+    
+        editableComments.forEach(function(cell) {
+            var issueId = cell.parentElement.querySelector('.issue-id').innerText.trim();
+            var newComment = cell.innerText.trim();
+            updatedComments[issueId] = newComment;
+        });
+    
+        document.getElementById('updated-comments').value = JSON.stringify(updatedComments);
+    
+        var csrftoken = getCookie('csrftoken');
+    
+        $.ajax({
+            url: '/update_comments/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: $('#update-comments-form').serialize(),
+            success: function(response) {
+                console.log('Comments updated successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating comments:', error);
+            }
+        });
+    }    
+
+    function submitCategory() {
+        var editableCategories = document.querySelectorAll('.editable-category');
+        var updatedCategories = {};
+        
+        editableCategories.forEach(function(cell) {
+            var leadId = cell.parentElement.querySelector('.lead-id').innerText.trim(); // Corrected from '.issue-id'
+            var newCategory = cell.innerText.trim();
+            updatedCategories[leadId] = newCategory;
+        });
+    
+        document.getElementById('updated-categories').value = JSON.stringify(updatedCategories);
+    
+        var csrftoken = getCookie('csrftoken');
+    
+        $.ajax({
+            url: '/update_category/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': csrftoken
+            },
+            data: $('#update-category-form').serialize(),
+            success: function(response) {
+                console.log('Category updated successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating category:', error);
+            }
+        });
+    }
+
+    function submitSalesLeads() {
+        var editableCells = document.querySelectorAll('.editable-12, .editable-13, .editable-14, .editable-15, .editable-16');
+        var updatedData = {};
+    
+        // Iterate over all editable cells and gather their values
+        editableCells.forEach(function(cell) {
+            var leadId = cell.parentElement.querySelector('.lead-id').innerText.trim();
+            var field = cell.getAttribute('data-field');
+            var value;
+    
+            if (field === "status") {
+                value = cell.parentElement.querySelector('#lead_status').value;
+            } else if (field === "source_type") {
+                value = cell.parentElement.querySelector('#lead_source_type').value;
+            } else if (field === "category") {
+                value = cell.parentElement.querySelector('#lead_category').value;
+            } else if (field === "risk_appetite") {
+                value = cell.parentElement.querySelector('#lead_risk_appetite').value;
+            } else if (field === "branch_employee_id" || field === "sales_employee_id") {
+                // For branch employee ID and sales employee ID, get the selected value from the dropdown
+                value = cell.parentElement.querySelector('.' + field + '-dropdown').value;
+            } else {
+                value = cell.innerText.trim();
+            }
+            console.log(value);
+    
+            if (!updatedData.hasOwnProperty(leadId)) {
+                updatedData[leadId] = {};
+            }
+    
+            updatedData[leadId][field] = value;
+        });
+    
+        // Serialize the updatedData object and send it to the server
+        $.ajax({
+            url: '/update_sales_leads/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                'updated_data': JSON.stringify(updatedData)
+            },
+            success: function(response) {
+                console.log('Sales updated successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating Sales:', error);
+            }
+        });
+    }
+    
+    
+
+    function submitIssues() {
+        var editableCells = document.querySelectorAll('.editable-5, .editable-6, .editable-7, .editable-10');
+        var updatedData = {};
+    
+        // Iterate over all editable cells and gather their values
+        editableCells.forEach(function(cell) {
+            var issueId = cell.parentElement.querySelector('.issue-id').innerText.trim();
+            var field = cell.getAttribute('data-field');
+            var value = cell.innerText.trim();
+            
+            if (!updatedData.hasOwnProperty(issueId)) {
+                updatedData[issueId] = {};
+            }
+            
+            updatedData[issueId][field] = value;
+        });
+
+        // Serialize the updatedData object and send it to the server
+        $.ajax({
+            url: '/update_issues/',
+            method: 'POST',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            },
+            data: {
+                'updated_issues': JSON.stringify(updatedData)
+            },
+            success: function(response) {
+                console.log('Issues updated successfully:', response);
+            },
+            error: function(xhr, status, error) {
+                console.error('Error updating issues:', error);
+            }
+        });
+    }
+    
+    function deletesales(lead_id) {
+        var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+        
+        $.ajax({
+            url: '/delete_sales/',
+            type: 'POST',
+            data: {
+                csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                lead_id: lead_id
+            },
+            success: function(response) {
+                if (response.success) {
+                    // If the deletion is successful, you can perform any necessary UI updates
+                    alert('Sales delete successfully');
+                    // Optionally, you can remove the deleted row from the table
+                    // Example: $('#lead_row_' + lead_id).remove();
+                } else {
+                    alert('Failed to delete Sales: ' + response.error);
+                }
+            },
+            error: function(xhr, status, error) {
+                alert('Failed to delete Sales: ' + error);
+            }
+        });
+    }
+    
+    
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+
+    function showTable(table, button) {
+        // Hide all tables, buttons, and headings
+        document.querySelectorAll('.table-container').forEach(function(el) {
+            el.style.display = 'none';
+        });
+        document.querySelectorAll('.btn').forEach(function(btn) {
+            btn.style.display = 'none';
+        });
+        //document.querySelectorAll('.heading-container').forEach(function(heading) {
+        //    heading.style.display = 'none';
+        //});
+    
+        // Show the selected table, its buttons, and heading
+        //document.getElementById(table + '-text').style.display = 'block';
+        document.getElementById(table + '-table').style.display = 'block';
+        document.getElementById('submit-' + table + '-btn').style.display = 'block';
+        document.getElementById('new-' + table + '-btn').style.display = 'block';
+
+        document.querySelectorAll('.sidebar-link').forEach(function(btn) {
+            btn.classList.remove('active');
+        });
+    
+        // Add 'active' class to the clicked button
+        button.classList.add('active');
+    }
+    
+</script>
+</body>
+</html>
