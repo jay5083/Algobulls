@@ -1,0 +1,396 @@
+{% extends "base.html" %}
+Hi
+<table>
+    <thead>
+        <tr class="table-info">
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Lead ID field of Sales" %}
+                    <th scope="col">Lead ID</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Branch Employee ID field of Sales" %}
+                    <th scope="col">Branch ID</th>
+                    <th scope="col">Broker Name</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Sales Employee ID field of Sales" %}
+                    <th scope="col">Sales Employee</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Broking ID field of Sales" %}
+                    <th scope="col">Broking ID</th>
+                {% endif %}
+            {% endfor %}
+          
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Name field of Sales" %}
+                    <th scope="col">Name</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Contact Number field of Sales" %}
+                    <th scope="col">Contact Number</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Email ID field of Sales" %}
+                    <th scope="col">Email ID</th>
+                {% endif %}
+            {% endfor %}
+           
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Source Type field of Sales" %}
+                    <th scope="col">Source Type</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Category field of Sales" %}
+                    <th scope="col">Category</th>
+                {% endif %}
+            {% endfor %}
+
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Risk Appetite field of Sales" %}
+                    <th scope="col">Risk Appetite</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Comments field of Sales" %}
+                <th scope="col">Comments</th>
+                {% endif %}
+            {% endfor %}
+              
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Amount field of Sales" %}
+                    <th scope="col">Amount</th>
+                {% endif %}
+            {% endfor %}
+
+            {% for permission in user_permissions %} 
+                {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                    <th scope="col">Purchase Date</th>
+                {% endif %}
+            {% endfor %}
+                   
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Status field of Sales" %}
+                    <th scope="col">Status</th>
+                {% endif %}
+            {% endfor %}
+            
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Reason For Dropped field of Sales" %}
+                    <th scope="col">Reason For Dropped</th>
+                {% endif %}
+            {% endfor %}
+                               
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can delete Sales" %}
+                    <th scope="col"></th>
+                {% endif %}
+            {% endfor %}
+
+        </tr>
+    </thead>
+    <tbody id="sales-leads-table-body">
+        {% for lead in sales_leads %}
+            
+                <tr class="table-light">
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Lead ID field of Sales" %}
+                            <td scope="row"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Lead ID field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Lead ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {%endif%}
+                            >{{ lead.lead_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Branch Employee ID field of Sales" %}
+                            <td class="editable-15" data-field="branch_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Branch Employee ID field of Sales" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Branch Employee ID field of Sales" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ lead.branch_employee_id.branch_id.branch_id }}</td>
+                            <td class="editable-15" data-field="broker_name"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Branch Employee ID field of Sales" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Branch Employee ID field of Sales" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ lead.branch_employee_id.branch_id.broker_id.broker_name }}</td>
+                        {% endif %}
+                    {% endfor %}
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Sales Employee ID field of Sales" %}
+                            <td class="editable-15" data-field="sales_employee_id">
+                                {% if "Can edit the Sales Employee ID field of Sales" not in permissions_name %}
+                                    {{ lead.sales_employee_id.name }}
+                                {% else %}
+                                    <select class="sales-employee-id-dropdown">
+                                        {% for sales_employee_id in sales_employees %}
+                                            {%if sales_employee_id.role_id.role_name == "Sales Employee" %}
+                                                <option value="{{ sales_employee_id.employee_id }}" {% if sales_employee_id.employee_id == lead.sales_employee_id.employee_id %} selected {% endif %}>{{ sales_employee_id.name }}</option>
+                                            {%endif%}
+                                        {% endfor %}
+                                    </select>
+                                    
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking ID field of Sales" %}
+                            <td class="editable-12" data-field="broking_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Broking ID field of Sales" %}
+                                    contenteditable="true"
+                                    onblur="submitSalesLeads()"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Broking ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.broking_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                                            
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Sales" %}
+                            <td class="editable-12" data-field="name"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Name field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Name field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.name }}</td>
+                        {% endif %}
+                    {% endfor %}
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Contact Number field of Sales" %}
+                            <td class="editable-12" data-field="contact_number"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Contact Number field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Contact Number field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.contact_number }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Sales" %}
+                            <td class="editable-12" data-field="email_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Email ID field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Email ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.email_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source Type field of Sales" %}
+                            <td class="editable-12" data-field="source_type">
+                            {% if "Can edit the Source Type field of Sales" not in permissions_name %}
+                                {{ lead.source_type }}
+                            {% else %}
+                                <select id="lead_source_type" name="lead_source_type">
+                                    <option value="Webinar" {% if lead.source_type == 'Webinar' %} selected {% endif %}>Webinar</option>
+                                    <option value="Branch" {% if lead.source_type == 'Branch' %} selected {% endif %}>Branch</option>
+                                    <option value="CP/AP" {% if lead.source_type == 'CP/AP' %} selected {% endif %}>CP/AP</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    <td class="lead-id hidden">{{ lead.lead_id }}</td>
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Category field of Sales" %}
+                            <td class="editable-13" data-field="category">
+                            {% if "Can edit the Category field of Sales" not in permissions_name %}
+                                {{ lead.category }}
+                            {% else %}
+                                <select id="lead_category" name="lead_category">
+                                    <option value="Retail" {% if lead.category == 'Retail' %} selected {% endif %}>Retail</option>
+                                    <option value="HNI" {% if lead.category == 'HNI' %} selected {% endif %}>HNI</option>
+                                    <option value="Ultra HNI" {% if lead.category == 'Ultra HNI' %} selected {% endif %}>Ultra HNI</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Risk Appetite field of Sales" %}
+                            <td class="editable-13" data-field="risk_appetite">
+                            {% if "Can edit the Risk Appetite field of Sales" not in permissions_name %}
+                                {{ lead.risk_appetite }}
+                            {% else %}
+                                <select id="lead_risk_appetite" name="lead_risk_appetite">
+                                    <option value="Low" {% if lead.risk_appetite == 'Low' %} selected {% endif %}>Low</option>
+                                    <option value="Medium" {% if lead.risk_appetite == 'Medium' %} selected {% endif %}>Medium</option>
+                                    <option value="High" {% if lead.risk_appetite == 'High' %} selected {% endif %}>High</option>
+                                    <!-- Add more options as needed -->
+                                </select><br><br>
+                            {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                        
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comments field of Sales" %}
+                            <td class="editable-13" data-field="comments"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Comments field of Sales" %}
+                                    contenteditable="true"
+                                    onblur="submitSalesLeads()"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Comments field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                         {% endif %}
+                            >{{ lead.comments }}</td>
+                        {% endif %}
+                    {% endfor %}
+                                            
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Amount field of Sales" %}
+                            <td class="editable-14" data-field="amount"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Amount field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Amount field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.amount }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                            <td class="editable-14" data-field="purchase_date">
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Purchase Date field of Sales" %}
+                                        <input type="date" id="purchase_date" name="purchase_date" value="{{ lead.purchase_date}}"><br><br>
+                                    {% comment %} {% else %}
+                                        {{ lead.purchase_date|date:'Y-m-d' }}<br><br> {% endcomment %}
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                
+                                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Sales" %}
+                            <td class="editable-16" data-field="status">
+                                {% if "Can edit the Status field of Sales" not in permissions_name %}
+                                    {{ lead.status }}
+                                {% else %}
+                                        <select id="lead_status" name="lead_status">
+                                            <option value="converted" {% if lead.status == 'converted' %} selected {% endif %}>Converted</option>
+                                            <option value="Dropped" {% if lead.status == 'Dropped' %} selected {% endif %}>Dropped</option>
+                                            <option value="Follow up" {% if lead.status == 'Follow up' %} selected {% endif %}>Follow up</option>
+                                            <option value="No Answer" {% if lead.status == 'No Answer' %} selected {% endif %}>No Answer</option>
+                                            <option value="Not Interested" {% if lead.status == 'Not Interested' %} selected {% endif %}>Not Interested</option>
+                                            <option value="In Progress" {% if lead.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                        </select><br><br>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Reason For Dropped field of Sales" %}   
+                            <td class="editable-14" data-field="reason_for_dropped"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Reason For Dropped field of Sales" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Reason For Dropped field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ lead.reason_for_dropped }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Sales" %}
+                            <td>
+                                <button  onclick="deleteLeadAndRedirect('{{ lead.lead_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                    <div style="font-size: 20px;">
+                                        <i class="fa fa-trash"></i>
+                                        </div> <!-- Font Awesome trash icon -->
+                                </button>
+                                <script>
+                                    function deleteLeadAndRedirect(leadId) {
+                                        deletesales(leadId);  // Call the deleteLead function
+                                        redirectToThisURL();     // Call the redirectToURL function
+                                    }
+                                    function redirectToThisURL() {
+                                        // Redirect to the specified URL
+                                        window.location.href = '';
+                                    }
+                                </script>
+                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+        {% endfor %}
+            
+    </tbody>
+</table>

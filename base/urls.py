@@ -20,4 +20,13 @@ urlpatterns = [
     path('update_tech_task/', views.update_tech_task, name='update_tech_task'),
     path('update_support/', views.update_support, name='update_support'),
     path('update_strategies/', views.update_strategies, name='update_strategies'),
+    path('update_sales/', views.update_sales, name='update_sales'),
+    path('get_division_employees/', views.get_division_employees, name='get_division_employees'),
+    path('get_status_values/<str:table>/', views.get_status_values, name='get_status_values'),
+    path('get_status_values/<str:table>/', views.get_status_values, name='get_status_values'),
+    path('filter_by_status/<str:table>/<str:status>/', views.status_filter, name='filter_by_status'),
+    path('sales/', views.sales, name='sales')
 ]
+
+    
+

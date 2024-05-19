@@ -163,7 +163,8 @@ class Support(models.Model):
     division_employee = models.ForeignKey(AlgobullsEmployee, models.DO_NOTHING, db_column='Division Employee', related_name='support_division_employee_set', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     status = models.TextField(db_column='Status', blank=True, null=True)  # Field name made lowercase.
     date_of_closing = models.TextField(db_column='Date of Closing', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-
+    division_assigned_to = models.TextField(db_column='Division Assigned To', blank=True, null=True)
+    
     class Meta:
         managed = True
         db_table = 'Support'

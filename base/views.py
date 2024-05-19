@@ -17,11 +17,25 @@ from django.shortcuts import render, redirect
 @login_required
 def home(request):
     # Fetch AlgobullsEmployee object corresponding to the currently logged-in user's email address
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    
+    # First, try to find the user in the AlgobullsEmployee table
     try:
         algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
         employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
     except AlgobullsEmployee.DoesNotExist:
-        employee_id = None
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
 
     # Fetch user groups
     user_groups = request.user.groups.all()
@@ -30,20 +44,22 @@ def home(request):
     user_permissions = []
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
-
-    # Print all permissions on the terminal
-    
     
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
-    build = Build.objects.all()
-    tech_task = TechTask.objects.all()
-    support = Support.objects.all()
-    strategies = Strategies.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
     name = algobulls_employee.name
-    user_group = user_groups[0].name  # Fetch the name of the first user group
-    # Pass user groups, user permissions, and employee ID to the template context
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
     context = {
         'user_groups': user_groups,
         'user_permissions': user_permissions,
@@ -57,7 +73,76 @@ def home(request):
         'builds' : build,
         'tech_tasks' : tech_task,
         'supports' : support,
-        'strategies' : strategies
+        'strategies' : strategies,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+
+    return render(request, 'base.html', context)
+
+from django.shortcuts import render
+from .models import Sales, Support, AlgobullsEmployee, BranchEmployee
+
+def status_filter(request, table, status):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id').filter(status=status)
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'selected_status': status,
+        'table':table,
     }
 
     return render(request, 'base.html', context)
@@ -78,8 +163,8 @@ def update_sales_leads(request):
                     if field == 'branch_employee_id':
                         # Handle branch employee ID separately
                         try:
-                            branch_employee = BranchEmployee.objects.get(employee_id=value)
-                            setattr(lead, field, branch_employee)
+                            branch_employee_id = BranchEmployee.objects.get(employee_id=value)
+                            setattr(lead, field, branch_employee_id)
                         except BranchEmployee.DoesNotExist:
                             # Handle the case where the provided branch employee ID does not exist
                             error_count += 1
@@ -87,8 +172,8 @@ def update_sales_leads(request):
                     elif field == 'sales_employee_id':
                         # Handle sales employee ID separately
                         try:
-                            sales_employee = AlgobullsEmployee.objects.get(employee_id=value)
-                            setattr(lead, field, sales_employee)
+                            sales_employee_id = AlgobullsEmployee.objects.get(employee_id=value)
+                            setattr(lead, field, sales_employee_id)
                         except AlgobullsEmployee.DoesNotExist:
                             # Handle the case where the provided sales employee ID does not exist
                             error_count += 1
@@ -590,7 +675,21 @@ def update_build(request):
             try:
                 build = Build.objects.get(build_id=build_id)
                 for field, value in build_data.items():
-                    setattr(build, field, value)
+                    # Special handling for strategist_name.employee_id field
+                    if field == 'strategist_name':
+                        # Assuming you have a ForeignKey field strategist_name in Build model
+                        employee_id = int(value)
+                        try:
+                            # Get the AlgobullsEmployee instance based on the employee_id
+                            strategist = AlgobullsEmployee.objects.get(employee_id=employee_id)
+                            # Assign the AlgobullsEmployee instance to the strategist_name field of the Build instance
+                            build.strategist_name = strategist
+                        except AlgobullsEmployee.DoesNotExist:
+                            # Handle the case where the AlgobullsEmployee with the provided ID does not exist
+                            error_count += 1
+                            continue
+                    else:
+                        setattr(build, field, value)
                 build.save()
                 success_count += 1
             except Build.DoesNotExist:
@@ -622,10 +721,15 @@ def update_tech_task(request):
             try:
                 task = TechTask.objects.get(task_id=task_id)
                 for field, value in task_data.items():
+                    # Convert employee_id to integer if the field is employee_id
+                    if field == 'employee_id':
+                        value = AlgobullsEmployee.objects.get(employee_id=value)
                     setattr(task, field, value)
                 task.save()
                 success_count += 1
             except TechTask.DoesNotExist:
+                error_count += 1
+            except AlgobullsEmployee.DoesNotExist:
                 error_count += 1
 
         success_message = f"{success_count} records updated successfully."
@@ -635,10 +739,6 @@ def update_tech_task(request):
       
     else:
         return JsonResponse({'error': 'Invalid request method'})
-
-from django.http import JsonResponse
-from .models import Support
-import json
 
 def update_support(request):
     if request.method == 'POST':
@@ -653,7 +753,16 @@ def update_support(request):
             try:
                 support = Support.objects.get(ticket_number=ticket_number)
                 for field, value in support_data.items():
-                    setattr(support, field, value)
+                    if field in ['support_employee', 'division_employee']:
+                        # Check if value is a valid employee_id and get the AlgobullsEmployee object
+                        try:
+                            employee = AlgobullsEmployee.objects.get(employee_id=value)
+                            setattr(support, field, employee)
+                        except AlgobullsEmployee.DoesNotExist:
+                            error_count += 1
+                            continue  # Skip to the next field if employee is not found
+                    else:
+                        setattr(support, field, value)
                 support.save()
                 success_count += 1
             except Support.DoesNotExist:
@@ -663,7 +772,7 @@ def update_support(request):
         error_message = f"{error_count} records failed to update."
 
         return JsonResponse({'success_message': success_message, 'error_message': error_message})
-      
+
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
@@ -680,7 +789,15 @@ def update_strategies(request):
             try:
                 strategy = Strategies.objects.get(strategy_id=strategy_id)
                 for field, value in strategy_data.items():
-                    setattr(strategy, field, value)
+                    if field == 'employee_id':
+                        try:
+                            employee = AlgobullsEmployee.objects.get(employee_id=value)
+                            setattr(strategy, field, employee)
+                        except AlgobullsEmployee.DoesNotExist:
+                            error_count += 1
+                            continue  # Skip to the next field if employee is not found
+                    else:
+                        setattr(strategy, field, value)
                 strategy.save()
                 success_count += 1
             except Strategies.DoesNotExist:
@@ -693,3 +810,131 @@ def update_strategies(request):
       
     else:
         return JsonResponse({'error': 'Invalid request method'})
+
+
+from django.http import JsonResponse
+from django.views.decorators.csrf import csrf_exempt
+from django.views.decorators.http import require_POST
+import json
+from .models import Sales # Adjust the import according to your models
+
+@csrf_exempt
+@require_POST
+def update_sales(request):
+    try:
+        data = json.loads(request.POST.get('updated_data'))
+        for lead_id, fields in data.items():
+            try:
+                lead = Sales.objects.get(id=lead_id)
+                for field, value in fields.items():
+                    setattr(lead, field, value)
+                lead.save()
+            except Sales.DoesNotExist:
+                return JsonResponse({'error': f'SalesLead with id {lead_id} does not exist'}, status=400)
+        return JsonResponse({'success': True})
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
+
+from django.http import JsonResponse
+from .models import AlgobullsEmployee, AlgobullsDivision
+from django.shortcuts import get_object_or_404
+
+def get_division_employees(request):
+    division_name = request.GET.get('division')
+    if division_name:
+        # Ensure proper sanitization of division name
+        division_name = division_name.strip()
+
+        # Retrieve the division object using the provided division name or return a 404 error if not found
+        division = get_object_or_404(AlgobullsDivision, division_name=division_name)
+
+        # Filter employees based on the retrieved division object
+        employees = AlgobullsEmployee.objects.filter(division_name=division)
+
+        # Prepare the employee data to send in the JSON response
+        employee_list = [
+            {'employee_id': employee.employee_id, 'name': employee.name} for employee in employees
+        ]
+
+        # Return the employee data as a JSON response
+        return JsonResponse({'employees': employee_list})
+    else:
+        # Return an error response if the division is not specified
+        return JsonResponse({'error': 'Division not specified'}, status=400)
+
+from django.http import JsonResponse
+from .models import Sales, Support
+
+def get_status_values(request, table):
+    # if request.is_ajax():
+        if table == 'sales-leads':
+            status_values = Sales.objects.values_list('status', flat=True).distinct()
+        elif table == 'support':
+            status_values = Support.objects.values_list('status', flat=True).distinct()
+        else:
+            status_values = []
+        return JsonResponse({'status_values': list(status_values)})
+    
+def sales(request):
+    
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id')
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+    return render(request, 'sales.html', context)        
