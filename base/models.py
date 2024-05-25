@@ -185,3 +185,28 @@ class TechTask(models.Model):
     class Meta:
         managed = True
         db_table = 'Tech Task'
+        
+class Rms(models.Model):
+    sr_no = models.TextField(db_column='Sr No', primary_key=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    ticket_number = models.TextField(db_column='Ticket Number', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    broker = models.ForeignKey(Broker, models.DO_NOTHING, db_column='Broker', blank=True, null=True)  # Field name made lowercase.
+    date = models.TextField(db_column='Date', blank=True, null=True)  # Field name made lowercase.
+    broking_id = models.TextField(db_column='Broking ID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
+    contact_number = models.TextField(db_column='Contact Number', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    email_id = models.TextField(db_column='Email ID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    customer_type = models.TextField(db_column='Customer Type', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    priority = models.TextField(db_column='Priority', blank=True, null=True)  # Field name made lowercase.
+    issue = models.TextField(db_column='Issue', blank=True, null=True)  # Field name made lowercase.
+    comment = models.TextField(db_column='Comment', blank=True, null=True)  # Field name made lowercase.
+    assigned_to = models.TextField(db_column='Assigned To', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    status = models.TextField(db_column='Status', blank=True, null=True)  # Field name made lowercase.
+    date_of_closing = models.TextField(db_column='Date of Closing', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rms_status = models.TextField(db_column='RMS Status', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    rms_comment = models.TextField(db_column='RMS Comment', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    employee = models.ForeignKey(AlgobullsEmployee, models.DO_NOTHING, db_column='Employee', blank=True, null=True)  # Field name made lowercase.
+
+    class Meta:
+        managed = True
+        db_table = 'Rms'
+

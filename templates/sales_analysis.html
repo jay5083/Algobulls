@@ -1,0 +1,773 @@
+{%load static%}
+<!DOCTYPE html>
+<html>
+<head>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Sales Analysis</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+        margin: 0;
+        font-family: "Lato", sans-serif;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 150px;
+            background-color: lightwhite;
+            position: fixed;
+            height: 90%;
+            overflow: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
+            border-radius: 0 0 100px 0; /* Curved bottom-right corner */
+        }
+        
+        .sidebar-item {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow border */
+            padding: 10px;
+            margin-bottom: 10px; /* Add some space between items */
+        }        
+        
+        .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+        
+        .sidebar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .sidebar a:hover:not(.active) {
+            background-color: #5b72e3bf;
+            color: white;
+        }
+        {% comment %} .sidebar::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Adjust the height as needed */
+            background-color: #2679c2bf; /* Set the color to blue */
+            border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
+        } {% endcomment %}
+        
+
+        div.content {
+            margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+            padding: 20px; /* Add padding to the content area */
+            }
+            
+            @media screen and (max-width: 700px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .sidebar a {float: left;}
+            div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
+            }
+            
+            @media screen and (max-width: 400px) {
+            .sidebar a {
+                text-align: center;
+                float: none;
+            }
+            }
+
+            .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-left: 5%; /* Add margin to the left side */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        
+            
+            /* Adjust other styles as needed */
+            
+        </style>
+    
+    
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <style>
+            .navbar {
+                min-height: 50px; /* Adjust the value as needed */
+            }
+        </style>
+        
+        <style>
+            #sales-leads-table th,
+            #sales-leads-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                padding: 8px; /* Add padding for better appearance */
+            }
+            #support-table th,
+            #support-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                padding: 8px; /* Add padding for better appearance */
+            }
+            #strategies-table th,
+            #strategies-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                {% comment %} padding: 20px; /* Add padding for better appearance */ {% endcomment %}
+            }
+            #build-table th,
+            #build-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                padding: 8px; /* Add padding for better appearance */
+            }
+            #tech-task-table th,
+            #tech-task-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                {% comment %} padding: 8px; /* Add padding for better appearance */ {% endcomment %}
+            }
+            .logo-circle {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%; /* Make it circular */
+                overflow: hidden; /* Hide overflow */
+                margin-right: 10px; /* Adjust margin as needed */
+            }
+            
+            .logo-circle img {
+                width: 100%; /* Make the image fill the circle */
+                height: auto; /* Maintain aspect ratio */
+            }
+            .editable-12,
+            .editable-13,
+            .editable-14,
+            .editable-15,
+            .editable-16 {
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-support{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-build{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-tech-task{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-strategies{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .sidebar-link.active {
+                background-color: green;
+                color: white; /* Change text color to white for better contrast */
+            }
+            .sidebar-item {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            
+            .sidebar-link {
+                text-decoration: none;
+                color: #333;
+                display: block;
+            }
+            
+            .sidebar-link:hover {
+                background-color: #f0f0f0;
+            }
+            
+            
+        </style>
+        
+        <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+            <div class="container-fluid">
+                <!-- Logo with man inside circle -->
+                <a class="navbar-brand" href="#">
+                    <div class="logo-circle">
+                        <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+                        </div>
+                </a>
+                <!-- Name -->
+                <a class="navbar-brand" href="#">Algobulls</a>
+                <!-- Toggle Button -->
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <!-- Navbar Links -->
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view Sales" %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="#"  role="button" aria-expanded="false">
+                                        Sales
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view Build" %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/build/" role="button" aria-expanded="false">
+                                        Build
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view Tech Task" %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/tech_task/" role="button" aria-expanded="false">
+                                        Tech Task
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view Support" %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/support/" role="button" aria-expanded="false">
+                                        Support
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view Strategies" %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/strategies/" role="button" aria-expanded="false">
+                                        Strategies
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view RMS" %}
+                                <li class="nav-item">
+                                    <a class="nav-link" href="/rms/" role="button" aria-expanded="false">
+                                        RMS
+                                    </a>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                    <!-- User Name -->
+                    <div class="d-flex align-items-center">
+                        <div class="logo-circle">
+                            <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                        </div>
+                        <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                        <div>
+                            <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
+                            <script>
+                                function redirectToLoginPage() {
+                                    // Redirect to the login page
+                                    window.location.href = '/accounts/login/';
+                                }
+                            </script> 
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+        <div class="sidebar">
+            <form id="filter-form">
+                {% csrf_token %}
+                <div class="filter-options">
+                    {% comment %} <button id="apply-filters-btn">Apply Filters</button> {% endcomment %}
+                    <a href="#" class="filter-option" data-filter="source_type">Source Type
+                        <div>
+                            <input type="checkbox" id="WebinarCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Webinar" checked>
+                            <label for="WebinarCheckbox">Webinar</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="BranchCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Branch" checked>
+                            <label for="BranchCheckbox">Branch</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="CPAPCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="CP/AP" checked>
+                            <label for="CPAPCheckbox">CP/AP</label>
+                        </div>
+                    </a>
+                    <a href="#" class="filter-option" data-filter="category">Category
+                        <div>
+                            <input type="checkbox" id="RetailCheckbox" name="Category" data-field="category" class="filter-checkbox" value="Retail" checked>
+                            <label for="RetailCheckbox">Retail</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="HNICheckbox" name="Category" data-field="category" class="filter-checkbox" value="HNI" checked>
+                            <label for="HNICheckbox">HNI</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="UltraHNICheckbox" name="Category" data-field="category" class="filter-checkbox" value="Ultra HNI" checked>
+                            <label for="UltraHNICheckbox">Ultra HNI</label>
+                        </div>
+                    </a>
+                    <a href="#" class="filter-option" data-filter="risk_appetite">Risk Appetite
+                        <div>
+                            <input type="checkbox" id="Low" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="Low" checked>
+                            <label for="Low">Low</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Medium" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="Medium" checked>
+                            <label for="Medium">Medium</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="High" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="High" checked>
+                            <label for="High">High</label>
+                        </div>
+                    </a>
+                    <a href="#" class="filter-option" data-filter="status">Status
+                        <div>
+                            <input type="checkbox" id="Converted" name="Status" data-field="status" class="filter-checkbox" value="Converted" checked>
+                            <label for="Converted">Converted</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Dropped" name="Status" data-field="status" class="filter-checkbox" value="Dropped" checked>
+                            <label for="Dropped">Dropped</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Follow up" name="Status" data-field="status" class="filter-checkbox" value="Follow up" checked>
+                            <label for="Follow up">Follow up</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="No Answer" name="Status" data-field="status" class="filter-checkbox" value="No Answer" checked>
+                            <label for="No Answer">No Answer</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Not Interested" name="Status" data-field="status" class="filter-checkbox" value="Not Interested" checked>
+                            <label for="Not Interested">Not Interested</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
+                            <label for="In Progress">In Progress</label>
+                        </div>
+                    </a>
+                    <a href="#" class="filter-option" data-filter="employee_id">Employee
+                        <div id="employee-filters">
+                            <!-- Employee checkboxes will be dynamically populated here -->
+                        </div>
+                    </a>
+                </div>
+            </form>
+        </div>
+    </header>
+    
+        <form class="start_end_date">
+            <label for="start_date">Start Date:</label>
+            <input type="date" id="start_date" name="start_date" value="{{ start_date }}"><br><br>
+            <label for="end_date">End Date:</label>
+            <input type="date" id="end_date" name="end_date" value="{{ end_date }}"><br><br>
+            <button type="submit">Submit Date</button>
+        </form>
+        <div class="container">
+        <div class="chart-container">
+            <div class="chart-item">
+                <h2>Total Leads Generated Weekly</h2>
+                <canvas class="chart-canvas" id="weeklyLeadsChart" ></canvas>
+            </div>
+            <div class="chart-item">
+                <h2>Branch-wise Split of Leads Generated</h2>
+                <canvas class="branch-leads-chart-canvas" id="branchLeadsChart" ></canvas>
+
+            </div>
+        </div>
+
+        <div class="chart-container">
+            <div class="chart-item">
+                <h2>Weekly Revenue</h2>
+                <canvas class="chart-canvas" id="weeklyRevenueChart" ></canvas>
+            </div>
+            <div class="chart-item">
+                <h2>Branch-wise Revenue</h2>
+                <canvas class="branch-revenue-chart-canvas" id="branchRevenueChart" ></canvas>
+            </div>
+        </div>
+    </div>
+    <style>
+        .chart-canvas {
+            width: 65% !important;
+            height: auto !important;
+        }
+
+        .branch-leads-chart-canvas {
+            width: 33% !important;
+            height: auto !important;
+        }
+
+        .branch-revenue-chart-canvas {
+            width: 33% !important;
+            height: auto !important;
+        }
+        
+        .row {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        
+        .chart-item {
+            flex: 1 1 25%;
+            margin: 10px;
+        }        
+
+        .start_end_date {
+            display: flex;
+            justify-content: center; /* Align items horizontally at center */
+            margin-top: 20px;
+        }
+        
+        .start_end_date label {
+            margin-top: 5px;
+            margin-right: 10px; /* Add some space between label and input */
+        }
+        
+        .start_end_date input[type="date"] {
+            padding: 5px;
+            margin-bottom: 10px;
+            margin-right: 40px; /* Add margin between input fields */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        .start_end_date button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }        
+        
+        .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-left: 15%; /* Add margin to the left side */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+    </style>
+    
+    <script>
+        
+    </script>
+    
+    <script>
+        var weeklyLeadsChartInstance, branchLeadsChartInstance, weeklyRevenueChartInstance, branchRevenueChartInstance;
+    
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        $(document).ready(function() {
+            fetchEmployeeFilters();
+            $('.start_end_date').on('submit', function(event) {
+                event.preventDefault();
+                var start_date = $('#start_date').val();
+                var end_date = $('#end_date').val();
+            
+                var filters = {
+                    source_type: [],
+                    category: [],
+                    risk_appetite: [],
+                    status: [],
+                    employee_id: []
+                };
+            
+                $('.filter-checkbox:checked').each(function() {
+                    var filter = $(this).data('field');
+                    var value = $(this).val();
+                    if (value) {  // Ensure the value is not empty
+                        filters[filter].push(value);
+                    }
+                });
+            
+                $.ajax({
+                    url: '/sales_analysis_data/',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    data: {
+                        'start_date': start_date,
+                        'end_date': end_date,
+                        'filters': JSON.stringify(filters)
+                    },
+                    success: function(response) {
+                        updateCharts(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error updating Sales:', error);
+                    }
+                });
+            });            
+        
+            setTimeout(function() {
+                $('.start_end_date button[type="submit"]').click();
+            }, 0);
+        });
+        
+        document.addEventListener('DOMContentLoaded', function() {
+            function getSelectedFilters() {
+                let filters = {
+                    source_type: [],
+                    category: [],
+                    risk_appetite: [],
+                    status: []
+                };
+    
+                document.querySelectorAll('.filter-checkbox:checked').forEach(function(checkbox) {
+                    filters[checkbox.getAttribute('data-field')].push(checkbox.value);
+                });
+    
+                return filters;
+            }
+    
+            document.querySelectorAll('.filter-checkbox').forEach(function(checkbox) {
+                checkbox.addEventListener('change', function() {
+                    // Trigger the form submit to apply filters
+                    document.querySelector('.start_end_date button[type="submit"]').click();
+                });
+            });
+        });
+        
+        function fetchEmployeeFilters() {
+            $.ajax({
+                url: '/fetch_employee_ids/',
+                method: 'GET',
+                success: function(response) {
+                    populateEmployeeFilters(response.employee_ids);
+                },
+                error: function(xhr, status, error) {
+                    console.error('Error fetching employee IDs:', error);
+                }
+            });
+        }
+        
+        function populateEmployeeFilters(employee_ids) {
+            const employeeFiltersDiv = document.getElementById('employee-filters');
+            employee_ids.forEach(function(employee_id) {
+                const div = document.createElement('div');
+                div.innerHTML = `
+                    <input type="checkbox" id="employee${employee_id}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="${employee_id}" checked>
+                    <label for="employee${employee_id}">${employee_id}</label>
+                `;
+                employeeFiltersDiv.appendChild(div);
+            });
+        }                                
+        
+        function updateCharts(response) {
+            updateWeeklyLeadsChart(response.results1);
+            updateBranchLeadsChart(response.results2);
+            updateWeeklyRevenueChart(response.results3);
+            updateBranchRevenueChart(response.results4);
+        }
+    
+        function updateWeeklyLeadsChart(results) {
+            var ctx = document.getElementById('weeklyLeadsChart').getContext('2d');
+            if (weeklyLeadsChartInstance) {
+                weeklyLeadsChartInstance.destroy();
+            }
+            weeklyLeadsChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results.map(row => row[0]),
+                    datasets: [{
+                        label: 'Total Leads',
+                        data: results.map(row => row[2]),
+                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
+                        borderColor: 'rgba(255, 99, 132, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    
+        function updateBranchLeadsChart(results) {
+            var ctx = document.getElementById('branchLeadsChart').getContext('2d');
+            if (branchLeadsChartInstance) {
+                branchLeadsChartInstance.destroy();
+            }
+            branchLeadsChartInstance = new Chart(ctx, {
+                type: 'pie', // Change chart type to 'pie'
+                data: {
+                    labels: results.map(row => row[0]),
+                    datasets: [{
+                        label: 'Total Leads',
+                        data: results.map(row => row[1]),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(tooltipItem) {
+                                    return tooltipItem.label + ': ' + tooltipItem.raw;
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+        
+        function updateWeeklyRevenueChart(results) {
+            var ctx = document.getElementById('weeklyRevenueChart').getContext('2d');
+            if (weeklyRevenueChartInstance) {
+                weeklyRevenueChartInstance.destroy();
+            }
+            weeklyRevenueChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results.map(row => row[0]),
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: results.map(row => row[2]),
+                        backgroundColor: 'rgba(75, 192, 192, 0.2)',
+                        borderColor: 'rgba(75, 192, 192, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+    
+        function updateBranchRevenueChart(results) {
+            var ctx = document.getElementById('branchRevenueChart').getContext('2d');
+            if (branchRevenueChartInstance) {
+                branchRevenueChartInstance.destroy();
+            }
+            branchRevenueChartInstance = new Chart(ctx, {
+                type: 'pie', // Set the type to 'pie' for a pie chart
+                data: {
+                    labels: results.map(row => row[0]),
+                    datasets: [{
+                        label: 'Total Revenue',
+                        data: results.map(row => row[1]),
+                        backgroundColor: [
+                            'rgba(255, 99, 132, 0.2)',
+                            'rgba(54, 162, 235, 0.2)',
+                            'rgba(255, 206, 86, 0.2)',
+                            'rgba(75, 192, 192, 0.2)',
+                            'rgba(153, 102, 255, 0.2)',
+                            'rgba(255, 159, 64, 0.2)'
+                            // Add more colors as needed
+                        ],
+                        borderColor: [
+                            'rgba(255, 99, 132, 1)',
+                            'rgba(54, 162, 235, 1)',
+                            'rgba(255, 206, 86, 1)',
+                            'rgba(75, 192, 192, 1)',
+                            'rgba(153, 102, 255, 1)',
+                            'rgba(255, 159, 64, 1)'
+                            // Add more colors as needed
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true
+                        }
+                    }
+                }
+            });
+        }
+        
+    </script>
+</body>
+</html>

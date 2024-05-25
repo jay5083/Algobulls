@@ -1,0 +1,891 @@
+{% load static %}
+{% load custom_filters %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Select Roles {% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+        margin: 0;
+        font-family: "Lato", sans-serif;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 150px;
+            background-color: lightwhite;
+            position: fixed;
+            height: 90%;
+            overflow: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
+            {% comment %} border-radius: 0 0 100px 0; /* Curved bottom-right corner */ {% endcomment %}
+        }
+        
+        .sidebar-item {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow border */
+            padding: 10px;
+            margin-bottom: 10px; /* Add some space between items */
+        }        
+        
+        .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+        
+        .sidebar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .sidebar a:hover:not(.active) {
+            background-color: #5b72e3bf;
+            color: white;
+        }
+        {% comment %} .sidebar::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Adjust the height as needed */
+            background-color: #2679c2bf; /* Set the color to blue */
+            border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
+        } {% endcomment %}
+        
+
+        div.content {
+            margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+            padding: 20px; /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 700px) {
+            .sidebar {
+              width: 100%;
+              height: auto;
+              position: relative;
+            }
+            .sidebar a {float: left;}
+            div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 400px) {
+            .sidebar a {
+              text-align: center;
+              float: none;
+            }
+          }
+
+          .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-left: 15%; /* Add margin to the left side */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        
+          
+          /* Adjust other styles as needed */
+            
+        </style>
+    
+    
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+            
+<header>
+    <style>
+        .navbar {
+            min-height: 50px; /* Adjust the value as needed */
+        }
+    </style>
+    
+    <style>
+        #sales-leads-table th,
+        #sales-leads-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #support-table th,
+        #support-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #strategies-table th,
+        #strategies-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 20px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        #build-table th,
+        #build-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #tech-task-table th,
+        #tech-task-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 8px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Make it circular */
+            overflow: hidden; /* Hide overflow */
+            margin-right: 10px; /* Adjust margin as needed */
+        }
+        
+        .logo-circle img {
+            width: 100%; /* Make the image fill the circle */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .editable-12,
+        .editable-13,
+        .editable-14,
+        .editable-15,
+        .editable-16 {
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-support{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-build{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-tech-task{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-strategies{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .sidebar-link.active {
+            background-color: green;
+            color: white; /* Change text color to white for better contrast */
+        }
+        .sidebar-item {
+            padding: 5px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .sidebar-link {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #f0f0f0;
+        }
+        
+        
+    </style>
+    
+    <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+        <div class="container-fluid">
+            <!-- Logo with man inside circle -->
+            <a class="navbar-brand" href="#">
+                <div class="logo-circle">
+                    <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+                    </div>
+            </a>
+            <!-- Name -->
+            <a class="navbar-brand" href="#">Algobulls</a>
+            <!-- Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                    </li>
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Sales" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('sales-leads', this)" role="button" aria-expanded="false">
+                                    Sales
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/sales-leads/" role="button" aria-expanded="false">
+                                    Sales
+                                </a> 
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Build" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('build', this)" role="button" aria-expanded="false">
+                                    Build
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/build/" role="button" aria-expanded="false">
+                                    Build
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Tech Task" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="#" role="button" aria-expanded="false">
+                                    Tech Task
+                                </a>
+                                {% comment %} <a class="nav-link" href="/tech_task/" role="button" aria-expanded="false">
+                                    Tech Task
+                                </a> {% endcomment %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Support" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('support', this)" role="button" aria-expanded="false">
+                                    Support
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/support/" role="button" aria-expanded="false">
+                                    Support
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Strategies" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('strategies', this)" role="button" aria-expanded="false">
+                                    Strategies
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/strategies/" role="button" aria-expanded="false">
+                                    Strategies
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view RMS" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/rms/" role="button" aria-expanded="false">
+                                    RMS
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <!-- User Name -->
+                <div class="d-flex align-items-center">
+                    <div class="logo-circle">
+                        <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                    </div>
+                    <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                    <div>
+                        <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
+                        <script>
+                            function redirectToLoginPage() {
+                                // Redirect to the login page
+                                window.location.href = '/accounts/login/';
+                            }
+                        </script> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="sidebar">
+        <!-- This will be dynamically populated by JavaScript -->
+        <div class="sidebar-item" id="tech-task-btn">
+            <a class="sidebar-link">{{ selected_status }}:{{ number_of_tech_task_status }}</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/Pending Development/" class="sidebar-link">Pending Development</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/Under Development/" class="sidebar-link">Under Development</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/Under Testing/" class="sidebar-link">Under Testing</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/Bugs Reported/" class="sidebar-link">Bugs Reported</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/Delivered or Closed/" class="sidebar-link">Delivered or Closed</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/In Progress/" class="sidebar-link">In Progress</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/On Hold/" class="sidebar-link">On Hold</a>
+        </div>
+        <div class="sidebar-item" id="tech-task-btn">
+            <a href="/filter_by_status/tech-task/Open/" class="sidebar-link">Open</a>
+        </div>
+    </div>
+    
+    {% block content %}
+    <div>
+        
+        <div class="container">
+
+        <div id="tech-task-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Tech Task</h2>
+        </div>
+        <table id="tech-task-table" class="table table-hover" class="table-container">
+            <!-- Tech Task Table Content -->
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task ID field of Tech Task" %}
+                            <th scope="col">Task ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Employee ID field of Tech Task" %}
+                            <th scope="col">Employee ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Tech Task" %}
+                            <th scope="col">Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task field of Tech Task" %}
+                            <th scope="col">Task</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Nature field of Tech Task" %}
+                            <th scope="col">Nature</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Task Status field of Tech Task" %}
+                            <th scope="col">Task Status</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Priority field of Tech Task" %}
+                            <th scope="col">Priority</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
+                            <th scope="col">Date of Closing</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Number Of Days field of Tech Task" %}
+                            <th scope="col">Number Of Days</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Comments field of Tech Task" %}
+                            <th scope="col">Comments</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Tech Task" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for task in tech_tasks %}
+                    {% if task.task_status == selected_status %}
+                        <tr class="table-light">
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Task ID field of Tech Task" %}
+                                    <td scope="row" class="editable-tech-task" data-field="task_id"
+                                    {% for permission in user_permissions %}
+                                        {% if permission.name == "Can edit the Task ID field of Tech Task" %}
+                                            contenteditable="true"
+                                        {% endif %}
+                                    {% endfor %}
+                                    {% if "Can edit the Task ID field of Tech Task" not in user_permissions %}
+                                        contenteditable="false"
+                                    {% endif %}
+                                    >{{ task.task_id }}</td>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Employee ID field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="employee_id">
+                                        {% if "Can edit the Employee ID field of Tech Task" not in permissions_name %}
+                                            {{ task.employee_id.employee_id }}
+                                        {% else %}
+                                            <select class="employee-id-dropdown">
+                                                {% for employee_id in sales_employees %}
+                                                    {%if employee_id.role_id.role_name == "Tech Employee" %}
+                                                        <option value="{{ employee_id.employee_id }}" {% if employee_id.employee_id == task.employee_id.employee_id %} selected {% endif %}>{{ employee_id.name }}</option>
+                                                    {%endif%}
+                                                {% endfor %}
+                                            </select>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Date field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="date">
+                                        {% for permission in user_permissions %}
+                                            {% if permission.name == "Can edit the Date field of Tech Task" %}
+                                                <input type="date" id="date" name="date" value="{{ task.date}}"><br><br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Task field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="task"
+                                        {% for permission in user_permissions %}
+                                            {% if permission.name == "Can edit the Task field of Tech Task" %}
+                                                contenteditable="true"
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if "Can edit the Task field of Tech Task" not in user_permissions %}
+                                            contenteditable="false"
+                                        {% endif %}
+                                    >{{ task.task }}</td>
+                                {% endif %}
+                            {% endfor %} 
+
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Nature field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="nature">
+                                        {% if "Can edit the Nature field of Tech Task" not in permissions_name %}
+                                            {{ task.nature }}
+                                        {% else %}
+                                            <select id="task_nature" name="task_nature" class="task-nature-dropdown">
+                                                <option value="Core Change" {% if task.nature == 'Core Change' %} selected {% endif %}>Core Change</option>
+                                                <option value="Strategy Change" {% if task.nature == 'Strategy Change' %} selected {% endif %}>Strategy Change</option>
+                                                <option value="None Core Request" {% if task.nature == 'None Core Request' %} selected {% endif %}>None Core Request</option>
+                                                <option value="Broker Integration" {% if task.nature == 'Broker Integration' %} selected {% endif %}>Broker Integration</option>
+                                                <option value="Operations" {% if task.nature == 'Operations' %} selected {% endif %}>Operations</option>
+                                            </select><br><br>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Task Status field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="task_status">
+                                        {% if "Can edit the Task Status field of Tech Task" not in permissions_name %}
+                                            {{ task.task_status }}
+                                        {% else %}
+                                            <select id="task_task_status" name="task_task_status" class="task-status-dropdown">
+                                                <option value="Pending Development" {% if task.task_status == 'Pending Development' %} selected {% endif %}>Pending Development</option>
+                                                <option value="Under Development" {% if task.task_status == 'Under Development' %} selected {% endif %}>Under Development</option>
+                                                <option value="Under Testing" {% if task.task_status == 'Under Testing' %} selected {% endif %}>Under Testing</option>
+                                                <option value="Bugs Reported" {% if task.task_status == 'Bugs Reported' %} selected {% endif %}>Bugs Reported</option>
+                                                <option value="Delivered or Closed" {% if task.task_status == 'Delivered or Closed' %} selected {% endif %}>Delivered or Closed</option>
+                                                <option value="In Progress" {% if task.task_status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                                <option value="On Hold" {% if task.task_status == 'On Hold' %} selected {% endif %}>On Hold</option>
+                                                <option value="Open" {% if task.task_status == 'Open' %} selected {% endif %}>Open</option>
+                                            </select><br><br>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Priority field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="priority">
+                                        {% if "Can edit the Priority field of Tech Task" not in permissions_name %}
+                                            {{ task.priority }}
+                                        {% else %}
+                                            <select id="task_priority" name="task_priority" class="task-priority-dropdown">
+                                                <option value="High" {% if task.priority == 'High' %} selected {% endif %}>High</option>
+                                                <option value="Medium" {% if task.priority == 'Medium' %} selected {% endif %}>Medium</option>
+                                                <option value="Low" {% if task.priority == 'Low' %} selected {% endif %}>Low</option>
+                                            </select><br><br>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                        
+
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="date_of_closing">
+                                        {% for permission in user_permissions %}
+                                            {% if permission.name == "Can edit the Date of Closing field of Tech Task" %}
+                                                <input type="date" id="date_of_closing" name="date_of_closing" value="{{ task.date_of_closing}}"><br><br>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Number Of Days field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="number_of_days"
+                                        {% for permission in user_permissions %}
+                                            {% if permission.name == "Can edit the Number Of Days field of Tech Task" %}
+                                                contenteditable="true"
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if "Can edit the Number Of Days field of Tech Task" not in user_permissions %}
+                                            contenteditable="false"
+                                        {% endif %}
+                                    >{{ task.number_of_days }}</td>
+                                {% endif %}
+                            {% endfor %}
+                            
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Comments field of Tech Task" %}
+                                    <td class="editable-tech-task" data-field="comments"
+                                        {% for permission in user_permissions %}
+                                            {% if permission.name == "Can edit the Comments field of Tech Task" %}
+                                                contenteditable="true"
+                                            {% endif %}
+                                        {% endfor %}
+                                        {% if "Can edit the Comments field of Tech Task" not in user_permissions %}
+                                            contenteditable="false"
+                                        {% endif %}
+                                    >{{ task.comments }}</td>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can delete Tech Task" %}
+                                    <td>
+                                        <button onclick="deleteTechTaskAndRedirect('{{ task.task_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                            <div style="font-size: 20px;">
+                                                <i class="fa fa-trash"></i>
+                                            </div> <!-- Font Awesome trash icon -->
+                                        </button>
+                                        <script>
+                                            function deleteTechTaskAndRedirect(taskId) {
+                                                deletetechtask(taskId);  // Call the deleteLead function
+                                                redirectToThisURL();     // Call the redirectToURL function
+                                            }
+                                            function redirectToThisURL() {
+                                                // Redirect to the specified URL
+                                                window.location.href = '';
+                                            }
+                                            function deletetechtask(taskId) {
+                                                var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                                
+                                                $.ajax({
+                                                    url: '/delete_tech_task/',
+                                                    type: 'POST',
+                                                    data: {
+                                                        csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                        task_id: taskId
+                                                    },
+                                                    success: function(response) {
+                                                        if (response.success) {
+                                                            // If the deletion is successful, you can perform any necessary UI updates
+                                                            alert('Tech Task deleted successfully');
+                                                            // Optionally, you can remove the deleted row from the table
+                                                            // Example: $('#task_row_' + taskId).remove();
+                                                        } else {
+                                                            alert('Failed to delete Tech Task: ' + response.error);
+                                                        }
+                                                    },
+                                                    error: function(xhr, status, error) {
+                                                        alert('Failed to delete Tech Task: ' + error);
+                                                    }
+                                                });
+                                            }
+                                            
+                                        </script>
+                                        
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+
+                        </tr>
+                    {%endif%}
+                {% endfor %}
+            </tbody>
+        </table>           
+
+    </div>
+
+        <form id="update-tech-task-form" class="btn-submit-tech-task-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-tech-task-btn" type="button" onclick="submitTechTaskAndRedirect()" class="btn btn-success">Submit Tech Task</button>
+            <script>
+                function submitTechTaskAndRedirect() {
+                    submitTechTask();          // Call the submitTechTask function
+                    redirectToThisURL();    // Call the redirectToThisURL function
+                }
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+                function submitTechTask() {
+                    var editedCells = document.querySelectorAll('.editable-tech-task');  // Select all editable cells
+                    var updatedData = {};  // Initialize an object to store updated data
+                    
+                    // Iterate over each edited cell
+                    editedCells.forEach(function(cell) {
+                        var taskId = cell.closest('tr').querySelector('.editable-tech-task').innerText.trim();  // Get the task ID from the closest row
+                        var fieldName = cell.getAttribute('data-field');  // Get the data field name
+                        var newValue;
+                
+                        // Special handling for dropdown fields
+                        if (fieldName === 'employee_id') {
+                            var selectedOption = cell.querySelector('select.employee-id-dropdown').value;
+                            newValue = parseInt(selectedOption); // Convert the selected value to an integer
+                        } else if (fieldName === 'nature') {
+                            var selectedNature = cell.querySelector('select.task-nature-dropdown').value;
+                            newValue = selectedNature;
+                        } else if (fieldName === 'task_status') {
+                            var selectedTaskStatus = cell.querySelector('select.task-status-dropdown').value;
+                            newValue = selectedTaskStatus;
+                        } else if (fieldName === 'priority') {
+                            var selectedPriority = cell.querySelector('select.task-priority-dropdown').value;
+                            newValue = selectedPriority;
+                        } else if (fieldName === 'date' || fieldName === 'date_of_closing') {
+                            // Special handling for date input fields
+                            var dateInput = cell.querySelector('input[type="date"]');
+                            if (dateInput) {
+                                newValue = dateInput.value; // Get the value from the date input
+                            }
+                        } else {
+                            newValue = cell.innerText.trim();  // Get the new value of the cell
+                        }
+                        
+                        // Store the updated data in the object
+                        if (!updatedData.hasOwnProperty(taskId)) {
+                            updatedData[taskId] = {};  // Initialize an object for the task ID if not present
+                        }
+                        updatedData[taskId][fieldName] = newValue;  // Store the new value for the field
+                    });
+                
+                    // Send the updated data to the backend using AJAX
+                    $.ajax({
+                        url: '/update_tech_task/',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')  // Assuming getCookie function retrieves the CSRF token
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Tech task updated successfully:', response);
+                            redirectToThisURL();  // Redirect to the specified URL after successful update
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating tech task:', error);
+                        }
+                    });
+                }                
+            </script>            
+        </form>
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Tech Task" %}
+                <div class="btn-new-tech-task-container">
+                    <button id="new-tech-task-btn" onclick="redirectToNewTechTaskURL()" class="btn btn-primary">New Tech Task</button>    
+                </div>
+                <script>
+                    function redirectToNewTechTaskURL() {
+                        // Redirect to the specified URL
+                        window.location.href = '/accounts/profile/add_tech_task/';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        <style>
+            .btn-submit-sales-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-build-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-tech-task-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-support-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-strategies-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-sales-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-build-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-tech-task-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-support-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-strategies-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+        </style>
+        
+        </div>
+        
+    </div>
+    
+    {% endblock content %}
+    
+</header>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function fetchStatusValues(table) {
+        fetch(`/get_status_values/${table}/`)
+            .then(response => response.json())
+            .then(data => {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.innerHTML = ''; // Clear existing sidebar content
+    
+                data.status_values.forEach(status => {
+                    const div = document.createElement('div');
+                    div.classList.add('sidebar-item');
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.classList.add('sidebar-link');
+                    a.textContent = status;
+                    a.onclick = function() {
+                        // Store the selected status and table
+                        selectedStatus = status;
+                        selectedTable = table;
+                        filterTableByStatus(table, status);
+                    };
+                    div.appendChild(a);
+                    sidebar.appendChild(div);
+                });
+            })
+            .catch(error => console.error('Error fetching status values:', error));
+    }
+
+    
+    {% comment %} let selected_status = ""; // Initialize selected_status globally {% endcomment %}
+
+    function filterTableByStatus(table, status) {
+        fetch(`/filter_by_status/${table}/${status}/`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(table + "-table-body").innerHTML = data; // Update table body with received data
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Add event listeners for editing date and date of closing columns
+    document.querySelectorAll('.editable-tech-task[data-field="date"] input[type="date"], .editable-tech-task[data-field="date_of_closing"] input[type="date"]').forEach(function(input) {
+        input.addEventListener('input', function() {
+            updateNumberOfDays(this); // Call function to update number of days
+        });
+    });
+    function updateNumberOfDays(input) {
+        var row = input.closest('tr');
+        var dateInput = row.querySelector('.editable-tech-task[data-field="date"] input[type="date"]');
+        var closingDateInput = row.querySelector('.editable-tech-task[data-field="date_of_closing"] input[type="date"]');
+        var daysCell = row.querySelector('.editable-tech-task[data-field="number_of_days"]');
+        
+        var startDate = new Date(dateInput.value);
+        var closingDate = new Date(closingDateInput.value);
+        var diffDays = null;
+    
+        if (dateInput.value && closingDateInput.value) {
+            var timeDiff = Math.abs(closingDate.getTime() - startDate.getTime());
+            diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        }
+        
+        daysCell.innerText = diffDays !== null ? diffDays : ''; // Update the number of days cell
+    }
+    // Function to update the number of days
+    
+    
+</script>
+</body>
+</html>

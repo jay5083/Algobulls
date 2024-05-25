@@ -1,0 +1,748 @@
+{% load static %}
+
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Select Roles {% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+        margin: 0;
+        font-family: "Lato", sans-serif;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 150px;
+            background-color: lightwhite;
+            position: fixed;
+            height: 90%;
+            overflow: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
+            border-radius: 0 0 100px 0; /* Curved bottom-right corner */
+        }
+        
+        .sidebar-item {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow border */
+            padding: 10px;
+            margin-bottom: 10px; /* Add some space between items */
+        }        
+        
+        .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+        
+        .sidebar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .sidebar a:hover:not(.active) {
+            background-color: #5b72e3bf;
+            color: white;
+        }
+        .sidebar::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Adjust the height as needed */
+            background-color: #2679c2bf; /* Set the color to blue */
+            border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
+        }
+        
+
+        div.content {
+            margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+            padding: 20px; /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 700px) {
+            .sidebar {
+              width: 100%;
+              height: auto;
+              position: relative;
+            }
+            .sidebar a {float: left;}
+            div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 400px) {
+            .sidebar a {
+              text-align: center;
+              float: none;
+            }
+          }
+
+          .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-left: 15%; /* Add margin to the left side */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        
+          
+          /* Adjust other styles as needed */
+            
+        </style>
+    
+    
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+            
+<header>
+    <style>
+        .navbar {
+            min-height: 50px; /* Adjust the value as needed */
+        }
+    </style>
+    
+    <style>
+        #sales-leads-table th,
+        #sales-leads-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #support-table th,
+        #support-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #strategies-table th,
+        #strategies-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 20px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        #build-table th,
+        #build-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #tech-task-table th,
+        #tech-task-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 8px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Make it circular */
+            overflow: hidden; /* Hide overflow */
+            margin-right: 10px; /* Adjust margin as needed */
+        }
+        
+        .logo-circle img {
+            width: 100%; /* Make the image fill the circle */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .editable-12,
+        .editable-13,
+        .editable-14,
+        .editable-15,
+        .editable-16 {
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-support{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-build{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-tech-task{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-strategies{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .sidebar-link.active {
+            background-color: green;
+            color: white; /* Change text color to white for better contrast */
+        }
+        .sidebar-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .sidebar-link {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #f0f0f0;
+        }
+        
+        
+    </style>
+    
+    <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+        <div class="container-fluid">
+            <!-- Logo with man inside circle -->
+            <a class="navbar-brand" href="#">
+                <div class="logo-circle">
+                    <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+                    </div>
+            </a>
+            <!-- Name -->
+            <a class="navbar-brand" href="#">Algobulls</a>
+            <!-- Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                    </li>
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Sales" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('sales-leads', this)" role="button" aria-expanded="false">
+                                    Sales
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/sales-leads/" role="button" aria-expanded="false">
+                                    Sales
+                                </a> 
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Build" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('build', this)" role="button" aria-expanded="false">
+                                    Build
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/build/" role="button" aria-expanded="false">
+                                    Build
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Tech Task" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/tech_task/" role="button" aria-expanded="false">
+                                    Tech Task
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Support" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('support', this)" role="button" aria-expanded="false">
+                                    Support
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/support/" role="button" aria-expanded="false">
+                                    Support
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Strategies" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="#"  role="button" aria-expanded="false">
+                                    Strategies
+                                </a>
+                                {% comment %} <a class="nav-link" href="/strategies/" onclick="showTable('strategies', this)" role="button" aria-expanded="false">
+                                    Strategies
+                                </a> {% endcomment %}
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view RMS" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/rms/" role="button" aria-expanded="false">
+                                    RMS
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <!-- User Name -->
+                <div class="d-flex align-items-center">
+                    <div class="logo-circle">
+                        <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                    </div>
+                    <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                    <div>
+                        <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
+                        <script>
+                            function redirectToLoginPage() {
+                                // Redirect to the login page
+                                window.location.href = '/accounts/login/';
+                            }
+                        </script> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="sidebar">
+        <!-- This will be dynamically populated by JavaScript -->
+    </div>
+    
+    {% block content %}
+    <div>
+        
+        <div class="container">           
+
+        <div id="strategies-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Strategies</h2>
+        </div>
+        
+        <table id="strategies-table" class="table table-hover" class="table-container">
+            <!-- Strategies Table Content -->
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy ID field of Strategies" %}
+                            <th scope="col">Strategy ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Employee ID field of Strategies" %}
+                            <th scope="col">Employee ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Name field of Strategies" %}
+                            <th scope="col">Name</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Mobile Number field of Strategies" %}
+                            <th scope="col">Mobile Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Broking House field of Strategies" %}
+                            <th scope="col">Broking House</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Client ID field of Strategies" %}
+                            <th scope="col">Client ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Strategies" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for strategy in strategies %}
+                    <tr class="table-light">
+                        
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Strategy ID field of Strategies" %}
+                                <td scope="row" class="editable-strategies" data-field="strategy_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategy ID field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategy ID field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.strategy_id }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Employee ID field of Strategies" %}
+                                <td class="editable-strategies" data-field="employee_id">
+                                    {% if "Can edit the Employee ID field of Strategies" not in permissions_name %}
+                                        {{ strategy.employee_id.employee_id }}
+                                    {% else %}
+                                        <select class="strategies-employee-id-dropdown">
+                                            {% for sales_employee in sales_employees %}
+                                                {%if sales_employee.role_id.role_name == "Strategy Employee" %}
+                                                    <option value="{{ sales_employee.employee_id }}" {% if sales_employee.employee_id == strategy.employee_id.employee_id %} selected {% endif %}>{{ sales_employee.name }}</option>
+                                                {%endif%}
+                                            {% endfor %}
+                                        </select>
+                                    {% endif %}
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                        
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Name field of Strategies" %}
+                                <td class="editable-strategies" data-field="name"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Name field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Name field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.name }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Mobile Number field of Strategies" %}
+                                <td class="editable-strategies" data-field="mobile_number"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Mobile Number field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Mobile Number field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.mobile_number }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Broking House field of Strategies" %}
+                                <td class="editable-strategies" data-field="broking_house"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Broking House field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Broking House field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.broking_house }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Client ID field of Strategies" %}
+                                <td class="editable-strategies" data-field="client_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Client ID field of Strategies" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Client ID field of Strategies" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                                >{{ strategy.client_id }}</td>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can delete Strategies" %}
+                                <td>
+                                    <button onclick="deleteStrategiesAndRedirect('{{ strategy.strategy_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                        <div style="font-size: 20px;">
+                                            <i class="fa fa-trash"></i>
+                                        </div> <!-- Font Awesome trash icon -->
+                                    </button>
+                                    <script>
+                                        function deleteStrategiesAndRedirect(strategyId) {
+                                            deleteStrategy(strategyId);  // Call the deleteStrategy function
+                                            redirectToThisURL();         // Call the redirectToURL function
+                                        }
+                                    
+                                        function deleteStrategy(strategyId) {
+                                            var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                    
+                                            $.ajax({
+                                                url: '/delete_strategy/',       // URL to send the request
+                                                type: 'POST',                   // HTTP method
+                                                data: {
+                                                    csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                    strategy_id: strategyId          // Strategy ID to be deleted
+                                                },
+                                                success: function(response) {
+                                                    if (response.success) {
+                                                        // If the deletion is successful, you can perform any necessary UI updates
+                                                        alert('Strategy deleted successfully');
+                                                        // Optionally, you can remove the deleted row from the table
+                                                        // Example: $('#strategy_row_' + strategyId).remove();
+                                                    } else {
+                                                        alert('Failed to delete strategy: ' + response.error);
+                                                    }
+                                                },
+                                                error: function(xhr, status, error) {
+                                                    alert('Failed to delete strategy: ' + error);
+                                                }
+                                            });
+                                        }
+                                    
+                                        function redirectToThisURL() {
+                                            // Redirect to the specified URL
+                                            window.location.href = '';  // You can specify the URL here
+                                        }
+                                    </script>
+                                    
+                                </td>
+                            {% endif %}
+                        {% endfor %}
+                    </tr>
+                {% endfor %}
+            </tbody>               
+        </table>
+    </div>
+
+        <form id="update-strategies-form" class="btn-submit-strategies-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-strategies-btn" type="button" onclick="submitStrategiesAndRedirect()" class="btn btn-success">Submit Strategies</button>
+            <script>
+                function submitStrategiesAndRedirect() {
+                    submitStrategies();  // Call the submitStrategies function
+                    redirectToThisURL(); // Call the redirectToThisURL function
+                }
+            
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+            
+                function submitStrategies() {
+                    var editableCells = document.querySelectorAll('.editable-strategies'); // Select all editable cells
+                    var updatedData = {}; // Initialize an object to store updated data
+                
+                    editableCells.forEach(function(cell) {
+                        var strategyIdElem = cell.closest('tr').querySelector('[data-field="strategy_id"]');
+                        var strategyId = strategyIdElem ? strategyIdElem.innerText.trim() : null;
+                        var field = cell.getAttribute('data-field');
+                        var value = null;
+                
+                        if (!strategyId) {
+                            console.error('Strategy ID not found for cell:', cell);
+                            return; // Skip this cell if the strategy ID is not found
+                        }
+                
+                        try {
+                            // For dropdowns, get the selected value from the dropdown
+                            if (field === "employee_id") {
+                                var employeeDropdown = cell.querySelector('.strategies-employee-id-dropdown');
+                                value = employeeDropdown ? employeeDropdown.value : null;
+                            } else {
+                                value = cell.innerText.trim();
+                            }
+                
+                            if (value !== null) {
+                                if (!updatedData.hasOwnProperty(strategyId)) {
+                                    updatedData[strategyId] = {};
+                                }
+                                updatedData[strategyId][field] = value;
+                            } else {
+                                console.error('Value not found for field:', field, 'in cell:', cell);
+                            }
+                        } catch (error) {
+                            console.error(`Error processing cell for strategyId ${strategyId} and field ${field}: ${error.message}`);
+                        }
+                    });
+                
+                    // Serialize the updatedData object and send it to the server
+                    $.ajax({
+                        url: '/update_strategies/',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Strategies updated successfully:', response);
+                            redirectToThisURL(); // Redirect to the specified URL after successful update
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating strategies:', error);
+                        }
+                    });
+                }
+                
+            </script>            
+        </form>
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Strategies" %}
+                <div class="btn-new-strategies-container">
+                    <button id="new-strategies-btn" onclick="redirectToNewStrategiesURL()" class="btn btn-primary">New Strategies</button>    
+                </div>
+                <script>
+                    function redirectToNewStrategiesURL() {
+                        // Redirect to the specified URL
+                        window.location.href = '/accounts/profile/add_strategies/';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        <style>
+            .btn-submit-sales-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-build-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-tech-task-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-support-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-strategies-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-sales-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-build-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-tech-task-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-support-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-strategies-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+        </style>
+        
+        </div>
+        
+    </div>
+    
+    {% endblock content %}
+    
+</header>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function fetchStatusValues(table) {
+        fetch(`/get_status_values/${table}/`)
+            .then(response => response.json())
+            .then(data => {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.innerHTML = ''; // Clear existing sidebar content
+    
+                data.status_values.forEach(status => {
+                    const div = document.createElement('div');
+                    div.classList.add('sidebar-item');
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.classList.add('sidebar-link');
+                    a.textContent = status;
+                    a.onclick = function() {
+                        // Store the selected status and table
+                        selectedStatus = status;
+                        selectedTable = table;
+                        filterTableByStatus(table, status);
+                    };
+                    div.appendChild(a);
+                    sidebar.appendChild(div);
+                });
+            })
+            .catch(error => console.error('Error fetching status values:', error));
+    }
+
+    
+    {% comment %} let selected_status = ""; // Initialize selected_status globally {% endcomment %}
+
+    function filterTableByStatus(table, status) {
+        fetch(`/filter_by_status/${table}/${status}/`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(table + "-table-body").innerHTML = data; // Update table body with received data
+            })
+            .catch(error => console.error('Error:', error));
+    }
+</script>
+</body>
+</html>

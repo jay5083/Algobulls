@@ -236,19 +236,22 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view Sales" %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTable('sales-leads', this)" role="button" aria-expanded="false">
-                                    Sales
-                                </a>
-                                {% comment %} <a class="nav-link" href="/sales/" onclick="showTable('sales-leads', this)" role="button" aria-expanded="false">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('sales-leads', this)" role="button" aria-expanded="false">
                                     Sales
                                 </a> {% endcomment %}
+                                <a class="nav-link" href="/sales-leads/" role="button" aria-expanded="false">
+                                    Sales
+                                </a> 
                             </li>
                         {% endif %}
                     {% endfor %}
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view Build" %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTable('build', this)" role="button" aria-expanded="false">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('build', this)" role="button" aria-expanded="false">
+                                    Build
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/build/" role="button" aria-expanded="false">
                                     Build
                                 </a>
                             </li>
@@ -257,7 +260,10 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view Tech Task" %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTable('tech-task', this)" role="button" aria-expanded="false">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('tech-task', this)" role="button" aria-expanded="false">
+                                    Tech Task
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/tech_task/" role="button" aria-expanded="false">
                                     Tech Task
                                 </a>
                             </li>
@@ -266,7 +272,10 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view Support" %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTable('support', this)" role="button" aria-expanded="false">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('support', this)" role="button" aria-expanded="false">
+                                    Support
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/support/" role="button" aria-expanded="false">
                                     Support
                                 </a>
                             </li>
@@ -275,8 +284,20 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view Strategies" %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTable('strategies', this)" role="button" aria-expanded="false">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('strategies', this)" role="button" aria-expanded="false">
                                     Strategies
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/strategies/" role="button" aria-expanded="false">
+                                    Strategies
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view RMS" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/rms/" role="button" aria-expanded="false">
+                                    RMS
                                 </a>
                             </li>
                         {% endif %}
@@ -302,9 +323,9 @@
         </div>
     </nav>
     
-    <div class="sidebar">
+    {% comment %} <div class="sidebar">
         <!-- This will be dynamically populated by JavaScript -->
-    </div>
+    </div> {% endcomment %}
     
     
     
@@ -2145,7 +2166,22 @@
             </tbody>
         </table>
     </div>
-        
+
+    {% comment %} <div><h1>Sales</h1></div>
+    <button class="btn btn-success" onclick="redirectget_dataURL()">Total leads generated (weekly)</button>
+    <script>
+        function redirectget_dataURL() {
+            window.location.href = '/get_data/';
+        }
+    </script>
+    
+    <button class="btn btn-success" onclick="redirectbranch_wise_leadsURL()">Branch wise split of leads generated </button>
+    <script>
+        function redirectbranch_wise_leadsURL() {
+            window.location.href = '/branch_wise_leads/';
+        }
+    </script> {% endcomment %}
+
         <form id="update-sales-leads-form" class="btn-submit-sales-container" method="post">
             {% csrf_token %}
             <input type="hidden" name="updated_data" id="updated-data">

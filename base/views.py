@@ -8,7 +8,7 @@ from django.contrib.auth import authenticate, login
 from django.shortcuts import render
 from django.shortcuts import render
 from django.views.decorators.csrf import csrf_exempt
-from .models import AlgobullsEmployee, Sales, BranchEmployee, Build, TechTask, Support, Strategies
+from .models import AlgobullsEmployee, Sales, BranchEmployee, Build, TechTask, Support, Strategies, Rms, Broker
 from datetime import datetime, date
 from .models import Support, BranchEmployee, AlgobullsEmployee
 from django.shortcuts import render, redirect
@@ -52,13 +52,17 @@ def home(request):
     tech_task = TechTask.objects.all().order_by('task_id')
     support = Support.objects.all().order_by('ticket_number')
     strategies = Strategies.objects.all().order_by('strategy_id')
-    name = algobulls_employee.name
+    # name = algobulls_employee.name
     user_group = user_groups[0].name
+    print(user_group)
     
     # Fetch the name of the first user group
     if user_group == "Branch Employee":
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
+    #     name = branch_employee.name
+    # else:
+    #     name = algobulls_employee.name
     
     context = {
         'user_groups': user_groups,
@@ -67,7 +71,7 @@ def home(request):
         'employee_id': employee_id,
         "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
-        "name": name,
+        # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
         'builds' : build,
@@ -112,20 +116,41 @@ def status_filter(request, table, status):
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
     
-    sales_leads = Sales.objects.all().order_by('lead_id').filter(status=status)
+    sales_leads = Sales.objects.filter(status=status).order_by('lead_id')
+    number_of_sales_status = sales_leads.count()
+    
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
+    
     build = Build.objects.all().order_by('build_id')
-    tech_task = TechTask.objects.all().order_by('task_id')
-    support = Support.objects.all().order_by('ticket_number')
+    
+    tech_task = TechTask.objects.filter(task_status=status).order_by('task_id')
+    number_of_tech_task_status = tech_task.count()
+    
+    support = Support.objects.filter(status=status).order_by('ticket_number')
+    number_of_support_status = support.count()
+    
     strategies = Strategies.objects.all().order_by('strategy_id')
-    name = algobulls_employee.name
+    # name = algobulls_employee.name
     user_group = user_groups[0].name
     
     # Fetch the name of the first user group
     if user_group == "Branch Employee":
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
+        number_of_sales_status = sales_leads.count()
+        number_of_support_status = support.count()
+        
+    if user_group == "Branch Head":
+        head_branch_id = branch_employee.branch_id
+        sales_leads = sales_leads.filter(branch_employee_id__branch_id=head_branch_id)
+        support = support.filter(branch_employee_id__branch_id=head_branch_id)
+        number_of_sales_status = sales_leads.count()
+        number_of_support_status = support.count()
+        
+    if user_group == "Sales Employee":
+        sales_leads = sales_leads.filter(sales_employee_id=employee_id)
+        number_of_sales_status = sales_leads.count()
     
     context = {
         'user_groups': user_groups,
@@ -134,7 +159,7 @@ def status_filter(request, table, status):
         'employee_id': employee_id,
         "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
-        "name": name,
+        # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
         'builds' : build,
@@ -143,10 +168,26 @@ def status_filter(request, table, status):
         'strategies' : strategies,
         'selected_status': status,
         'table':table,
+        'number_of_sales_status':number_of_sales_status,
+        'number_of_support_status':number_of_support_status,
+        'number_of_tech_task_status':number_of_tech_task_status,
     }
-
-    return render(request, 'base.html', context)
-
+    if table=="sales-leads":
+        return render(request, 'sales.html', context)
+    
+    if table=="support":
+        return render(request, 'support.html', context)
+    
+    if table=="build":
+        return render(request, "build.html", context)
+    
+    if table=="strategies":
+        return render(request, "strategies.html", context)
+    
+    if table=='tech-task':
+        return render(request, 'tech_task.html', context)
+    
+    
 def update_sales_leads(request):
     if request.method == 'POST':
         updated_data_json = request.POST.get('updated_data')
@@ -259,7 +300,7 @@ def add_sales_leads(request):
 
         # Fetch Algobulls employee and user information
         
-        return redirect('/accounts/profile/')
+        return redirect('/sales-leads/')
 
     else:
         # Fetch user groups
@@ -811,6 +852,50 @@ def update_strategies(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
+def update_rms(request):
+    if request.method == 'POST':
+        updated_data_json = request.POST.get('updated_data')
+        updated_data = json.loads(updated_data_json)
+
+        success_count = 0
+        error_count = 0
+
+        # Update records in the database based on the received data
+        for sr_no, rms_data in updated_data.items():
+            try:
+                rms = Rms.objects.get(sr_no=sr_no)
+                for field, value in rms_data.items():
+                    if field == 'broker':
+                        # Check if value is a valid broker_id and get the Broker object
+                        try:
+                            broker = Broker.objects.get(broker_id=value)
+                            setattr(rms, field, broker)
+                        except Broker.DoesNotExist:
+                            error_count += 1
+                            continue
+                    elif field == 'employee':
+                        # Check if value is a valid employee_id and get the AlgobullsEmployee object
+                        try:
+                            employee = AlgobullsEmployee.objects.get(employee_id=value)
+                            setattr(rms, field, employee)
+                        except AlgobullsEmployee.DoesNotExist:
+                            error_count += 1
+                            continue
+                    else:
+                        setattr(rms, field, value)
+                rms.save()
+                success_count += 1
+            except Rms.DoesNotExist:
+                error_count += 1
+
+        success_message = f"{success_count} records updated successfully."
+        error_message = f"{error_count} records failed to update."
+
+        return JsonResponse({'success_message': success_message, 'error_message': error_message})
+
+    else:
+        return JsonResponse({'error': 'Invalid request method'})
+
 
 from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -876,12 +961,10 @@ def get_status_values(request, table):
         return JsonResponse({'status_values': list(status_values)})
     
 def sales(request):
-    
     employee_id = None
     # name = None
     algobulls_employee = None
     branch_employee = None
-    
     # First, try to find the user in the AlgobullsEmployee table
     try:
         algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
@@ -912,7 +995,7 @@ def sales(request):
     tech_task = TechTask.objects.all().order_by('task_id')
     support = Support.objects.all().order_by('ticket_number')
     strategies = Strategies.objects.all().order_by('strategy_id')
-    name = algobulls_employee.name
+    # name = algobulls_employee.name
     user_group = user_groups[0].name
     
     # Fetch the name of the first user group
@@ -927,7 +1010,7 @@ def sales(request):
         'employee_id': employee_id,
         "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
-        "name": name,
+        # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
         'builds' : build,
@@ -937,4 +1020,652 @@ def sales(request):
         'selected_status': request.GET.get('status', '')
     }
     
-    return render(request, 'sales.html', context)        
+    return render(request, 'sales.html', context)
+
+def support(request):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id')
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    # name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        # "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+    return render(request, 'support.html', context)        
+
+
+def build(request):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id')
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    # name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        # "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+    return render(request, 'build.html', context) 
+
+
+def strategies(request):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id')
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    # name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        # "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+    return render(request, 'strategies.html', context)        
+
+
+def tech_task(request):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id')
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    # name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        # "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+    return render(request, 'tech_task.html', context)        
+
+def rms(request):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.all().order_by('lead_id')
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    build = Build.objects.all().order_by('build_id')
+    tech_task = TechTask.objects.all().order_by('task_id')
+    support = Support.objects.all().order_by('ticket_number')
+    strategies = Strategies.objects.all().order_by('strategy_id')
+    rms = Rms.objects.all().order_by('sr_no')
+    broker = Broker.objects.all()
+    # name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        support = support.filter(branch_employee_id=employee_id)
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        # "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'builds' : build,
+        'tech_tasks' : tech_task,
+        'supports' : support,
+        'strategies' : strategies,
+        'rms_objects': rms,
+        'brokers': broker,
+        'selected_status': request.GET.get('status', '')
+    }
+    
+    return render(request, 'rms.html', context)        
+
+def add_rms(request):
+    if request.method == 'POST':
+        # Extract form data
+        sr_no = request.POST.get('sr_no')
+        ticket_number = request.POST.get('ticket_number')
+        broker_id = request.POST.get('broker')
+        date = request.POST.get('date')
+        broking_id = request.POST.get('broking_id')
+        name = request.POST.get('name')
+        contact_number = request.POST.get('contact_number')
+        email_id = request.POST.get('email_id')
+        customer_type = request.POST.get('customer_type')
+        priority = request.POST.get('priority')
+        issue = request.POST.get('issue')
+        comment = request.POST.get('comment')
+        assigned_to = request.POST.get('assigned_to')
+        status = request.POST.get('status')
+        date_of_closing = request.POST.get('date_of_closing')
+        rms_status = request.POST.get('rms_status')
+        rms_comment = request.POST.get('rms_comment')
+        employee_id = request.POST.get('employee')
+
+        # Validate and convert dates if needed
+        # For example:
+        # try:
+        #     date = datetime.strptime(date_str, '%Y-%m-%d').date()
+        # except ValueError:
+        #     return JsonResponse({'error': 'Invalid date format for date'}, status=400)
+
+        # Check if the provided broker_id exists
+        if broker_id:
+            try:
+                broker = Broker.objects.get(broker_id=broker_id)
+            except Broker.DoesNotExist:
+                return redirect('error_page')  # Redirect to an error page or handle the error appropriately
+        else:
+            broker = None
+
+        # Check if the provided employee_id exists
+        if employee_id:
+            try:
+                employee = AlgobullsEmployee.objects.get(employee_id=employee_id)
+            except AlgobullsEmployee.DoesNotExist:
+                return redirect('error_page')  # Redirect to an error page or handle the error appropriately
+        else:
+            employee = None
+
+        # Create a new Rms object and save it to the database
+        new_rms = Rms.objects.create(
+            sr_no=sr_no,
+            ticket_number=ticket_number,
+            broker=broker,
+            date=date,
+            broking_id=broking_id,
+            name=name,
+            contact_number=contact_number,
+            email_id=email_id,
+            customer_type=customer_type,
+            priority=priority,
+            issue=issue,
+            comment=comment,
+            assigned_to=assigned_to,
+            status=status,
+            date_of_closing=date_of_closing,
+            rms_status=rms_status,
+            rms_comment=rms_comment,
+            employee=employee,
+        )
+
+        return redirect('/accounts/profile/')
+
+    else:
+        # Fetch user groups
+        user_groups = request.user.groups.all()
+        brokers = Broker.objects.all()
+        employees = AlgobullsEmployee.objects.all()
+        
+        # Fetch user permissions
+        user_permissions = []
+        for group in user_groups:
+            user_permissions.extend(group.permissions.all())
+
+        context = {
+            'user_permissions': user_permissions,
+            'brokers': brokers,
+            'sales_employees': employees,
+        }
+
+        return render(request, 'add_rms.html', context)
+
+from django.shortcuts import render
+from datetime import datetime, timedelta
+
+def to_sales_analysis(request):
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=30)
+    
+    context = {
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d')
+    }
+    
+    return render(request, 'sales_analysis.html', context)
+
+
+from django.db import connection
+
+def execute_raw_sql(query, params):
+    with connection.cursor() as cursor:
+        cursor.execute(query, params)
+        results = cursor.fetchall()
+    return results
+
+import json
+from django.http import JsonResponse
+from django.shortcuts import render
+import logging
+
+logger = logging.getLogger(__name__)
+
+def sales_analysis_data(request):
+    try:
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        filters = json.loads(request.POST.get('filters', '{}'))
+
+        source_types = filters.get('source_type', [])
+        categories = filters.get('category', [])
+        risk_appetites = filters.get('risk_appetite', [])
+        statuses = filters.get('status', [])
+        employee_ids = filters.get('employee_id', [])
+
+        filter_conditions = []
+        params = [start_date, end_date]
+
+        if source_types:
+            filter_conditions.append('"Source Type" IN %s')
+            params.append(tuple(source_types))
+        if categories:
+            filter_conditions.append('"Category" IN %s')
+            params.append(tuple(categories))
+        if risk_appetites:
+            filter_conditions.append('"Risk Appetite" IN %s')
+            params.append(tuple(risk_appetites))
+        if statuses:
+            filter_conditions.append('"Status" IN %s')
+            params.append(tuple(statuses))
+        if employee_ids:
+            filter_conditions.append('"Sales Employee ID" IN %s')
+            params.append(tuple(employee_ids))
+
+        filter_sql = ' AND '.join(filter_conditions)
+
+        query1 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                COUNT(*) AS total_leads
+            FROM "Sales"
+            WHERE "Purchase Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
+            GROUP BY week_start, week_end
+            ORDER BY week_start;
+        """
+        query2 = f"""
+            SELECT
+                "Branch Employee ID",
+                COUNT(*) AS total_leads
+            FROM "Sales"
+            WHERE "Purchase Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
+            GROUP BY "Branch Employee ID"
+            ORDER BY "Branch Employee ID";
+        """
+        query3 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                SUM(CAST("Amount" AS DECIMAL)) AS total_revenue
+            FROM "Sales"
+            WHERE "Purchase Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
+            GROUP BY week_start, week_end
+            ORDER BY week_start;
+        """
+        query4 = f"""
+            SELECT
+                "Branch Employee ID",
+                SUM(CAST("Amount" AS DECIMAL)) AS branch_revenue
+            FROM "Sales"
+            WHERE "Purchase Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
+            GROUP BY "Branch Employee ID"
+            ORDER BY "Branch Employee ID";
+        """
+
+        logger.info("Executing query1 with params: %s", params)
+        results1 = execute_raw_sql(query1, params)
+        logger.info("Executing query2 with params: %s", params)
+        results2 = execute_raw_sql(query2, params)
+        logger.info("Executing query3 with params: %s", params)
+        results3 = execute_raw_sql(query3, params)
+        logger.info("Executing query4 with params: %s", params)
+        results4 = execute_raw_sql(query4, params)
+
+        user_groups = request.user.groups.all()
+        user_permissions = []
+        for group in user_groups:
+            user_permissions.extend(group.permissions.all())
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = {
+                'results1': results1,
+                'results2': results2,
+                'results3': results3,
+                'results4': results4,
+            }
+            return JsonResponse(data)
+        else:
+            context = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'results1': results1,
+                'results2': results2,
+                'results3': results3,
+                'results4': results4,
+            }
+            return render(request, 'sales_analysis.html', context)
+    except Exception as e:
+        logger.error("Error in sales_analysis_data view: %s", e)
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+
+    
+from django.http import JsonResponse
+
+def fetch_employee_ids(request):
+    try:
+        query = 'SELECT DISTINCT "Sales Employee ID" FROM "Sales";'
+        employee_ids = execute_raw_sql(query, [])
+        employee_ids = [row[0] for row in employee_ids]
+        return JsonResponse({'employee_ids': employee_ids})
+    except Exception as e:
+        logger.error("Error fetching employee IDs: %s", e)
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+def sales_filter(request, column, value):
+    employee_id = None
+    # name = None
+    algobulls_employee = None
+    branch_employee = None
+    
+    # First, try to find the user in the AlgobullsEmployee table
+    try:
+        algobulls_employee = AlgobullsEmployee.objects.get(email_id=request.user.username)
+        employee_id = algobulls_employee.employee_id
+        # name = algobulls_employee.name
+    except AlgobullsEmployee.DoesNotExist:
+        # If not found, try to find the user in the BranchEmployee table
+        try:
+            branch_employee = BranchEmployee.objects.get(email_id=request.user.username)
+            employee_id = branch_employee.branch_employee_id
+            # name = branch_employee.name
+        except BranchEmployee.DoesNotExist:
+            employee_id = None
+            # name = None
+
+    # Fetch user groups
+    user_groups = request.user.groups.all()
+    
+    # Fetch user permissions
+    user_permissions = []
+    for group in user_groups:
+        user_permissions.extend(group.permissions.all())
+    
+    sales_leads = Sales.objects.filter().order_by('lead_id')
+    number_of_sales_status = sales_leads.count()
+    
+    branch_employees = BranchEmployee.objects.all()
+    sales_employees = AlgobullsEmployee.objects.all()
+    # name = algobulls_employee.name
+    user_group = user_groups[0].name
+    
+    # Fetch the name of the first user group
+    if user_group == "Branch Employee":
+        sales_leads = sales_leads.filter(branch_employee_id=employee_id)
+        number_of_sales_status = sales_leads.count()
+        
+    if user_group == "Branch Head":
+        head_branch_id = branch_employee.branch_id
+        sales_leads = sales_leads.filter(branch_employee_id__branch_id=head_branch_id)
+        number_of_sales_status = sales_leads.count()
+        
+    if user_group == "Sales Employee":
+        sales_leads = sales_leads.filter(sales_employee_id=employee_id)
+        number_of_sales_status = sales_leads.count()
+    
+    context = {
+        'user_groups': user_groups,
+        'user_permissions': user_permissions,
+        'permissions_name': [i.name for i in user_permissions],
+        'employee_id': employee_id,
+        "sales_leads": sales_leads,
+        "role_name": user_group,  # Replace "Sales Head" with user_group
+        # "name": name,
+        'branch_employees': branch_employees,
+        'sales_employees' : sales_employees,
+        'number_of_sales_status':number_of_sales_status,
+        
+    }
+    
+    return render(request, 'sales.html', context)
+from django.http import JsonResponse
+from django.db.models import Q
+
+def apply_filters(request):
+    if request.method == 'POST' and request.headers.get('HTTP_X_REQUESTED_WITH') == 'XMLHttpRequest':
+        # Process the AJAX request
+        filters = request.POST.dict()  # Assuming filters are sent as POST data
+        # Construct Q objects for filtering
+        q_objects = Q()
+        for key, value in filters.items():
+            q_objects |= Q(**{key: value})
+        # Query the Sales model with the constructed Q objects
+        sales_leads = Sales.objects.filter(q_objects).values()
+        # Return JSON response with filtered data
+        return JsonResponse({'status': 'success', 'data': list(sales_leads)})
+    else:
+        # Handle non-AJAX or GET request
+        return JsonResponse({'status': 'error', 'message': 'Invalid request'})

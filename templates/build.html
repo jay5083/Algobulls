@@ -1,0 +1,943 @@
+{% load static %}
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Select Roles {% block title %}{% endblock title %}</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <style>
+        body {
+        margin: 0;
+        font-family: "Lato", sans-serif;
+        }
+
+        .sidebar {
+            margin: 0;
+            padding: 0;
+            width: 150px;
+            background-color: lightwhite;
+            position: fixed;
+            height: 90%;
+            overflow: auto;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
+            border-radius: 0 0 100px 0; /* Curved bottom-right corner */
+        }
+        
+        .sidebar-item {
+            background-color: white;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow border */
+            padding: 10px;
+            margin-bottom: 10px; /* Add some space between items */
+        }        
+        
+        .sidebar a {
+            display: block;
+            color: black;
+            padding: 16px;
+            text-decoration: none;
+        }
+        
+        .sidebar a.active {
+            background-color: #04AA6D;
+            color: white;
+        }
+        
+        .sidebar a:hover:not(.active) {
+            background-color: #5b72e3bf;
+            color: white;
+        }
+        .sidebar::after {
+            content: "";
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 150px; /* Adjust the height as needed */
+            background-color: #2679c2bf; /* Set the color to blue */
+            border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
+        }
+        
+
+        div.content {
+            margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+            padding: 20px; /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 700px) {
+            .sidebar {
+              width: 100%;
+              height: auto;
+              position: relative;
+            }
+            .sidebar a {float: left;}
+            div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
+          }
+          
+          @media screen and (max-width: 400px) {
+            .sidebar a {
+              text-align: center;
+              float: none;
+            }
+          }
+
+          .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-left: 15%; /* Add margin to the left side */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+        
+          
+          /* Adjust other styles as needed */
+            
+        </style>
+    
+    
+
+    <style>
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+            
+<header>
+    <style>
+        .navbar {
+            min-height: 50px; /* Adjust the value as needed */
+        }
+    </style>
+    
+    <style>
+        #sales-leads-table th,
+        #sales-leads-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #support-table th,
+        #support-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #strategies-table th,
+        #strategies-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 20px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        #build-table th,
+        #build-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            padding: 8px; /* Add padding for better appearance */
+        }
+        #tech-task-table th,
+        #tech-task-table td {
+            text-align: center;
+            border: 1px solid #ccc; /* Add border to all sides */
+            {% comment %} padding: 8px; /* Add padding for better appearance */ {% endcomment %}
+        }
+        .logo-circle {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%; /* Make it circular */
+            overflow: hidden; /* Hide overflow */
+            margin-right: 10px; /* Adjust margin as needed */
+        }
+        
+        .logo-circle img {
+            width: 100%; /* Make the image fill the circle */
+            height: auto; /* Maintain aspect ratio */
+        }
+        .editable-12,
+        .editable-13,
+        .editable-14,
+        .editable-15,
+        .editable-16 {
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-support{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-build{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-tech-task{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .editable-strategies{
+            max-width: 150px; /* Adjust the maximum width as needed */
+            overflow-x: auto; /* Enable horizontal scrolling */
+            white-space: nowrap; /* Prevent wrapping of text */
+        }
+        .sidebar-link.active {
+            background-color: green;
+            color: white; /* Change text color to white for better contrast */
+        }
+        .sidebar-item {
+            padding: 10px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        .sidebar-link {
+            text-decoration: none;
+            color: #333;
+            display: block;
+        }
+        
+        .sidebar-link:hover {
+            background-color: #f0f0f0;
+        }
+        
+        
+    </style>
+    
+    <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+        <div class="container-fluid">
+            <!-- Logo with man inside circle -->
+            <a class="navbar-brand" href="#">
+                <div class="logo-circle">
+                    <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+                    </div>
+            </a>
+            <!-- Name -->
+            <a class="navbar-brand" href="#">Algobulls</a>
+            <!-- Toggle Button -->
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <!-- Navbar Links -->
+            <div class="collapse navbar-collapse" id="navbarColor01">
+                <ul class="navbar-nav me-auto">
+                    <li class="nav-item">
+                        <a class="nav-link active" href="#">
+                            <span class="visually-hidden">(current)</span>
+                        </a>
+                    </li>
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Sales" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('sales-leads', this)" role="button" aria-expanded="false">
+                                    Sales
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/sales-leads/" role="button" aria-expanded="false">
+                                    Sales
+                                </a> 
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Build" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('build', this)" role="button" aria-expanded="false">
+                                    Build
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/build/" role="button" aria-expanded="false">
+                                    Build
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Tech Task" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/tech_task/" role="button" aria-expanded="false">
+                                    Tech Task
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Support" %}
+                            <li class="nav-item">
+                                {% comment %} <a class="nav-link" href="#" onclick="showTable('support', this)" role="button" aria-expanded="false">
+                                    Support
+                                </a> {% endcomment %}
+                                <a class="nav-link" href="/support/" role="button" aria-expanded="false">
+                                    Support
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view Strategies" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/strategies/" role="button" aria-expanded="false">
+                                    Strategies
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view RMS" %}
+                            <li class="nav-item">
+                                <a class="nav-link" href="/rms/" role="button" aria-expanded="false">
+                                    RMS
+                                </a>
+                            </li>
+                        {% endif %}
+                    {% endfor %}
+                </ul>
+                <!-- User Name -->
+                <div class="d-flex align-items-center">
+                    <div class="logo-circle">
+                        <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                    </div>
+                    <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                    <div>
+                        <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
+                        <script>
+                            function redirectToLoginPage() {
+                                // Redirect to the login page
+                                window.location.href = '/accounts/login/';
+                            }
+                        </script> 
+                    </div>
+                </div>
+            </div>
+        </div>
+    </nav>
+    
+    <div class="sidebar">
+        <!-- This will be dynamically populated by JavaScript -->
+    </div>
+    
+    {% block content %}
+    <div>
+        
+        
+        <div class="container">
+        
+
+        <div id="build-text" style="text-align: center;" style="display: none;" class="heading-container">
+            <h2>Build</h2>
+        </div>
+        <table id="build-table" class="table table-hover" class="table-container">
+            <thead>
+                <tr class="table-info">
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Build ID field of Build" %}
+                            <th scope="col">Build ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Name field of Build" %}
+                            <th scope="col">Strategist Name</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Number field of Build" %}
+                            <th scope="col">Strategist Number</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Build" %}
+                            <th scope="col">Email ID</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Build" %}
+                            <th scope="col">Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy field of Build" %}
+                            <th scope="col">Strategy</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Document field of Build" %}
+                            <th scope="col">Document</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Date field of Build" %}
+                            <th scope="col">Payment Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Amount field of Build" %}
+                            <th scope="col">Payment Amount</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Delivery Date field of Build" %}
+                            <th scope="col">Delivery Date</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Remarks field of Build" %}
+                            <th scope="col">Remarks</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Build" %}
+                            <th scope="col">Status</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source field of Build" %}
+                            <th scope="col">Source</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Assign From field of Build" %}
+                            <th scope="col">Assign From</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Manage By field of Build" %}
+                            <th scope="col">Manage By</th>
+                        {% endif %}
+                    {% endfor %}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Build" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
+                </tr>
+            </thead>
+            <tbody>
+                {% for build in builds %}
+                <tr class="table-light">
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Build ID field of Build" %}
+                            <td scope="row" class="editable-build" data-field="build_id"
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can edit the Build ID field of Build" %}
+                                    contenteditable="true"
+                                {% endif %}
+                            {% endfor %}
+                            {% if "Can edit the Build ID field of Sales" not in user_permissions %}
+                                contenteditable="false"
+                            {% endif %}
+                            >{{ build.build_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Name field of Build" %}
+                            <td class="editable-build" data-field="strategist_name">
+                                {% if "Can edit the Strategist Name field of Build" not in permissions_name %}
+                                    {{ build.strategist_name.name }}
+                                {% else %}
+                                    <select class="strategist_name-dropdown">
+                                        {% for strategist_name in sales_employees %}
+                                            {%if strategist_name.role_id.role_name == "Strategy Employee" %}
+                                                <option value="{{ strategist_name.employee_id }}" {% if strategist_name.employee_id == build.strategist_name.employee_id %} selected {% endif %}>{{ strategist_name.name }}</option>
+                                            {%endif%}
+                                        {% endfor %}
+                                    </select>
+                                {% endif %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategist Number field of Build" %}
+                            <td class="editable-build" data-field="strategist_number"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategist Number field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategist Number field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.strategist_number }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Email ID field of Build" %}
+                            <td class="editable-build" data-field="email_id"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategist Number field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategist Number field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.email_id }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Date field of Build" %}
+                            <td class="editable-build" data-field="date">
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Date field of Build" %}
+                                        <input type="date" id="date" name="date" value="{{ build.date}}"><br><br>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Strategy field of Build" %}
+                            <td class="editable-build" data-field="strategy"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Strategy field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Strategy field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.strategy }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Document field of Build" %}
+                            <td class="editable-build" data-field="document"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Document field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Document field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.document }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Date field of Build" %}
+                            <td class="editable-build" data-field="payment_date">
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Payment Date field of Build" %}
+                                        <input type="date" id="payment_date" name="payment_date" value="{{ build.payment_date}}"><br><br>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Payment Amount field of Build" %}
+                            <td class="editable-build" data-field="payment_amount"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Payment Amount field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Payment Amount field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.payment_amount }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Delivery Date field of Build" %}
+                            <td class="editable-build" data-field="delivery_date">
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Delivery Date field of Build" %}
+                                        <input type="date" id="delivery_date" name="delivery_date" value="{{ build.delivery_date}}"><br><br>
+                                    {% endif %}
+                                {% endfor %}
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Remarks field of Build" %}
+                            <td class="editable-build" data-field="remarks"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Remarks field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Remarks field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.remarks }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Status field of Build" %}
+                            <td class="editable-build" data-field="status"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Status field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Status field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.status }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Source field of Build" %}
+                            <td class="editable-build" data-field="source"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Source field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Source field of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.source }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Assign From field of Build" %}
+                            <td class="editable-build" data-field="assign_from"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Assign From field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Assign From of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.assign_from }}</td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can view the Manage By field of Build" %}
+                            <td class="editable-build" data-field="manage_by"
+                                {% for permission in user_permissions %}
+                                    {% if permission.name == "Can edit the Manage By field of Build" %}
+                                        contenteditable="true"
+                                    {% endif %}
+                                {% endfor %}
+                                {% if "Can edit the Manage By of Build" not in user_permissions %}
+                                    contenteditable="false"
+                                {% endif %}
+                            >{{ build.manage_by }}</td>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete Build" %}
+                            <td>
+                                <button onclick="deleteBuildAndRedirect('{{ build.build_id }}')" style="padding: 3px; color: white; background-color: red; border: none;">
+                                    <div style="font-size: 20px;">
+                                        <i class="fa fa-trash"></i>
+                                      </div> <!-- Font Awesome trash icon -->
+                                </button>
+                                <script>
+                                    function deleteBuildAndRedirect(buildId) {
+                                        deleteBuild(buildId);  // Call the deleteBuild function
+                                        redirectToThisURL();   // Call the redirectToURL function
+                                    }
+                                    
+                                    function redirectToThisURL() {
+                                        // Redirect to the specified URL
+                                        window.location.href = '';
+                                    }
+                                    
+                                    function deleteBuild(buildId) {
+                                        var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                        
+                                        $.ajax({
+                                            url: '/delete_build/',
+                                            type: 'POST',
+                                            data: {
+                                                csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                build_id: buildId
+                                            },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    // If the deletion is successful, you can perform any necessary UI updates
+                                                    alert('Build deleted successfully');
+                                                    // Optionally, you can remove the deleted row from the table
+                                                    // Example: $('#build_row_' + buildId).remove();
+                                                } else {
+                                                    alert('Failed to delete Build: ' + response.error);
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {
+                                                alert('Failed to delete Build: ' + error);
+                                            }
+                                        });
+                                    }
+                                </script>                                
+                            </td>
+                        {% endif %}
+                    {% endfor %}
+                    
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+    </div>
+
+        <form id="update-build-form" class="btn-submit-build-container" method="post">
+            {% csrf_token %}
+            <input type="hidden" name="updated_data" id="updated-data">
+            <button id="submit-build-btn" type="button" onclick="submitBuildAndRedirect()" class="btn btn-success">Submit Build</button>
+            <script>
+                function submitBuildAndRedirect() {
+                    submitBuild();          // Call the submitBuild function
+                    redirectToThisURL();    // Call the redirectToThisURL function
+                }
+                
+                function redirectToThisURL() {
+                    // Redirect to the specified URL
+                    window.location.href = '';
+                }
+                
+                function submitBuild(buildId) {
+                    var editedCells = document.querySelectorAll('.editable-build'); // Select all editable cells
+                    var updatedData = {}; // Initialize an empty object to store updated data
+            
+                    // Iterate over each edited cell
+                    editedCells.forEach(function(cell) {
+                        var buildId = cell.parentElement.querySelector('.editable-build').innerText.trim(); // Get the build ID
+                        var fieldName = cell.getAttribute('data-field'); // Get the data field name
+                        var newValue = null; // Initialize newValue variable to null
+            
+                        try {
+                            if (fieldName === "strategist_name") {
+                                var strategistDropdown = cell.querySelector('.strategist_name-dropdown'); // Get the dropdown element
+                                if (strategistDropdown) {
+                                    newValue = strategistDropdown.value; // Get the selected value from the dropdown
+                                } else {
+                                    console.error('Strategist Name dropdown not found for buildId: ' + buildId);
+                                }
+                            } else if (fieldName === "date" || fieldName === "payment_date" || fieldName === "delivery_date") {
+                                var dateInput = cell.querySelector('input[type="date"]'); // Get the date input element
+                                if (dateInput) {
+                                    newValue = dateInput.value; // Get the value from the date input
+                                } else {
+                                    console.error(fieldName + ' input not found for buildId: ' + buildId);
+                                }
+                            } else {
+                                newValue = cell.innerText.trim(); // Get the new value of the cell
+                            }
+            
+                            // Store the updated data in the updatedData object
+                            if (!updatedData.hasOwnProperty(buildId)) {
+                                updatedData[buildId] = {}; // Initialize an object for the build ID if not present
+                            }
+                            updatedData[buildId][fieldName] = newValue; // Store the new value for the field
+                        } catch (error) {
+                            console.error(`Error processing cell for buildId ${buildId} and field ${fieldName}: ${error.message}`);
+                        }
+                    });
+            
+                    // Send the updated data to the backend using AJAX
+                    $.ajax({
+                        url: '/update_build/',
+                        type: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken')
+                        },
+                        data: {
+                            'updated_data': JSON.stringify(updatedData)
+                        },
+                        success: function(response) {
+                            console.log('Build updated successfully:', response);
+                            redirectToThisURL(); // Redirect to the specified URL after successful update
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating Build:', error);
+                        }
+                    });
+                }                
+            </script>            
+        </form>
+
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can add Build" %}
+                <div class="btn-new-build-container">
+                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">New Build</button>    
+                </div>
+                <script>
+                    function redirectToNewBuildURL() {
+                        // Redirect to the specified URL
+                        window.location.href = '/accounts/profile/add_build/';
+                    }
+                </script>
+            {%endif%}
+        {%endfor%}
+
+        <style>
+            .btn-submit-sales-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-build-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-tech-task-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-support-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-submit-strategies-container{
+                position: fixed;
+                bottom: 10px;
+                left: 200px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-sales-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-build-container {
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-tech-task-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-support-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+            .btn-new-strategies-container{
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                z-index: 999; /* Ensure it's above other content */
+            }
+        </style>
+        
+        </div>
+        
+    </div>
+    
+    {% endblock content %}
+    
+</header>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+    function getCookie(name) {
+        var cookieValue = null;
+        if (document.cookie && document.cookie !== '') {
+            var cookies = document.cookie.split(';');
+            for (var i = 0; i < cookies.length; i++) {
+                var cookie = cookies[i].trim();
+                if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                    cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                    break;
+                }
+            }
+        }
+        return cookieValue;
+    }
+    
+    function fetchStatusValues(table) {
+        fetch(`/get_status_values/${table}/`)
+            .then(response => response.json())
+            .then(data => {
+                const sidebar = document.querySelector('.sidebar');
+                sidebar.innerHTML = ''; // Clear existing sidebar content
+    
+                data.status_values.forEach(status => {
+                    const div = document.createElement('div');
+                    div.classList.add('sidebar-item');
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.classList.add('sidebar-link');
+                    a.textContent = status;
+                    a.onclick = function() {
+                        // Store the selected status and table
+                        selectedStatus = status;
+                        selectedTable = table;
+                        filterTableByStatus(table, status);
+                    };
+                    div.appendChild(a);
+                    sidebar.appendChild(div);
+                });
+            })
+            .catch(error => console.error('Error fetching status values:', error));
+    }
+
+    
+    {% comment %} let selected_status = ""; // Initialize selected_status globally {% endcomment %}
+
+    function filterTableByStatus(table, status) {
+        fetch(`/filter_by_status/${table}/${status}/`)
+            .then(response => response.text())
+            .then(data => {
+                document.getElementById(table + "-table-body").innerHTML = data; // Update table body with received data
+            })
+            .catch(error => console.error('Error:', error));
+    }
+
+    // Add event listeners for editing date and date of closing columns
+    document.querySelectorAll('.editable-tech-task[data-field="date"] input[type="date"], .editable-tech-task[data-field="date_of_closing"] input[type="date"]').forEach(function(input) {
+        input.addEventListener('input', function() {
+            updateNumberOfDays(this); // Call function to update number of days
+        });
+    });
+    function updateNumberOfDays(input) {
+        var row = input.closest('tr');
+        var dateInput = row.querySelector('.editable-tech-task[data-field="date"] input[type="date"]');
+        var closingDateInput = row.querySelector('.editable-tech-task[data-field="date_of_closing"] input[type="date"]');
+        var daysCell = row.querySelector('.editable-tech-task[data-field="number_of_days"]');
+        
+        var startDate = new Date(dateInput.value);
+        var closingDate = new Date(closingDateInput.value);
+        var diffDays = null;
+    
+        if (dateInput.value && closingDateInput.value) {
+            var timeDiff = Math.abs(closingDate.getTime() - startDate.getTime());
+            diffDays = Math.ceil(timeDiff / (1000 * 3600 * 24));
+        }
+        
+        daysCell.innerText = diffDays !== null ? diffDays : ''; // Update the number of days cell
+    }
+    // Function to update the number of days
+    
+    
+</script>
+</body>
+</html>
