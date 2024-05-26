@@ -998,10 +998,34 @@ def sales(request):
     # name = algobulls_employee.name
     user_group = user_groups[0].name
     
+    sales_leads = Sales.objects.select_related('sales_employee_id').all()
+    unique_sales_employees = set()
+    for lead in sales_leads:
+        if lead.sales_employee_id:
+            unique_sales_employees.add((lead.sales_employee_id.employee_id, lead.sales_employee_id.name))
+    
+    sales_leads = Sales.objects.select_related('branch_employee_id__branch_id__broker_id').all()
+    unique_branch_ids = set()
+    unique_broker_names = set()
+    for lead in sales_leads:
+        if lead.branch_employee_id and lead.branch_employee_id.branch_id:
+            unique_branch_ids.add((lead.branch_employee_id.branch_id.branch_id, lead.branch_employee_id.branch_id.branch_id))
+            if lead.branch_employee_id.branch_id.broker_id:
+                unique_broker_names.add((lead.branch_employee_id.branch_id.broker_id.broker_id, lead.branch_employee_id.branch_id.broker_id.broker_name))
+            
     # Fetch the name of the first user group
     if user_group == "Branch Employee":
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
+        
+    if request.method == 'POST':
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+
+        start_date = datetime.strptime(start_date, '%Y-%m-%d')
+        end_date = datetime.strptime(end_date, '%Y-%m-%d')
+
+        sales_leads = Sales.objects.filter(entry_date__range=[start_date, end_date]).order_by('lead_id')
     
     context = {
         'user_groups': user_groups,
@@ -1017,7 +1041,10 @@ def sales(request):
         'tech_tasks' : tech_task,
         'supports' : support,
         'strategies' : strategies,
-        'selected_status': request.GET.get('status', '')
+        'selected_status': request.GET.get('status', ''),
+        'unique_sales_employees': unique_sales_employees,
+        'unique_branch_ids': unique_branch_ids,
+        'unique_broker_names': unique_broker_names,
     }
     
     return render(request, 'sales.html', context)
@@ -1496,17 +1523,24 @@ def sales_analysis_data(request):
             SELECT
                 DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) AS week_start,
                 (DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Status",
                 COUNT(*) AS total_leads
             FROM "Sales"
             WHERE "Purchase Date" BETWEEN %s AND %s
             {f"AND {filter_sql}" if filter_sql else ""}
-            GROUP BY week_start, week_end
-            ORDER BY week_start;
+            GROUP BY week_start, week_end, "Status"
+            ORDER BY week_start, "Status";
         """
         query2 = f"""
             SELECT
                 "Branch Employee ID",
-                COUNT(*) AS total_leads
+                COUNT(*) AS total_leads,
+                SUM(CASE WHEN "Status" = 'Converted' THEN 1 ELSE 0 END) AS Converted,
+                SUM(CASE WHEN "Status" = 'Dropped' THEN 1 ELSE 0 END) AS Dropped,
+                SUM(CASE WHEN "Status" = 'Follow up' THEN 1 ELSE 0 END) AS "Follow up",
+                SUM(CASE WHEN "Status" = 'No Answer' THEN 1 ELSE 0 END) AS "No Answer",
+                SUM(CASE WHEN "Status" = 'Not Interested' THEN 1 ELSE 0 END) AS "Not Interested",
+                SUM(CASE WHEN "Status" = 'In Progress' THEN 1 ELSE 0 END) AS "In Progress"
             FROM "Sales"
             WHERE "Purchase Date" BETWEEN %s AND %s
             {f"AND {filter_sql}" if filter_sql else ""}
@@ -1548,10 +1582,34 @@ def sales_analysis_data(request):
         user_permissions = []
         for group in user_groups:
             user_permissions.extend(group.permissions.all())
+            
+        weekly_data = {}
+        statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress']
+
+        for row in results1:
+            week_start = row[0]
+            status = row[2]
+            total_leads = row[3]
+
+            if week_start not in weekly_data:
+                weekly_data[week_start] = {status: 0 for status in statuses}
+            
+            weekly_data[week_start][status] += total_leads
+            
+        response1 = {
+                'labels': list(weekly_data.keys()),
+                'datasets': [
+                    {
+                        'name': status,
+                        'data': [weekly_data[week].get(status, 0) for week in weekly_data]
+                    } for status in statuses
+                ]
+            }
+        print(results2)
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             data = {
-                'results1': results1,
+                'results1': response1,
                 'results2': results2,
                 'results3': results3,
                 'results4': results4,

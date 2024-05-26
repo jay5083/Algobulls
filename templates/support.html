@@ -309,7 +309,7 @@
         </div>
     </nav>
     
-    <div class="sidebar">
+    {% comment %} <div class="sidebar">
         <div class="sidebar-item" id="support-btn">
             <a class="sidebar-link">{{ selected_status }}:{{ number_of_support_status }}</a>
         </div>
@@ -325,15 +325,96 @@
         <div class="sidebar-item" id="support-btn">
             <a href="/filter_by_status/support/Resolved/" class="sidebar-link">Resolved</a>
         </div>
+    </div> {% endcomment %}
+
+    <div class="sidebar">
+        <form id="filter-form">
+            {% csrf_token %}
+            <div class="filter-options">
+                <a href="#" class="filter-option" data-filter="customer_type">Customer Type
+                    <div>
+                        <input type="checkbox" id="Choose" name="Customer Type" data-field="customer_type" class="filter-checkbox" value="Choose" checked>
+                        <label for="Choose">Choose</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Build" name="Customer Type" data-field="customer_type" class="filter-checkbox" value="Build" checked>
+                        <label for="Build">Build</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="priority">Priority
+                    <div>
+                        <input type="checkbox" id="Low" name="Priority" data-field="priority" class="filter-checkbox" value="Low" checked>
+                        <label for="Low">Low</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Medium" name="Priority" data-field="priority" class="filter-checkbox" value="Medium" checked>
+                        <label for="Medium">Medium</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="High" name="Priority" data-field="priority" class="filter-checkbox" value="High" checked>
+                        <label for="High">High</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="issue">Issue
+                    <div>
+                        <input type="checkbox" id="Converted" name="Issue" data-field="issue" class="filter-checkbox" value="Converted" checked>
+                        <label for="Converted">Converted</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Dropped" name="Issue" data-field="issue" class="filter-checkbox" value="Dropped" checked>
+                        <label for="Dropped">Dropped</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Follow up" name="Issue" data-field="issue" class="filter-checkbox" value="Follow up" checked>
+                        <label for="Follow up">Follow up</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="No Answer" name="Issue" data-field="issue" class="filter-checkbox" value="No Answer" checked>
+                        <label for="No Answer">No Answer</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Not Interested" name="Issue" data-field="issue" class="filter-checkbox" value="Not Interested" checked>
+                        <label for="Not Interested">Not Interested</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="In Progress" name="Issue" data-field="issue" class="filter-checkbox" value="In Progress" checked>
+                        <label for="In Progress">In Progress</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="sales_employee_id">Sales Employee ID
+                    {% for employee_id, employee_name in unique_sales_employees %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Sales Employee ID" data-field="sales_employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>  
+                <a href="#" class="filter-option" data-filter="branch_id">Branch ID
+                    {% for branch_id, branch_name in unique_branch_ids %}
+                        <div>
+                            <input type="checkbox" id="branch{{ branch_id }}" name="Branch ID" data-field="branch_id" class="filter-checkbox" value="{{ branch_id }}" checked>
+                            <label for="branch{{ branch_id }}">{{ branch_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>
+                <a href="#" class="filter-option" data-filter="broker_name">Broker Name
+                    {% for broker_id, broker_name in unique_broker_names %}
+                        <div>
+                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_id }}" checked>
+                            <label for="broker{{ broker_id }}">{{ broker_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>            
+            </div>
+        </form>
     </div>
     
     {% block content %}
     <div>
-        <div class="container">      
-        
         <div id="support-text" style="text-align: center;" style="display: none;" class="heading-container">
             <h2>Support</h2>
         </div>
+        <div class="container">      
         <table id="support-table" class="table table-hover" class="table-container">
             <!-- Support Table Content -->
             <thead>
@@ -444,7 +525,7 @@
             </thead>
             <tbody>
                 {% for support in supports %}
-                    {% if support.status == selected_status %}
+                    {% comment %} {% if support.status == selected_status %} {% endcomment %}
                         <tr class="table-light">
                             
                             {% for permission in user_permissions %}
@@ -804,7 +885,7 @@
                             {% endfor %}
 
                         </tr>
-                    {%endif%}
+                    {% comment %} {%endif%} {% endcomment %}
                 {% endfor %}
             </tbody>
         </table>   

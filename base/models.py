@@ -125,6 +125,7 @@ class Sales(models.Model):
     status = models.TextField(db_column='Status', blank=True, null=True)  # Field name made lowercase.
     reason_for_dropped = models.TextField(db_column='Reason For Dropped', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     sales_employee_id = models.ForeignKey(AlgobullsEmployee, models.DO_NOTHING, db_column='Sales Employee ID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    entry_date = models.TextField(db_column='Entry Date', blank=True, null=True)
 
     class Meta:
         managed = True

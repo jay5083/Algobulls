@@ -312,7 +312,6 @@
             <form id="filter-form">
                 {% csrf_token %}
                 <div class="filter-options">
-                    {% comment %} <button id="apply-filters-btn">Apply Filters</button> {% endcomment %}
                     <a href="#" class="filter-option" data-filter="source_type">Source Type
                         <div>
                             <input type="checkbox" id="WebinarCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Webinar" checked>
@@ -390,7 +389,6 @@
             </form>
         </div>
     </header>
-    
         <form class="start_end_date">
             <label for="start_date">Start Date:</label>
             <input type="date" id="start_date" name="start_date" value="{{ start_date }}"><br><br>
@@ -402,14 +400,34 @@
         <div class="chart-container">
             <div class="chart-item">
                 <h2>Total Leads Generated Weekly</h2>
-                <canvas class="chart-canvas" id="weeklyLeadsChart" ></canvas>
+                <canvas class="chart-canvas" id="weeklyLeadsChart"></canvas>
+                
             </div>
             <div class="chart-item">
                 <h2>Branch-wise Split of Leads Generated</h2>
                 <canvas class="branch-leads-chart-canvas" id="branchLeadsChart" ></canvas>
-
+            </div>
+            <div class="modal fade" id="detailsModal" tabindex="-1" aria-labelledby="detailsModalLabel" aria-hidden="true">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <h5 class="modal-title" id="detailsModalLabel">Status Segregation</h5>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <ul id="statusList"></ul>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
 
         <div class="chart-container">
             <div class="chart-item">
@@ -498,7 +516,7 @@
     <script>
         
     </script>
-    
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script>
         var weeklyLeadsChartInstance, branchLeadsChartInstance, weeklyRevenueChartInstance, branchRevenueChartInstance;
     
@@ -617,45 +635,106 @@
         
         function updateCharts(response) {
             updateWeeklyLeadsChart(response.results1);
-            updateBranchLeadsChart(response.results2);
+            updateBranchLeadsChart(results);
             updateWeeklyRevenueChart(response.results3);
             updateBranchRevenueChart(response.results4);
         }
     
         function updateWeeklyLeadsChart(results) {
-            var ctx = document.getElementById('weeklyLeadsChart').getContext('2d');
-            if (weeklyLeadsChartInstance) {
-                weeklyLeadsChartInstance.destroy();
+            console.log(results);
+        
+            if (!results || typeof results !== 'object') {
+                console.error('Invalid results parameter:', results);
+                return;
             }
-            weeklyLeadsChartInstance = new Chart(ctx, {
-                type: 'bar',
+        
+            var ctx = document.getElementById('weeklyLeadsChart').getContext('2d');
+            if (window.weeklyLeadsChartInstance) {
+                window.weeklyLeadsChartInstance.destroy();
+            }
+        
+            var statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress'];
+            var colors = [
+                'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
+                'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                'rgba(255, 159, 64, 0.2)', 'rgba(210, 159, 64, 0.2)'
+            ];
+            var borderColors = [
+                'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
+                'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
+                'rgba(255, 159, 64, 1)', 'rgba(210, 159, 64, 1)'
+            ];
+        
+            var datasets = statuses.map((status, index) => {
+                return {
+                    label: status,
+                    data: results.datasets.find(dataset => dataset.name === status).data,
+                    backgroundColor: colors[index % colors.length],
+                    borderColor: borderColors[index % borderColors.length],
+                    borderWidth: 1
+                };
+            });
+        
+            var labels = results.labels;
+        
+            window.weeklyLeadsChartInstance = new Chart(ctx, {
+                type: 'bar', // Change from 'bar' to 'column'
                 data: {
-                    labels: results.map(row => row[0]),
-                    datasets: [{
-                        label: 'Total Leads',
-                        data: results.map(row => row[2]),
-                        backgroundColor: 'rgba(255, 99, 132, 0.2)',
-                        borderColor: 'rgba(255, 99, 132, 1)',
-                        borderWidth: 1
-                    }]
+                    labels: labels,
+                    datasets: datasets
                 },
                 options: {
                     scales: {
                         y: {
                             beginAtZero: true
                         }
+                    },
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        title: {
+                            display: true,
+                            text: 'Weekly Leads by Status'
+                        }
+                    },
+                    onClick: function (evt, activeElements) {
+                        if (activeElements.length) {
+                            var clickedIndex = activeElements[0].index;
+                            var clickedDatasetIndex = activeElements[0].datasetIndex;
+                            var value = datasets[clickedDatasetIndex].data[clickedIndex];
+                            var label = labels[clickedIndex];
+                            console.log('Clicked bar value:', value);
+                            console.log('Label:', label);
+                            // Perform additional actions based on the clicked bar
+                            // For example, display the corresponding category and risk appetite
+                        }
                     }
                 }
             });
-        }
-    
+        }                                                                   
+        
+        // Helper function to generate random color
+        function getRandomColor() {
+            var letters = '0123456789ABCDEF';
+            var color = '#';
+            for (var i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }        
+        
+        var branchLeadsChartInstance;
+        
         function updateBranchLeadsChart(results) {
             var ctx = document.getElementById('branchLeadsChart').getContext('2d');
             if (branchLeadsChartInstance) {
                 branchLeadsChartInstance.destroy();
             }
+        
             branchLeadsChartInstance = new Chart(ctx, {
-                type: 'pie', // Change chart type to 'pie'
+                type: 'pie',
                 data: {
                     labels: results.map(row => row[0]),
                     datasets: [{
@@ -693,10 +772,50 @@
                                 }
                             }
                         }
+                    },
+                    onClick: function (evt, activeElements) {
+                        if (activeElements.length) {
+                            var clickedIndex = activeElements[0].index;
+                            var branchId = branchLeadsChartInstance.data.labels[clickedIndex];
+                            var branchData = results.find(row => row[0] === branchId);
+                            if (branchData) {
+                                displayModal(branchData);
+                            }
+                        }
                     }
                 }
             });
         }
+        
+
+        function displayModal(branchData) {
+            var statusList = document.getElementById('statusList');
+            statusList.innerHTML = ''; // Clear previous data
+
+            // Assume branchData[2] contains status segregation
+            var statuses = branchData[2];
+            for (var status in statuses) {
+                if (statuses.hasOwnProperty(status)) {
+                    var li = document.createElement('li');
+                    li.textContent = `${status}: ${statuses[status]}`;
+                    statusList.appendChild(li);
+                }
+            }
+
+            // Show the modal
+            var myModal = new bootstrap.Modal(document.getElementById('detailsModal'));
+            myModal.show();
+        }
+
+        // Example results data
+        var results = [
+            ['Branch A', 30, { 'Converted': 10, 'Dropped': 5, 'Follow up': 8, 'No Answer': 3, 'Not Interested': 2, 'In Progress': 2 }],
+            ['Branch B', 20, { 'Converted': 5, 'Dropped': 7, 'Follow up': 3, 'No Answer': 2, 'Not Interested': 1, 'In Progress': 2 }],
+            // Add more branches as needed
+        ];
+
+        // Call the function to update the chart
+        updateBranchLeadsChart(results);
         
         function updateWeeklyRevenueChart(results) {
             var ctx = document.getElementById('weeklyRevenueChart').getContext('2d');

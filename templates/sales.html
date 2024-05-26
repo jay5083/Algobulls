@@ -52,7 +52,7 @@
             background-color: #5b72e3bf;
             color: white;
         }
-        .sidebar::after {
+        {% comment %} .sidebar::after {
             content: "";
             position: absolute;
             bottom: 0;
@@ -61,7 +61,7 @@
             height: 150px; /* Adjust the height as needed */
             background-color: #2679c2bf; /* Set the color to blue */
             border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
-        }
+        } {% endcomment %}
         
 
         div.content {
@@ -288,8 +288,16 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <div class="btn-sales-analysis-container">
+                        <button class="btn btn-success" onclick="redirectsales_analysis_dataURL()"> Sales Analysis</button>
+                    </div>
+                    <script>
+                        function redirectsales_analysis_dataURL() {
+                            window.location.href = '/to_sales_analysis/';
+                        }
+                    </script>
                 </ul>
-                <!-- User Name -->
+                
                 <div class="d-flex align-items-center">
                     <div class="logo-circle">
                         <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
@@ -313,7 +321,6 @@
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
-                {% comment %} <button id="apply-filters-btn">Apply Filters</button> {% endcomment %}
                 <a href="#" class="filter-option" data-filter="source_type">Source Type
                     <div>
                         <input type="checkbox" id="WebinarCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Webinar" checked>
@@ -382,6 +389,30 @@
                         <label for="In Progress">In Progress</label>
                     </div>
                 </a>
+                <a href="#" class="filter-option" data-filter="sales_employee_id">Sales Employee ID
+                    {% for employee_id, employee_name in unique_sales_employees %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Sales Employee ID" data-field="sales_employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>  
+                <a href="#" class="filter-option" data-filter="branch_id">Branch ID
+                    {% for branch_id, branch_name in unique_branch_ids %}
+                        <div>
+                            <input type="checkbox" id="branch{{ branch_id }}" name="Branch ID" data-field="branch_id" class="filter-checkbox" value="{{ branch_id }}" checked>
+                            <label for="branch{{ branch_id }}">{{ branch_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>
+                <a href="#" class="filter-option" data-filter="broker_name">Broker Name
+                    {% for broker_id, broker_name in unique_broker_names %}
+                        <div>
+                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_id }}" checked>
+                            <label for="broker{{ broker_id }}">{{ broker_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>            
             </div>
         </form>
     </div>
@@ -498,13 +529,81 @@
         }        
     </script>
 
+    <script>
+        .start_end_date {
+            display: flex;
+            justify-content: center; /* Align items horizontally at center */
+            margin-top: 20px;
+        }
+        
+        .start_end_date label {
+            margin-top: 5px;
+            margin-right: 10px; /* Add some space between label and input */
+        }
+        
+        .start_end_date input[type="date"] {
+            padding: 5px;
+            margin-top: 10px;
+            margin-right: 20px; /* Adjust margin between input fields */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        .submit_start_end_date {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }        
+    </script>
+
     {% block content %}
     <div>
-        <div class="container">  
-
         <div id="sales-leads-text"style="text-align: center;" style="display: none;" class="heading-container">
             <h2>Sales</h2>
+            {% comment %} <form class="start_end_date">
+                {% csrf_token %}
+                <label for="start_date">Start Date:</label>
+                <input type="date" id="start_date" name="start_date" value="{{ start_date }}"><br><br>
+                <label for="end_date">End Date:</label>
+                <input type="date" id="end_date" name="end_date" value="{{ end_date }}"><br><br>
+                <button type="button" class="submit_start_end_date">Submit Date</button>
+            </form> {% endcomment %}
+            
+            <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+            <script>
+                $(document).ready(function() {
+                    $('.submit_start_end_date').click(function() {
+                        var start_date = $('#start_date').val();
+                        var end_date = $('#end_date').val();
+            
+                        $.ajax({
+                            type: 'POST',
+                            url: '/sales-leads/',  // Replace with the actual URL of your sales view
+                            headers: {
+                                'X-CSRFToken': $('input[name=csrfmiddlewaretoken]').val()
+                            },
+                            data: {
+                                'start_date': start_date,
+                                'end_date': end_date
+                            },
+                            success: function(response) {
+                                // Handle the response, such as updating the sales data on the page
+                                console.log(response);
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error:', error);
+                            }
+                        });
+                    });
+                });
+            </script>            
+            
         </div>
+        <div class="container">  
         <table id="sales-leads-table" class="table table-hover" class="table-container">
             <thead>
                 <tr class="table-info">
@@ -555,7 +654,7 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Source Type field of Sales" %}
                             <th scope="col">Source Type
-                                <input type="text" id="sourceTypeFilter" placeholder="Filter Source Type">
+                                {% comment %} <input type="text" id="sourceTypeFilter" placeholder="Filter Source Type"> {% endcomment %}
                             </th>
                         {% endif %}
                     {% endfor %}
@@ -563,7 +662,7 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Category field of Sales" %}
                             <th scope="col">Category
-                                <input type="text" id="categoryFilter" placeholder="Filter Category">
+                                {% comment %} <input type="text" id="categoryFilter" placeholder="Filter Category"> {% endcomment %}
                             </th>
                         {% endif %}
                     {% endfor %}
@@ -571,7 +670,7 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Risk Appetite field of Sales" %}
                             <th scope="col">Risk Appetite
-                                <input type="text" id="riskAppetiteFilter" placeholder="Filter Risk Appetite">
+                                {% comment %} <input type="text" id="riskAppetiteFilter" placeholder="Filter Risk Appetite"> {% endcomment %}
                             </th>
                         {% endif %}
                     {% endfor %}
@@ -591,6 +690,12 @@
                     {% for permission in user_permissions %} 
                         {% if permission.name == "Can view the Purchase Date field of Sales" %}
                             <th scope="col">Purchase Date</th>
+                        {% endif %}
+                    {% endfor %}
+
+                    {% for permission in user_permissions %} 
+                        {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                            <th scope="col">Entry Date</th>
                         {% endif %}
                     {% endfor %}
                            
@@ -840,7 +945,20 @@
                                 {% endif %}
                             {% endfor %}
                         
-                                            
+                            {% for permission in user_permissions %}
+                                {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                                    <td class="editable-14" data-field="entry_date">
+                                        {% for permission in user_permissions %}
+                                            {% if permission.name == "Can edit the Purchase Date field of Sales" %}
+                                                <input type="date" id="entry_date" name="entry_date" value="{{ lead.entry_date}}"><br><br>
+                                            {% comment %} {% else %}
+                                                {{ lead.purchase_date|date:'Y-m-d' }}<br><br> {% endcomment %}
+                                            {% endif %}
+                                        {% endfor %}
+                                    </td>
+                                {% endif %}
+                            {% endfor %}
+                            
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Status field of Sales" %}
                                     <td class="editable-16" data-field="status">
@@ -998,6 +1116,13 @@
                                 } else {
                                     console.error('Purchase date input not found for leadId: ' + leadId);
                                 }
+                            } else if (field === "entry_date") {
+                                var entryDateInput = cell.parentElement.querySelector('#entry_date');
+                                if (entryDateInput) {
+                                    value = entryDateInput.value;
+                                } else {
+                                    console.error('Entry date input not found for leadId: ' + leadId);
+                                }
                             } else {
                                 value = cell.innerText.trim();
                             }
@@ -1049,14 +1174,7 @@
             {%endif%}
         {%endfor%}
 
-        <div class="btn-sales-analysis-container">
-            <button class="btn btn-success" onclick="redirectsales_analysis_dataURL()"> Sales Analysis</button>
-        </div>
-        <script>
-            function redirectsales_analysis_dataURL() {
-                window.location.href = '/to_sales_analysis/';
-            }
-        </script>
+        
 
         <style>
             .filter-dropdown {
@@ -1094,8 +1212,8 @@
             } {% endcomment %}
             .btn-sales-analysis-container{
                 position: fixed;
-                bottom: 60px;
-                left: 10px;
+                top: 20px;
+                left: 850px;
                 z-index: 999; /* Ensure it's above other content */
             }
             .btn-submit-sales-container{
