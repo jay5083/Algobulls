@@ -288,7 +288,7 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    <div class="btn-sales-analysis-container">
+                    <div>
                         <button class="btn btn-success" onclick="redirectsales_analysis_dataURL()"> Sales Analysis</button>
                     </div>
                     <script>
@@ -408,7 +408,7 @@
                 <a href="#" class="filter-option" data-filter="broker_name">Broker Name
                     {% for broker_id, broker_name in unique_broker_names %}
                         <div>
-                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_id }}" checked>
+                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_name }}" checked>
                             <label for="broker{{ broker_id }}">{{ broker_name }}</label>
                         </div>
                     {% endfor %}
@@ -417,14 +417,14 @@
         </form>
     </div>
     <script> 
-        document.addEventListener('DOMContentLoaded', function () {
+        {% comment %} document.addEventListener('DOMContentLoaded', function () {
             function filterTable() {
                 var rows = document.querySelectorAll('tbody tr');
                 rows.forEach(function (row) {
                     var displayRow = true;
                     
                     // Iterate through each type of filter
-                    var filterCategories = ['source_type', 'category', 'risk_appetite', 'status'];
+                    var filterCategories = ['source_type', 'category', 'risk_appetite', 'status', 'branch_id'];
                     filterCategories.forEach(function (category) {
                         var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
                         if (checkboxes.length > 0) {
@@ -458,7 +458,52 @@
         
             // Initial filter to set the table correctly based on default checked checkboxes
             filterTable();
-        });        
+        }); {% endcomment %}
+        
+        document.addEventListener('DOMContentLoaded', function () {
+            function filterTable() {
+                var rows = document.querySelectorAll('tbody tr');
+                rows.forEach(function (row) {
+                    var displayRow = true;
+        
+                    // Iterate through each type of filter
+                    var filterCategories = ['sales_employee_id','source_type', 'category', 'risk_appetite', 'status', 'branch_id', 'broker_name'];
+                    filterCategories.forEach(function (category) {
+                        var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
+                        if (checkboxes.length > 0) {
+                            var selectedValues = Array.from(checkboxes).map(function (checkbox) {
+                                return checkbox.value;
+                            });
+        
+                            var cell = row.querySelector('td[data-field="' + category + '"]');
+                            if (cell) {
+                                var select = cell.querySelector('select');
+                                var text;
+                                if (select) {
+                                    text = select.options[select.selectedIndex].value;  // Get the employee_id
+                                } else {
+                                    text = cell.textContent || cell.innerText;
+                                }
+                                if (!selectedValues.includes(text)) {
+                                    displayRow = false;
+                                }
+                            }
+                        }
+                    });
+        
+                    row.style.display = displayRow ? '' : 'none';
+                });
+            }
+        
+            // Add event listeners for all checkboxes
+            var checkboxes = document.querySelectorAll('.filter-checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', filterTable);
+            });
+        
+            // Initial filter to set the table correctly based on default checked checkboxes
+            filterTable();
+        });
 
         $(document).ready(function() {
             $('.filter-option input[type="checkbox"]').change(function() {

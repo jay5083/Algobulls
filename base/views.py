@@ -84,6 +84,22 @@ def home(request):
 
     return render(request, 'base.html', context)
 
+import time
+import pyotp
+import qrcode
+
+def auth(request):
+    if request.method == 'POST':
+        otp = request.POST.get('otp')
+        key = "Prospace"
+        totp = pyotp.TOTP(key)
+        if totp.verify(otp):
+            return redirect('/home/')
+        else:
+            return render(request, 'auth.html', {'error': 'OTP Not Verified'})
+    else:
+        return render(request, 'auth.html')
+        
 from django.shortcuts import render
 from .models import Sales, Support, AlgobullsEmployee, BranchEmployee
 
@@ -1077,6 +1093,27 @@ def support(request):
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
     
+    supports = Support.objects.select_related('support_employee').all()
+    unique_support_employees = set()
+    for support in supports:
+        if support.support_employee:
+            unique_support_employees.add((support.support_employee.employee_id, support.support_employee.name))
+    
+    supports = Support.objects.select_related('division_employee').all()
+    unique_division_employees = set()
+    for support in supports:
+        if support.division_employee:
+            unique_division_employees.add((support.division_employee.employee_id, support.division_employee.name))
+    
+    supports = Support.objects.select_related('branch_employee_id__branch_id__broker_id').all()
+    unique_branch_ids = set()
+    unique_broker_names = set()
+    for support in supports:
+        if support.branch_employee_id and support.branch_employee_id.branch_id:
+            unique_branch_ids.add((support.branch_employee_id.branch_id.branch_id, support.branch_employee_id.branch_id.branch_id))
+            if support.branch_employee_id.branch_id.broker_id:
+                unique_broker_names.add((support.branch_employee_id.branch_id.broker_id.broker_id, support.branch_employee_id.branch_id.broker_id.broker_name))
+    
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
@@ -1106,7 +1143,11 @@ def support(request):
         'tech_tasks' : tech_task,
         'supports' : support,
         'strategies' : strategies,
-        'selected_status': request.GET.get('status', '')
+        'selected_status': request.GET.get('status', ''),
+        'unique_support_employees':unique_support_employees,
+        'unique_division_employees':unique_division_employees,
+        'unique_branch_ids': unique_branch_ids,
+        'unique_broker_names': unique_broker_names,
     }
     
     return render(request, 'support.html', context)        
@@ -1139,6 +1180,13 @@ def build(request):
     user_permissions = []
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
+        
+    builds = Build.objects.select_related('strategist_name').all()
+    unique_strategist_names = set()
+    for build in builds:
+        if build.strategist_name:
+            unique_strategist_names.add((build.strategist_name.employee_id, build.strategist_name.name))
+
     
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
@@ -1169,7 +1217,8 @@ def build(request):
         'tech_tasks' : tech_task,
         'supports' : support,
         'strategies' : strategies,
-        'selected_status': request.GET.get('status', '')
+        'selected_status': request.GET.get('status', ''),
+        'unique_strategist_names': unique_strategist_names,
     }
     
     return render(request, 'build.html', context) 
@@ -1202,6 +1251,13 @@ def strategies(request):
     user_permissions = []
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
+        
+    strategies = Strategies.objects.select_related('employee_id').all()
+    unique_employee_ids = set()
+    for strategy in strategies:
+        if strategy.employee_id:
+            unique_employee_ids.add((strategy.employee_id.employee_id, strategy.employee_id.name))
+
     
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
@@ -1232,7 +1288,8 @@ def strategies(request):
         'tech_tasks' : tech_task,
         'supports' : support,
         'strategies' : strategies,
-        'selected_status': request.GET.get('status', '')
+        'selected_status': request.GET.get('status', ''),
+        'unique_employee_ids': unique_employee_ids,
     }
     
     return render(request, 'strategies.html', context)        
@@ -1265,6 +1322,13 @@ def tech_task(request):
     user_permissions = []
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
+        
+    tech_tasks = TechTask.objects.select_related('employee_id').all()
+    unique_employee_ids = set()
+    for tech_task in tech_tasks:
+        if tech_task.employee_id:
+            unique_employee_ids.add((tech_task.employee_id.employee_id, tech_task.employee_id.name))
+
     
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
@@ -1295,7 +1359,8 @@ def tech_task(request):
         'tech_tasks' : tech_task,
         'supports' : support,
         'strategies' : strategies,
-        'selected_status': request.GET.get('status', '')
+        'selected_status': request.GET.get('status', ''),
+        'unique_employee_ids': unique_employee_ids,
     }
     
     return render(request, 'tech_task.html', context)        
@@ -1327,7 +1392,19 @@ def rms(request):
     user_permissions = []
     for group in user_groups:
         user_permissions.extend(group.permissions.all())
+        
+    rmss = Rms.objects.select_related('employee').all()
+    unique_employees = set()
+    for rms in rmss:
+        if rms.employee:
+            unique_employees.add((rms.employee.employee_id, rms.employee.name))
     
+    rmss = Rms.objects.select_related('broker').all()
+    unique_brokers = set()
+    for rms in rmss:
+        if rms.broker.broker_id:
+            unique_brokers.add((rms.broker.broker_id, rms.broker.broker_name))
+
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
@@ -1361,7 +1438,9 @@ def rms(request):
         'strategies' : strategies,
         'rms_objects': rms,
         'brokers': broker,
-        'selected_status': request.GET.get('status', '')
+        'selected_status': request.GET.get('status', ''),
+        'unique_employees': unique_employees,
+        'unique_brokers': unique_brokers,
     }
     
     return render(request, 'rms.html', context)        
@@ -1470,6 +1549,63 @@ def to_sales_analysis(request):
     
     return render(request, 'sales_analysis.html', context)
 
+def to_support_analysis(request):
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=30)
+    
+    supports = Support.objects.select_related('support_employee').all()
+    unique_support_employees = set()
+    for support in supports:
+        if support.support_employee:
+            unique_support_employees.add((support.support_employee.employee_id, support.support_employee.name))
+    
+    supports = Support.objects.select_related('division_employee').all()
+    unique_division_employees = set()
+    for support in supports:
+        if support.division_employee:
+            unique_division_employees.add((support.division_employee.employee_id, support.division_employee.name))
+    
+    supports = Support.objects.select_related('branch_employee_id__branch_id__broker_id').all()
+    unique_branch_ids = set()
+    unique_broker_names = set()
+    for support in supports:
+        if support.branch_employee_id and support.branch_employee_id.branch_id:
+            unique_branch_ids.add((support.branch_employee_id.branch_id.branch_id, support.branch_employee_id.branch_id.branch_id))
+            if support.branch_employee_id.branch_id.broker_id:
+                unique_broker_names.add((support.branch_employee_id.branch_id.broker_id.broker_id, support.branch_employee_id.branch_id.broker_id.broker_name))
+    
+    context = {
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d'),
+        'unique_support_employees':unique_support_employees,
+        'unique_division_employees':unique_division_employees,
+        'unique_branch_ids': unique_branch_ids,
+        'unique_broker_names': unique_broker_names,
+    }
+    
+    return render(request, 'support_analysis.html', context)
+
+def to_rms_analysis(request):
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=30)
+    
+    context = {
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d')
+    }
+    
+    return render(request, 'rms_analysis.html', context)
+
+def to_tech_task_analysis(request):
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=30)
+    
+    context = {
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d')
+    }
+    
+    return render(request, 'tech_task_analysis.html', context)
 
 from django.db import connection
 
@@ -1629,8 +1765,717 @@ def sales_analysis_data(request):
         logger.error("Error in sales_analysis_data view: %s", e)
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
+def support_analysis_data(request):
+    try:
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Query for weekly data
+        query1 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Status",
+                COUNT(*) AS total_leads
+            FROM "Support"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Status"
+            ORDER BY week_start, "Status";
+        """
+        results1 = execute_raw_sql(query1, [start_date, end_date])
+        
+        # Query for status-wise data
+        query2 = f"""
+            SELECT
+                "Status",
+                COUNT(*) AS count
+            FROM "Support"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Status"
+            ORDER BY "Status";
+        """
+        results2 = execute_raw_sql(query2, [start_date, end_date])
+        
+        # Query for weekly priority data
+        query3 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Priority",
+                COUNT(*) AS total_leads
+            FROM "Support"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Priority"
+            ORDER BY week_start, "Priority";
+        """
+        results3 = execute_raw_sql(query3, [start_date, end_date])
+        
+        # Query for priority-wise data
+        query4 = f"""
+            SELECT
+                "Priority",
+                COUNT(*) AS count
+            FROM "Support"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Priority"
+            ORDER BY "Priority";
+        """
+        results4 = execute_raw_sql(query4, [start_date, end_date])
+        
+        # Query for weekly division data
+        query5 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Division Assigned To",
+                COUNT(*) AS total_leads
+            FROM "Support"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Division Assigned To"
+            ORDER BY week_start, "Division Assigned To";
+        """
+        results5 = execute_raw_sql(query5, [start_date, end_date])
+        
+        # Query for division-wise data
+        query6 = f"""
+            SELECT
+                "Division Assigned To",
+                COUNT(*) AS count
+            FROM "Support"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Division Assigned To"
+            ORDER BY "Division Assigned To";
+        """
+        results6 = execute_raw_sql(query6, [start_date, end_date])
+        
+        # Prepare data for weekly status chart
+        weekly_data = {}
+        statuses = ['Open', 'In Progress', 'Hold', 'Resolved']
 
-    
+        for row in results1:
+            week_start = row[0]
+            status = row[2]
+            total_leads = row[3]
+
+            if week_start not in weekly_data:
+                weekly_data[week_start] = {status: 0 for status in statuses}
+            
+            weekly_data[week_start][status] += total_leads
+            
+        response1 = {
+            'labels': list(weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': status,
+                    'data': [weekly_data[week].get(status, 0) for week in weekly_data],
+                    'backgroundColor': 'rgba(255, 99, 132, 0.2)',
+                    'borderColor': 'rgba(255, 99, 132, 1)',
+                    'borderWidth': 1
+                } for status in statuses
+            ]
+        }
+        
+        # Prepare data for status pie chart
+        status_data = {row[0]: row[1] for row in results2}
+        
+        response2 = {
+            'labels': list(status_data.keys()),
+            'datasets': [{
+                'data': list(status_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        # Prepare data for weekly priority chart
+        priority_weekly_data = {}
+        priorities = ['High', 'Medium', 'Low']
+
+        for row in results3:
+            week_start = row[0]
+            priority = row[2]
+            total_leads = row[3]
+
+            if week_start not in priority_weekly_data:
+                priority_weekly_data[week_start] = {priority: 0 for priority in priorities}
+            
+            priority_weekly_data[week_start][priority] += total_leads
+            
+        response3 = {
+            'labels': list(priority_weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': priority,
+                    'data': [priority_weekly_data[week].get(priority, 0) for week in priority_weekly_data],
+                    'backgroundColor': 'rgba(255, 159, 64, 0.2)',
+                    'borderColor': 'rgba(255, 159, 64, 1)',
+                    'borderWidth': 1
+                } for priority in priorities
+            ]
+        }
+
+        # Prepare data for priority pie chart
+        priority_data = {row[0]: row[1] for row in results4}
+        
+        response4 = {
+            'labels': list(priority_data.keys()),
+            'datasets': [{
+                'data': list(priority_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        # Prepare data for weekly division chart
+        division_weekly_data = {}
+        divisions = ['Tech', 'Build', 'RMS', 'Sales', 'Strategy', 'Support']
+
+        for row in results5:
+            week_start = row[0]
+            division = row[2]
+            total_leads = row[3]
+
+            if week_start not in division_weekly_data:
+                division_weekly_data[week_start] = {division: 0 for division in divisions}
+            
+            division_weekly_data[week_start][division] += total_leads
+            
+        response5 = {
+            'labels': list(division_weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': division,
+                    'data': [division_weekly_data[week].get(division, 0) for week in division_weekly_data],
+                    'backgroundColor': 'rgba(75, 192, 192, 0.2)',
+                    'borderColor': 'rgba(75, 192, 192, 1)',
+                    'borderWidth': 1
+                } for division in divisions
+            ]
+        }
+
+        # Prepare data for division pie chart
+        division_data = {row[0]: row[1] for row in results6}
+        
+        response6 = {
+            'labels': list(division_data.keys()),
+            'datasets': [{
+                'data': list(division_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = {
+                'results1': response1,
+                'results2': response2,
+                'results3': response3,
+                'results4': response4,
+                'results5': response5,
+                'results6': response6,
+            }
+            return JsonResponse(data)
+        else:
+            context = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'results1': response1,
+                'results2': response2,
+                'results3': response3,
+                'results4': response4,
+                'results5': response5,
+                'results6': response6,
+            }
+            return render(request, 'support_analysis.html', context)
+    except Exception as e:
+        logger.error("Error in support_analysis_data view: %s", e)
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+def rms_analysis_data(request):
+    try:
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Query for weekly data
+        query1 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Status",
+                COUNT(*) AS total_leads
+            FROM "Rms"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Status"
+            ORDER BY week_start, "Status";
+        """
+        results1 = execute_raw_sql(query1, [start_date, end_date])
+        
+        # Query for status-wise data
+        query2 = f"""
+            SELECT
+                "Status",
+                COUNT(*) AS count
+            FROM "Rms"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Status"
+            ORDER BY "Status";
+        """
+        results2 = execute_raw_sql(query2, [start_date, end_date])
+        
+        # Query for weekly priority data
+        query3 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Issue",
+                COUNT(*) AS total_leads
+            FROM "Rms"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Issue"
+            ORDER BY week_start, "Issue";
+        """
+        results3 = execute_raw_sql(query3, [start_date, end_date])
+        
+        # Query for priority-wise data
+        query4 = f"""
+            SELECT
+                "Issue",
+                COUNT(*) AS count
+            FROM "Rms"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Issue"
+            ORDER BY "Issue";
+        """
+        results4 = execute_raw_sql(query4, [start_date, end_date])
+        
+        # Query for weekly division data
+        query5 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Customer Type",
+                COUNT(*) AS total_leads
+            FROM "Rms"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Customer Type"
+            ORDER BY week_start, "Customer Type";
+        """
+        results5 = execute_raw_sql(query5, [start_date, end_date])
+        
+        # Query for division-wise data
+        query6 = f"""
+            SELECT
+                "Customer Type",
+                COUNT(*) AS count
+            FROM "Rms"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Customer Type"
+            ORDER BY "Customer Type";
+        """
+        results6 = execute_raw_sql(query6, [start_date, end_date])
+        
+        # Prepare data for weekly status chart
+        weekly_data = {}
+        statuses = ['Open', 'In Progress', 'Hold', 'Resolved']
+
+        for row in results1:
+            week_start = row[0]
+            status = row[2]
+            total_leads = row[3]
+
+            if week_start not in weekly_data:
+                weekly_data[week_start] = {status: 0 for status in statuses}
+            
+            weekly_data[week_start][status] += total_leads
+            
+        response1 = {
+            'labels': list(weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': status,
+                    'data': [weekly_data[week].get(status, 0) for week in weekly_data],
+                    'backgroundColor': 'rgba(255, 99, 132, 0.2)',
+                    'borderColor': 'rgba(255, 99, 132, 1)',
+                    'borderWidth': 1
+                } for status in statuses
+            ]
+        }
+        
+        # Prepare data for status pie chart
+        status_data = {row[0]: row[1] for row in results2}
+        
+        response2 = {
+            'labels': list(status_data.keys()),
+            'datasets': [{
+                'data': list(status_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        # Prepare data for weekly priority chart
+        issue_weekly_data = {}
+        issues = ['Strategy Development', 'Live Trading and RMS', 'Package and Funds', 'Front End Issues', 'General Info', 'Sales Related', 'Others']
+
+        for row in results3:
+            week_start = row[0]
+            issue = row[2]
+            total_leads = row[3]
+
+            if week_start not in issue_weekly_data:
+                issue_weekly_data[week_start] = {issue: 0 for issue in issues}
+            
+            issue_weekly_data[week_start][issue] += total_leads
+            
+        response3 = {
+            'labels': list(issue_weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': issue,
+                    'data': [issue_weekly_data[week].get(issue, 0) for week in issue_weekly_data],
+                    'backgroundColor': 'rgba(255, 159, 64, 0.2)',
+                    'borderColor': 'rgba(255, 159, 64, 1)',
+                    'borderWidth': 1
+                } for issue in issues
+            ]
+        }
+
+        # Prepare data for priority pie chart
+        issue_data = {row[0]: row[1] for row in results4}
+        
+        response4 = {
+            'labels': list(issue_data.keys()),
+            'datasets': [{
+                'data': list(issue_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        # Prepare data for weekly division chart
+        customer_type_weekly_data = {}
+        customer_types = ['Choose', 'Build', 'Others']
+
+        for row in results5:
+            week_start = row[0]
+            customer_type = row[2]
+            total_leads = row[3]
+
+            if week_start not in customer_type_weekly_data:
+                customer_type_weekly_data[week_start] = {customer_type: 0 for customer_type in customer_types}
+            
+            customer_type_weekly_data[week_start][customer_type] += total_leads
+            
+        response5 = {
+            'labels': list(customer_type_weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': customer_type,
+                    'data': [customer_type_weekly_data[week].get(customer_type, 0) for week in customer_type_weekly_data],
+                    'backgroundColor': 'rgba(75, 192, 192, 0.2)',
+                    'borderColor': 'rgba(75, 192, 192, 1)',
+                    'borderWidth': 1
+                } for customer_type in customer_types
+            ]
+        }
+
+        # Prepare data for division pie chart
+        customer_type_data = {row[0]: row[1] for row in results6}
+        
+        response6 = {
+            'labels': list(customer_type_data.keys()),
+            'datasets': [{
+                'data': list(customer_type_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = {
+                'results1': response1,
+                'results2': response2,
+                'results3': response3,
+                'results4': response4,
+                'results5': response5,
+                'results6': response6,
+            }
+            return JsonResponse(data)
+        else:
+            context = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'results1': response1,
+                'results2': response2,
+                'results3': response3,
+                'results4': response4,
+                'results5': response5,
+                'results6': response6,
+            }
+            return render(request, 'rms_analysis.html', context)
+    except Exception as e:
+        logger.error("Error in rms_analysis_data view: %s", e)
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+def tech_task_analysis_data(request):
+    try:
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Query for weekly data
+        query1 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Task Status",
+                COUNT(*) AS total_leads
+            FROM "Tech Task"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Task Status"
+            ORDER BY week_start, "Task Status";
+        """
+        results1 = execute_raw_sql(query1, [start_date, end_date])
+        
+        # Query for status-wise data
+        query2 = f"""
+            SELECT
+                "Task Status",
+                COUNT(*) AS count
+            FROM "Tech Task"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Task Status"
+            ORDER BY "Task Status";
+        """
+        results2 = execute_raw_sql(query2, [start_date, end_date])
+        
+        # Query for weekly priority data
+        query3 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Nature",
+                COUNT(*) AS total_leads
+            FROM "Tech Task"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Nature"
+            ORDER BY week_start, "Nature";
+        """
+        results3 = execute_raw_sql(query3, [start_date, end_date])
+        
+        # Query for priority-wise data
+        query4 = f"""
+            SELECT
+                "Nature",
+                COUNT(*) AS count
+            FROM "Tech Task"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Nature"
+            ORDER BY "Nature";
+        """
+        results4 = execute_raw_sql(query4, [start_date, end_date])
+        
+        # Prepare data for weekly status chart
+        weekly_data = {}
+        task_statuses = ['Pending Development', 'Under Development', 'Under Testing', 'Bugs Reported', 'Delivered or Closed', 'In Progress', 'On Hold', 'Open']
+
+        for row in results1:
+            week_start = row[0]
+            task_status = row[2]
+            total_leads = row[3]
+
+            if week_start not in weekly_data:
+                weekly_data[week_start] = {task_status: 0 for task_status in task_statuses}
+            
+            weekly_data[week_start][task_status] += total_leads
+            
+        response1 = {
+            'labels': list(weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': task_status,
+                    'data': [weekly_data[week].get(task_status, 0) for week in weekly_data],
+                    'backgroundColor': 'rgba(255, 99, 132, 0.2)',
+                    'borderColor': 'rgba(255, 99, 132, 1)',
+                    'borderWidth': 1
+                } for task_status in task_statuses
+            ]
+        }
+        
+        # Prepare data for status pie chart
+        task_status_data = {row[0]: row[1] for row in results2}
+        
+        response2 = {
+            'labels': list(task_status_data.keys()),
+            'datasets': [{
+                'data': list(task_status_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        # Prepare data for weekly priority chart
+        nature_weekly_data = {}
+        natures = ['Core Change', 'Strategy Change', 'None Core Request', 'Broker Integration', 'Operations']
+
+        for row in results3:
+            week_start = row[0]
+            nature = row[2]
+            total_leads = row[3]
+
+            if week_start not in nature_weekly_data:
+                nature_weekly_data[week_start] = {priority: 0 for priority in natures}
+            
+            nature_weekly_data[week_start][nature] += total_leads
+            
+        response3 = {
+            'labels': list(nature_weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': nature,
+                    'data': [nature_weekly_data[week].get(nature, 0) for week in nature_weekly_data],
+                    'backgroundColor': 'rgba(255, 159, 64, 0.2)',
+                    'borderColor': 'rgba(255, 159, 64, 1)',
+                    'borderWidth': 1
+                } for nature in natures
+            ]
+        }
+
+        # Prepare data for priority pie chart
+        nature_data = {row[0]: row[1] for row in results4}
+        
+        response4 = {
+            'labels': list(nature_data.keys()),
+            'datasets': [{
+                'data': list(nature_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = {
+                'results1': response1,
+                'results2': response2,
+                'results3': response3,
+                'results4': response4,
+            }
+            return JsonResponse(data)
+        else:
+            context = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'results1': response1,
+                'results2': response2,
+                'results3': response3,
+                'results4': response4,
+            }
+            return render(request, 'tech_task_analysis.html', context)
+    except Exception as e:
+        logger.error("Error in tech_task_analysis_data view: %s", e)
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
 from django.http import JsonResponse
 
 def fetch_employee_ids(request):

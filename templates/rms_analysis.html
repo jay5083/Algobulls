@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html>
+<head>
+    {% load static %}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>RMS Analysis</title>
+    <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
+    <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+            .hidden {
+                display: none;
+            }
+            body {
+            margin: 0;
+            font-family: "Lato", sans-serif;
+            }
+    
+            .sidebar {
+                margin: 0;
+                padding: 0;
+                width: 150px;
+                background-color: lightwhite;
+                position: fixed;
+                height: 90%;
+                overflow: auto;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
+                border-radius: 0 0 100px 0; /* Curved bottom-right corner */
+            }
+            
+            .sidebar-item {
+                background-color: white;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Shadow border */
+                padding: 10px;
+                margin-bottom: 10px; /* Add some space between items */
+            }        
+            
+            .sidebar a {
+                display: block;
+                color: black;
+                padding: 16px;
+                text-decoration: none;
+            }
+            
+            .sidebar a.active {
+                background-color: #04AA6D;
+                color: white;
+            }
+            
+            .sidebar a:hover:not(.active) {
+                background-color: #5b72e3bf;
+                color: white;
+            }
+            {% comment %} .sidebar::after {
+                content: "";
+                position: absolute;
+                bottom: 0;
+                left: 0;
+                width: 100%;
+                height: 150px; /* Adjust the height as needed */
+                background-color: #2679c2bf; /* Set the color to blue */
+                border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
+            } {% endcomment %}
+            
+    
+            div.content {
+                margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+                padding: 20px; /* Add padding to the content area */
+                }
+                
+                @media screen and (max-width: 700px) {
+                .sidebar {
+                    width: 100%;
+                    height: auto;
+                    position: relative;
+                }
+                .sidebar a {float: left;}
+                div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
+                }
+                
+                @media screen and (max-width: 400px) {
+                .sidebar a {
+                    text-align: center;
+                    float: none;
+                }
+                }
+    
+                .container {
+                width: 100%; /* Adjust the width as needed */
+                max-height: 75vh; /* Use viewport height for a responsive maximum height */
+                overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+                overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+                margin-top: 1%; /* Add margin at the top for spacing */
+                margin-left: 5%; /* Add margin to the left side */
+                box-sizing: border-box; /* Include padding and border in the element's total width and height */
+            }
+            .navbar {
+                min-height: 50px; /* Adjust the value as needed */
+            }
+            #sales-leads-table th,
+            #sales-leads-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                padding: 8px; /* Add padding for better appearance */
+            }
+            #support-table th,
+            #support-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                padding: 8px; /* Add padding for better appearance */
+            }
+            #strategies-table th,
+            #strategies-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                {% comment %} padding: 20px; /* Add padding for better appearance */ {% endcomment %}
+            }
+            #build-table th,
+            #build-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                padding: 8px; /* Add padding for better appearance */
+            }
+            #tech-task-table th,
+            #tech-task-table td {
+                text-align: center;
+                border: 1px solid #ccc; /* Add border to all sides */
+                {% comment %} padding: 8px; /* Add padding for better appearance */ {% endcomment %}
+            }
+            .logo-circle {
+                width: 40px;
+                height: 40px;
+                border-radius: 50%; /* Make it circular */
+                overflow: hidden; /* Hide overflow */
+                margin-right: 10px; /* Adjust margin as needed */
+            }
+            
+            .logo-circle img {
+                width: 100%; /* Make the image fill the circle */
+                height: auto; /* Maintain aspect ratio */
+            }
+            .editable-12,
+            .editable-13,
+            .editable-14,
+            .editable-15,
+            .editable-16 {
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-support{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-build{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-tech-task{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .editable-strategies{
+                max-width: 150px; /* Adjust the maximum width as needed */
+                overflow-x: auto; /* Enable horizontal scrolling */
+                white-space: nowrap; /* Prevent wrapping of text */
+            }
+            .sidebar-link.active {
+                background-color: green;
+                color: white; /* Change text color to white for better contrast */
+            }
+            .sidebar-item {
+                padding: 10px;
+                border-bottom: 1px solid #ccc;
+            }
+            
+            .sidebar-link {
+                text-decoration: none;
+                color: #333;
+                display: block;
+            }
+            
+            .sidebar-link:hover {
+                background-color: #f0f0f0;
+            }
+    </style>
+    <style>
+        .chart-canvas {
+            width: 75% !important;
+            height: auto !important;
+        }
+
+        .pie-chart-canvas {
+            width: 40% !important;
+            height: auto !important;
+        }
+        
+        .row {
+            display: flex;
+            justify-content: space-around;
+            flex-wrap: wrap;
+        }
+        
+        .chart-container {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+        
+        .chart-item {
+            flex: 1 1 25%;
+            margin: 10px;
+        }        
+
+        .start_end_date {
+            display: flex;
+            justify-content: center; /* Align items horizontally at center */
+            margin-top: 20px;
+        }
+        
+        .start_end_date label {
+            margin-top: 5px;
+            margin-right: 10px; /* Add some space between label and input */
+        }
+        
+        .start_end_date input[type="date"] {
+            padding: 5px;
+            margin-bottom: 10px;
+            margin-right: 40px; /* Add margin between input fields */
+            border-radius: 5px;
+            border: 1px solid #ccc;
+        }
+        
+        .start_end_date button[type="submit"] {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            background-color: #007bff;
+            color: #fff;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }        
+        
+        .container {
+            width: 100%; /* Adjust the width as needed */
+            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-left: 15%; /* Add margin to the left side */
+            box-sizing: border-box; /* Include padding and border in the element's total width and height */
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="#">
+                    <div class="logo-circle">
+                        <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
+                    </div>
+                </a>
+                <a class="navbar-brand" href="#">Algobulls</a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarColor01">
+                    <ul class="navbar-nav me-auto">
+                        <li class="nav-item">
+                            <a class="nav-link active" href="#">
+                                <span class="visually-hidden">(current)</span>
+                            </a>
+                        </li>
+                    </ul>
+                    <div class="d-flex align-items-center">
+                        <div class="logo-circle">
+                            <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                        </div>
+                        <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                        <div>
+                            <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
+                            <script>
+                                function redirectToLoginPage() {
+                                    window.location.href = '/accounts/login/';
+                                }
+                            </script>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <form class="start_end_date">
+        <label for="start_date">Start Date:</label>
+        <input type="date" id="start_date" name="start_date" value="{{ start_date }}"><br><br>
+        <label for="end_date">End Date:</label>
+        <input type="date" id="end_date" name="end_date" value="{{ end_date }}"><br><br>
+        <button type="submit">Submit Date</button>
+    </form>
+    <div class="container">
+        <div class="chart-container">
+            <div class="chart-item">
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Weekly Status Wise Split</h2>
+                        <canvas class="chart-canvas" id="weeklyBarChart" ></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>Status Wise Split</h2>
+                        <canvas class="pie-chart-canvas" id="statusPieChart"></canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Weekly Issue Wise Split</h2>
+                        <canvas class="chart-canvas" id="issueBarChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>Issue Wise Split</h2>
+                        <canvas class="pie-chart-canvas" id="issuePieChart"></canvas>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-6">
+                        <h2>Weekly Customer Type Wise Split</h2>
+                        <canvas class="chart-canvas" id="customerBarChart"></canvas>
+                    </div>
+                    <div class="col-md-6">
+                        <h2>Customer Type Wise Split</h2>
+                        <canvas class="pie-chart-canvas" id="customerPieChart"></canvas>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+    
+        $(document).ready(function() {
+            $('.start_end_date').on('submit', function(event) {
+                event.preventDefault();
+                var start_date = $('#start_date').val();
+                var end_date = $('#end_date').val();
+    
+                $.ajax({
+                    url: '/rms_analysis_data/',
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': getCookie('csrftoken'),
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    data: {
+                        'start_date': start_date,
+                        'end_date': end_date,
+                    },
+                    success: function(response) {
+                        updateCharts(response);
+                    },
+                    error: function(xhr, status, error) {
+                        console.error('Error updating Rms:', error);
+                    }
+                });
+            });
+    
+            setTimeout(function() {
+                $('.start_end_date button[type="submit"]').click();
+            }, 0);
+        });
+
+        var weeklyBarChartInstance, statusPieChartInstance, priorityBarChartInstance, priorityPieChartInstance, divisionBarChartInstance, divisionPieChartInstance;
+        
+        function updateCharts(response) {
+            updateWeeklyBarChart(response.results1);
+            updateStatusPieChart(response.results2);
+            updateIssueBarChart(response.results3);
+            updateIssuePieChart(response.results4);
+            updateCustomerBarChart(response.results5);
+            updateCustomerPieChart(response.results6);
+        }
+
+        function updateWeeklyBarChart(results1) {
+            const ctx = document.getElementById('weeklyBarChart').getContext('2d');
+            
+            if (weeklyBarChartInstance) {
+                weeklyBarChartInstance.destroy();
+            }
+            
+            weeklyBarChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results1.labels,
+                    datasets: results1.datasets.map((dataset, index) => ({
+                        label: dataset.name,
+                        data: dataset.data,
+                        backgroundColor: getRandomColor(index),
+                        borderColor: getRandomColor(index),
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'start',
+                            formatter: (value) => value,
+                            color: 'black',
+                            font: {
+                                weight: 'bold',
+                                size: '15'
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+    
+        function updateStatusPieChart(results2) {
+            const ctx = document.getElementById('statusPieChart').getContext('2d');
+        
+            if (statusPieChartInstance) {
+                statusPieChartInstance.destroy();
+            }
+        
+            statusPieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: results2.labels,
+                    datasets: results2.datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'end',
+                            align: 'start',
+                            offset: -10,
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            borderRadius: 25,
+                            backgroundColor: (context) => {
+                                return context.dataset.backgroundColor;
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 35
+                            },
+                            formatter: (value) => {
+                                return value;
+                            }
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        function updateIssueBarChart(results3) {
+            const ctx = document.getElementById('issueBarChart').getContext('2d');
+        
+            if (priorityBarChartInstance) {
+                priorityBarChartInstance.destroy();
+            }
+        
+            priorityBarChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results3.labels,
+                    datasets: results3.datasets.map((dataset, index) => ({
+                        label: dataset.name,
+                        data: dataset.data,
+                        backgroundColor: getRandomColor(index),
+                        borderColor: getRandomColor(index),
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'start',
+                            color: '#000',
+                            font: {
+                                weight: 'bold',
+                                size: 15
+                            },
+                            formatter: (value) => value
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+        
+        function updateIssuePieChart(results4) {
+            const ctx = document.getElementById('issuePieChart').getContext('2d');
+        
+            if (priorityPieChartInstance) {
+                priorityPieChartInstance.destroy();
+            }
+        
+            priorityPieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: results4.labels,
+                    datasets: results4.datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'end',
+                            align: 'start',
+                            offset: -10,
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            borderRadius: 25,
+                            backgroundColor: (context) => context.dataset.backgroundColor,
+                            font: {
+                                weight: 'bold',
+                                size: 35
+                            },
+                            formatter: (value) => value
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        function updateCustomerBarChart(results5) {
+            const ctx = document.getElementById('customerBarChart').getContext('2d');
+        
+            if (divisionBarChartInstance) {
+                divisionBarChartInstance.destroy();
+            }
+        
+            divisionBarChartInstance = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: results5.labels,
+                    datasets: results5.datasets.map((dataset, index) => ({
+                        label: dataset.name,
+                        data: dataset.data,
+                        backgroundColor: getRandomColor(index),
+                        borderColor: getRandomColor(index),
+                        borderWidth: 1
+                    }))
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'start',
+                            color: '#000',
+                            font: {
+                                weight: 'bold',
+                                size: 12
+                            },
+                            formatter: (value) => value
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+        
+        function updateCustomerPieChart(results6) {
+            const ctx = document.getElementById('customerPieChart').getContext('2d');
+        
+            if (divisionPieChartInstance) {
+                divisionPieChartInstance.destroy();
+            }
+        
+            divisionPieChartInstance = new Chart(ctx, {
+                type: 'pie',
+                data: {
+                    labels: results6.labels,
+                    datasets: results6.datasets
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'end',
+                            align: 'start',
+                            offset: -10,
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            borderRadius: 25,
+                            backgroundColor: (context) => context.dataset.backgroundColor,
+                            font: {
+                                weight: 'bold',
+                                size: 35
+                            },
+                            formatter: (value) => value
+                        }
+                    }
+                },
+                plugins: [ChartDataLabels]
+            });
+        }
+
+        function getRandomColor() {
+            const letters = '0123456789ABCDEF';
+            let color = '#';
+            for (let i = 0; i < 6; i++) {
+                color += letters[Math.floor(Math.random() * 16)];
+            }
+            return color;
+        }
+
+    </script> 
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels"></script>
+   
+</body>
+</html>

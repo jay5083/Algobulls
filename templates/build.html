@@ -317,19 +317,75 @@
     </nav>
     
     <div class="sidebar">
-        <!-- This will be dynamically populated by JavaScript -->
+        <form id="filter-form">
+            {% csrf_token %}
+            <div class="filter-options">
+                <a href="#" class="filter-option" data-filter="strategist_name">Strategist Name
+                    {% for employee_id, employee_name in unique_strategist_names %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Strategist Name" data-field="strategist_name" class="filter-checkbox" value="{{ employee_id }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>            
+            </div>
+        </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function filterTable() {
+                var rows = document.querySelectorAll('#build-table tbody tr');
+                rows.forEach(function (row) {
+                    var displayRow = true;
+        
+                    // Iterate through each type of filter
+                    var filterCategories = ['strategist_name'];
+                    filterCategories.forEach(function (category) {
+                        var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
+                        if (checkboxes.length > 0) {
+                            var selectedValues = Array.from(checkboxes).map(function (checkbox) {
+                                return checkbox.value;
+                            });
+        
+                            var cell = row.querySelector('td[data-field="' + category + '"]');
+                            if (cell) {
+                                var select = cell.querySelector('select');
+                                var text;
+                                if (select) {
+                                    text = select.options[select.selectedIndex].value;  // Get the employee_id
+                                } else {
+                                    text = cell.textContent || cell.innerText;
+                                }
+                                if (!selectedValues.includes(text)) {
+                                    displayRow = false;
+                                }
+                            }
+                        }
+                    });
+        
+                    row.style.display = displayRow ? '' : 'none';
+                });
+            }
+        
+            // Add event listeners for all checkboxes
+            var checkboxes = document.querySelectorAll('.filter-checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', filterTable);
+            });
+        
+            // Initial filter to set the table correctly based on default checked checkboxes
+            filterTable();
+        });                
+    </script>
     
     {% block content %}
     <div>
-        
-        
-        <div class="container">
-        
-
         <div id="build-text" style="text-align: center;" style="display: none;" class="heading-container">
             <h2>Build</h2>
         </div>
+        
+        <div class="container">
+        
         <table id="build-table" class="table table-hover" class="table-container">
             <thead>
                 <tr class="table-info">
@@ -442,9 +498,9 @@
                                 {% else %}
                                     <select class="strategist_name-dropdown">
                                         {% for strategist_name in sales_employees %}
-                                            {%if strategist_name.role_id.role_name == "Strategy Employee" %}
+                                            {% if strategist_name.role_id.role_name == "Strategy Employee" %}
                                                 <option value="{{ strategist_name.employee_id }}" {% if strategist_name.employee_id == build.strategist_name.employee_id %} selected {% endif %}>{{ strategist_name.name }}</option>
-                                            {%endif%}
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 {% endif %}

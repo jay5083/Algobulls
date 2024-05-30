@@ -19,7 +19,7 @@
         .sidebar {
             margin: 0;
             padding: 0;
-            width: 150px;
+            width: 200px;
             background-color: lightwhite;
             position: fixed;
             height: 90%;
@@ -302,6 +302,14 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <div class="btn-tech-task-analysis-container">
+                        <button class="btn btn-success" onclick="redirecttech_task_analysis_dataURL()">Tech Task Analysis</button>
+                    </div>
+                    <script>
+                        function redirecttech_task_analysis_dataURL() {
+                            window.location.href = '/to_tech_task_analysis/';
+                        }
+                    </script>
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -323,7 +331,7 @@
         </div>
     </nav>
     
-    <div class="sidebar">
+    {% comment %} <div class="sidebar">
         <!-- This will be dynamically populated by JavaScript -->
         <div class="sidebar-item" id="tech-task-btn">
             <a class="sidebar-link">{{ selected_status }}:{{ number_of_tech_task_status }}</a>
@@ -352,7 +360,140 @@
         <div class="sidebar-item" id="tech-task-btn">
             <a href="/filter_by_status/tech-task/Open/" class="sidebar-link">Open</a>
         </div>
+    </div> {% endcomment %}
+
+    <div class="sidebar">
+        <form id="filter-form">
+            {% csrf_token %}
+            <div class="filter-options">
+                <a href="#" class="filter-option" data-filter="nature">Nature
+                    <div>
+                        <input type="checkbox" id="Core Change" name="Nature" data-field="nature" class="filter-checkbox" value="Core Change" checked>
+                        <label for="Core Change">Core Change</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Strategy Change" name="Nature" data-field="nature" class="filter-checkbox" value="Strategy Change" checked>
+                        <label for="Strategy Change">Strategy Change</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="None Core Request" name="Nature" data-field="nature" class="filter-checkbox" value="None Core Request" checked>
+                        <label for="None Core Request">None Core Request</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Broker Integration" name="Nature" data-field="nature" class="filter-checkbox" value="Broker Integration" checked>
+                        <label for="Broker Integration">Broker Integration</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Operations" name="Nature" data-field="nature" class="filter-checkbox" value="Operations" checked>
+                        <label for="Operations">Operations</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="task_status">Task Status 
+                    <div>
+                        <input type="checkbox" id="Pending Development" name="Task Status" data-field="task_status" class="filter-checkbox" value="Pending Development" checked>
+                        <label for="Pending Development">Pending Development</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Under Development" name="Task Status" data-field="task_status" class="filter-checkbox" value="Under Development" checked>
+                        <label for="Under Development">Under Development</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Under Testing" name="Task Status" data-field="task_status" class="filter-checkbox" value="Under Testing" checked>
+                        <label for="Under Testing">Under Testing</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Bugs Reported" name="Task Status" data-field="task_status" class="filter-checkbox" value="Bugs Reported" checked>
+                        <label for="Bugs Reported">Bugs Reported</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Delivered or Closed" name="Task Status" data-field="task_status" class="filter-checkbox" value="Delivered or Closed" checked>
+                        <label for="Delivered or Closed">Delivered or Closed</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="In Progress" name="Task Status" data-field="task_status" class="filter-checkbox" value="In Progress" checked>
+                        <label for="In Progress">In Progress</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="On Hold" name="Task Status" data-field="task_status" class="filter-checkbox" value="On Hold" checked>
+                        <label for="On Hold">On Hold</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Open" name="Task Status" data-field="task_status" class="filter-checkbox" value="Open" checked>
+                        <label for="Open">Open</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="priority">Priority
+                    <div>
+                        <input type="checkbox" id="Low" name="Priority" data-field="priority" class="filter-checkbox" value="Low" checked>
+                        <label for="Low">Low</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Medium" name="Priority" data-field="priority" class="filter-checkbox" value="Medium" checked>
+                        <label for="Medium">Medium</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="High" name="Priority" data-field="priority" class="filter-checkbox" value="High" checked>
+                        <label for="High">High</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="employee_id">Employee ID
+                    {% for employee_id, employee_name in unique_employee_ids %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="{{ employee_name }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>            
+            </div>
+        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function filterTable() {
+                var rows = document.querySelectorAll('#tech-task-table tbody tr');
+                rows.forEach(function (row) {
+                    var displayRow = true;
+        
+                    // Iterate through each type of filter
+                    var filterCategories = [
+                        'nature', 'task_status', 'priority', 'employee_id'
+                    ];
+                    filterCategories.forEach(function (category) {
+                        var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
+                        if (checkboxes.length > 0) {
+                            var selectedValues = Array.from(checkboxes).map(function (checkbox) {
+                                return checkbox.value.toUpperCase();
+                            });
+        
+                            var cell = row.querySelector('td[data-field="' + category + '"]');
+                            if (cell) {
+                                var text = cell.textContent || cell.innerText;
+                                var select = cell.querySelector('select');
+                                if (select) {
+                                    text = select.options[select.selectedIndex].text;
+                                }
+                                if (!selectedValues.includes(text.toUpperCase())) {
+                                    displayRow = false;
+                                }
+                            }
+                        }
+                    });
+        
+                    row.style.display = displayRow ? '' : 'none';
+                });
+            }
+        
+            // Add event listeners for all checkboxes
+            var checkboxes = document.querySelectorAll('.filter-checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', filterTable);
+            });
+        
+            // Initial filter to set the table correctly based on default checked checkboxes
+            filterTable();
+        });        
+    </script>
     
     {% block content %}
     <div>
@@ -425,7 +566,7 @@
             </thead>
             <tbody>
                 {% for task in tech_tasks %}
-                    {% if task.task_status == selected_status %}
+                    {% comment %} {% if task.task_status == selected_status %} {% endcomment %}
                         <tr class="table-light">
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Task ID field of Tech Task" %}
@@ -633,9 +774,8 @@
                                     </td>
                                 {% endif %}
                             {% endfor %}
-
                         </tr>
-                    {%endif%}
+                    {% comment %} {%endif%} {% endcomment %}
                 {% endfor %}
             </tbody>
         </table>           

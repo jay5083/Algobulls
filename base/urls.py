@@ -4,7 +4,8 @@ from . import views
 
 urlpatterns = [ 
     path("accounts/", include("django.contrib.auth.urls")),
-    path('accounts/profile/', home, name='home'),
+    path('accounts/profile/', views.auth, name='auth'),
+    path('home/', home, name='home'),
     path('update_sales_leads/', update_sales_leads, name='update_sales_leads'),
     path('accounts/profile/sales/add_sales_leads/', add_sales_leads, name='sales/add_sales_leads'),  
     path('delete_sales/', delete_sales, name='delete_sales'), 
@@ -35,6 +36,12 @@ urlpatterns = [
     path('rms/', views.rms, name='rms'),
     path('sales_analysis_data/', views.sales_analysis_data, name='sales_analysis_data'),
     path('to_sales_analysis/', views.to_sales_analysis, name='to_sales_analysis'),
+    path('to_support_analysis/', views.to_support_analysis, name='to_support_analysis'),
+    path('to_rms_analysis/', views.to_rms_analysis, name='to_rms_analysis'),
+    path('to_tech_task_analysis/', views.to_tech_task_analysis, name='to_tech_task_analysis'),
+    path('support_analysis_data/', views.support_analysis_data, name='support_analysis_data'),  
+    path('rms_analysis_data/', views.rms_analysis_data, name='rms_analysis_data'),  
+    path('tech_task_analysis_data/', views.tech_task_analysis_data, name='tech_task_analysis_data'),  
     path('sales_filter/', views.sales_filter, name='sales_filter'),
     path('apply_filters/', views.apply_filters, name='apply_filters'),
     path('fetch_employee_ids/', views.fetch_employee_ids, name='fetch_employee_ids'),

@@ -19,7 +19,7 @@
         .sidebar {
             margin: 0;
             padding: 0;
-            width: 150px;
+            width: 200px;
             background-color: lightwhite;
             position: fixed;
             height: 90%;
@@ -51,7 +51,7 @@
             background-color: #5b72e3bf;
             color: white;
         }
-        .sidebar::after {
+        {% comment %} .sidebar::after {
             content: "";
             position: absolute;
             bottom: 0;
@@ -60,7 +60,7 @@
             height: 150px; /* Adjust the height as needed */
             background-color: #2679c2bf; /* Set the color to blue */
             border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
-        }
+        } {% endcomment %}
         
 
         div.content {
@@ -263,10 +263,9 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view Support" %}
                             <li class="nav-item">
-                                <a class="nav-link" href="#" onclick="showTable('support', this)" role="button" aria-expanded="false">
+                                <a class="nav-link" href="/support/" role="button" aria-expanded="false">
                                     Support
                                 </a>
-                                
                             </li>
                         {% endif %}
                     {% endfor %}
@@ -288,6 +287,14 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <div class="btn-rms-analysis-container">
+                        <button class="btn btn-success" onclick="redirectrms_analysis_dataURL()">Rms Analysis</button>
+                    </div>
+                    <script>
+                        function redirectrms_analysis_dataURL() {
+                            window.location.href = '/to_rms_analysis/';
+                        }
+                    </script>
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -310,16 +317,192 @@
     </nav>
     
     <div class="sidebar">
-        
+        <form id="filter-form">
+            {% csrf_token %}
+            <div class="filter-options">
+                <a href="#" class="filter-option" data-filter="customer_type">Customer Type
+                    <div>
+                        <input type="checkbox" id="Choose" name="Customer Type" data-field="customer_type" class="filter-checkbox" value="Choose" checked>
+                        <label for="Choose">Choose</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Build" name="Customer Type" data-field="customer_type" class="filter-checkbox" value="Build" checked>
+                        <label for="Build">Build</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Others" name="Customer Type" data-field="customer_type" class="filter-checkbox" value="Others" checked>
+                        <label for="Others">Others</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="priority">Priority
+                    <div>
+                        <input type="checkbox" id="Low" name="Priority" data-field="priority" class="filter-checkbox" value="Low" checked>
+                        <label for="Low">Low</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Medium" name="Priority" data-field="priority" class="filter-checkbox" value="Medium" checked>
+                        <label for="Medium">Medium</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="High" name="Priority" data-field="priority" class="filter-checkbox" value="High" checked>
+                        <label for="High">High</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="issue">Issue
+                    <div>
+                        <input type="checkbox" id="Strategy Development" name="Issue" data-field="issue" class="filter-checkbox" value="Strategy Development" checked>
+                        <label for="Strategy Development">Strategy Development</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Live Trading and RMS" name="Issue" data-field="issue" class="filter-checkbox" value="Live Trading and RMS" checked>
+                        <label for="Live Trading and RMS">Live Trading and RMS</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Package and Funds" name="Issue" data-field="issue" class="filter-checkbox" value="Package and Funds" checked>
+                        <label for="Package and Funds">Package and Funds</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Front End Issues" name="Issue" data-field="issue" class="filter-checkbox" value="Front End Issues" checked>
+                        <label for="Front End Issues">Front End Issues</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="General Info" name="Issue" data-field="issue" class="filter-checkbox" value="General Info" checked>
+                        <label for="General Info">General Info</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Sales Related" name="Issue" data-field="issue" class="filter-checkbox" value="Sales Related" checked>
+                        <label for="Sales Related">Sales Related</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Others" name="Issue" data-field="issue" class="filter-checkbox" value="Others" checked>
+                        <label for="Others">Others</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="assigned_to">Assigned To
+                    <div>
+                        <input type="checkbox" id="Tech" name="Assigned To" data-field="assigned_to" class="filter-checkbox" value="Tech" checked>
+                        <label for="Tech">Tech</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Sales" name="Assigned To" data-field="assigned_to" class="filter-checkbox" value="Sales" checked>
+                        <label for="Sales">Sales</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Support" name="Assigned To" data-field="assigned_to" class="filter-checkbox" value="Support" checked>
+                        <label for="Support">Support</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="status">Status
+                    <div>
+                        <input type="checkbox" id="Open" name="Status" data-field="status" class="filter-checkbox" value="Open" checked>
+                        <label for="Open">Open</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
+                        <label for="In Progress">In Progress</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Hold" name="Status" data-field="status" class="filter-checkbox" value="Hold" checked>
+                        <label for="Hold">Hold</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Resolved" name="Status" data-field="status" class="filter-checkbox" value="Resolved" checked>
+                        <label for="Resolved">Resolved</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="rms_status">Rms Status
+                    <div>
+                        <input type="checkbox" id="Open" name="Rms Status" data-field="rms_status" class="filter-checkbox" value="Open" checked>
+                        <label for="Open">Open</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="In Progress" name="Rms Status" data-field="rms_status" class="filter-checkbox" value="In Progress" checked>
+                        <label for="In Progress">In Progress</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Hold" name="Rms Status" data-field="rms_status" class="filter-checkbox" value="Hold" checked>
+                        <label for="Hold">Hold</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Resolved" name="Rms Status" data-field="rms_status" class="filter-checkbox" value="Resolved" checked>
+                        <label for="Resolved">Resolved</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="employee">Employee
+                    {% for employee_id, employee_name in unique_employees %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Employee" data-field="employee" class="filter-checkbox" value="{{ employee_name }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>
+                <a href="#" class="filter-option" data-filter="broker">Broker
+                    {% for broker_id, broker_name in unique_brokers %}
+                        <div>
+                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker" data-field="broker" class="filter-checkbox" value="{{ broker_name }}" checked>
+                            <label for="broker{{ broker_id }}">{{ broker_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>            
+            </div>
+        </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function filterTable() {
+                var rows = document.querySelectorAll('#rms-table tbody tr');
+                rows.forEach(function (row) {
+                    var displayRow = true;
+        
+                    // Iterate through each type of filter
+                    var filterCategories = [
+                        'customer_type', 'priority', 'issue', 'assigned_to', 'status', 'rms_status', 'broker', 'employee'
+                    ];
+                    filterCategories.forEach(function (category) {
+                        var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
+                        if (checkboxes.length > 0) {
+                            var selectedValues = Array.from(checkboxes).map(function (checkbox) {
+                                return checkbox.value.toUpperCase();
+                            });
+        
+                            var cell = row.querySelector('td[data-field="' + category + '"]');
+                            if (cell) {
+                                var text = cell.textContent || cell.innerText;
+                                var select = cell.querySelector('select');
+                                if (select) {
+                                    text = select.options[select.selectedIndex].text;
+                                }
+                                if (!selectedValues.includes(text.toUpperCase())) {
+                                    displayRow = false;
+                                }
+                            }
+                        }
+                    });
+        
+                    row.style.display = displayRow ? '' : 'none';
+                });
+            }
+        
+            // Add event listeners for all checkboxes
+            var checkboxes = document.querySelectorAll('.filter-checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', filterTable);
+            });
+        
+            // Initial filter to set the table correctly based on default checked checkboxes
+            filterTable();
+        });        
+    </script>
     
     {% block content %}
     <div>
-        <div class="container">      
-        
         <div id="rms-text" style="text-align: center;" class="heading-container">
             <h2>RMS</h2>
         </div>
+
+        <div class="container">      
+        
         <table id="rms-table" class="table table-hover" class="table-container">
             <thead>
                 <tr class="table-info">
@@ -457,7 +640,7 @@
                                     {% else %}
                                         <select class="rms-broker-dropdown" id="rms_broker">
                                             {% for broker in brokers %}
-                                                    <option value="{{broker.broker_id}}" {% if broker.broker_id == rms.broker.broker_id %} selected {% endif %}>{{ broker.broker_id }}</option>
+                                                    <option value="{{broker.broker_id}}" {% if broker.broker_id == rms.broker.broker_id %} selected {% endif %}>{{ broker.broker_name }}</option>
                                             {% endfor %}
                                         </select>    
                                     {% endif %}
@@ -628,7 +811,7 @@
                                         {{ rms.status }}
                                     {% else %}
                                         <select id="rms_status" name="rms_status">
-                                            <option value="Open" {% if rms.status == 'Tech' %} selected {% endif %}>Tech</option>
+                                            <option value="Open" {% if rms.status == 'Open' %} selected {% endif %}>Open</option>
                                             <option value="In Progress" {% if rms.status == 'In Progress' %} selected {% endif %}>In Progress</option>
                                             <option value="Hold" {% if rms.status == 'Hold' %} selected {% endif %}>Hold</option>
                                             <option value="Resolved" {% if rms.status == 'Resolved' %} selected {% endif %}>Resolved</option>
@@ -657,7 +840,7 @@
                                     {{ rms.rms_status }}
                                 {% else %}
                                     <select id="rms_rms_status" name="rms_rms_status">
-                                        <option value="Open" {% if rms.rms_status == 'Tech' %} selected {% endif %}>Tech</option>
+                                        <option value="Open" {% if rms.rms_status == 'Open' %} selected {% endif %}>Open</option>
                                         <option value="In Progress" {% if rms.rms_status == 'In Progress' %} selected {% endif %}>In Progress</option>
                                         <option value="Hold" {% if rms.rms_status == 'Hold' %} selected {% endif %}>Hold</option>
                                         <option value="Resolved" {% if rms.rms_status == 'Resolved' %} selected {% endif %}>Resolved</option>

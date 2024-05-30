@@ -19,7 +19,7 @@
         .sidebar {
             margin: 0;
             padding: 0;
-            width: 150px;
+            width: 200px;
             background-color: lightwhite;
             position: fixed;
             height: 90%;
@@ -51,7 +51,7 @@
             background-color: #5b72e3bf;
             color: white;
         }
-        .sidebar::after {
+        {% comment %} .sidebar::after {
             content: "";
             position: absolute;
             bottom: 0;
@@ -60,7 +60,7 @@
             height: 150px; /* Adjust the height as needed */
             background-color: #2679c2bf; /* Set the color to blue */
             border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
-        }
+        } {% endcomment %}
         
 
         div.content {
@@ -288,6 +288,14 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <div class="btn-support-analysis-container">
+                        <button class="btn btn-success" onclick="redirectsupport_analysis_dataURL()">Support Analysis</button>
+                    </div>
+                    <script>
+                        function redirectsupport_analysis_dataURL() {
+                            window.location.href = '/to_support_analysis/';
+                        }
+                    </script>
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -357,34 +365,90 @@
                 </a>
                 <a href="#" class="filter-option" data-filter="issue">Issue
                     <div>
-                        <input type="checkbox" id="Converted" name="Issue" data-field="issue" class="filter-checkbox" value="Converted" checked>
-                        <label for="Converted">Converted</label>
+                        <input type="checkbox" id="Strategy Development" name="Issue" data-field="issue" class="filter-checkbox" value="Strategy Development" checked>
+                        <label for="Strategy Development">Strategy Development</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="Dropped" name="Issue" data-field="issue" class="filter-checkbox" value="Dropped" checked>
-                        <label for="Dropped">Dropped</label>
+                        <input type="checkbox" id="Live Trading and RMS" name="Issue" data-field="issue" class="filter-checkbox" value="Live Trading and RMS" checked>
+                        <label for="Live Trading and RMS">Live Trading and RMS</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="Follow up" name="Issue" data-field="issue" class="filter-checkbox" value="Follow up" checked>
-                        <label for="Follow up">Follow up</label>
+                        <input type="checkbox" id="Package and Funds" name="Issue" data-field="issue" class="filter-checkbox" value="Package and Funds" checked>
+                        <label for="Package and Funds">Package and Funds</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="No Answer" name="Issue" data-field="issue" class="filter-checkbox" value="No Answer" checked>
-                        <label for="No Answer">No Answer</label>
+                        <input type="checkbox" id="Front End Issues" name="Issue" data-field="issue" class="filter-checkbox" value="Front End Issues" checked>
+                        <label for="Front End Issues">Front End Issues</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="Not Interested" name="Issue" data-field="issue" class="filter-checkbox" value="Not Interested" checked>
-                        <label for="Not Interested">Not Interested</label>
+                        <input type="checkbox" id="General Info" name="Issue" data-field="issue" class="filter-checkbox" value="General Info" checked>
+                        <label for="General Info">General Info</label>
                     </div>
                     <div>
-                        <input type="checkbox" id="In Progress" name="Issue" data-field="issue" class="filter-checkbox" value="In Progress" checked>
-                        <label for="In Progress">In Progress</label>
+                        <input type="checkbox" id="Hold" name="Issue" data-field="issue" class="filter-checkbox" value="Hold" checked>
+                        <label for="Hold">Hold</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Resolved" name="Issue" data-field="issue" class="filter-checkbox" value="Resolved" checked>
+                        <label for="Resolved">Resolved</label>
                     </div>
                 </a>
-                <a href="#" class="filter-option" data-filter="sales_employee_id">Sales Employee ID
-                    {% for employee_id, employee_name in unique_sales_employees %}
+                <a href="#" class="filter-option" data-filter="status">Status
+                    <div>
+                        <input type="checkbox" id="Open" name="Status" data-field="status" class="filter-checkbox" value="Open" checked>
+                        <label for="Open">Open</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
+                        <label for="In Progress">In Progress</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Hold" name="Status" data-field="status" class="filter-checkbox" value="Hold" checked>
+                        <label for="Hold">Hold</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Resolved" name="Status" data-field="status" class="filter-checkbox" value="Resolved" checked>
+                        <label for="Resolved">Resolved</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="division_assigned_to">Division Assigned To
+                    <div>
+                        <input type="checkbox" id="Tech" name="Division Assigned To" data-field="division_assigned_to" class="filter-checkbox" value="Tech" checked>
+                        <label for="Tech">Tech</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Sales" name="Division Assigned To" data-field="division_assigned_to" class="filter-checkbox" value="Sales" checked>
+                        <label for="Sales">Sales</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Strategy" name="Division Assigned To" data-field="division_assigned_to" class="filter-checkbox" value="Strategy" checked>
+                        <label for="Strategy">Strategy</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Support" name="Division Assigned To" data-field="division_assigned_to" class="filter-checkbox" value="Support" checked>
+                        <label for="Support">Support</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="RMS" name="Division Assigned To" data-field="division_assigned_to" class="filter-checkbox" value="RMS" checked>
+                        <label for="RMS">RMS</label>
+                    </div>
+                    <div>
+                        <input type="checkbox" id="Build" name="Division Assigned To" data-field="division_assigned_to" class="filter-checkbox" value="Build" checked>
+                        <label for="Build">Build</label>
+                    </div>
+                </a>
+                <a href="#" class="filter-option" data-filter="support_employee">Support Employee
+                    {% for employee_id, employee_name in unique_support_employees %}
                         <div>
-                            <input type="checkbox" id="employee{{ employee_id }}" name="Sales Employee ID" data-field="sales_employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Support Employee" data-field="support_employee" class="filter-checkbox" value="{{ employee_name }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>
+                <a href="#" class="filter-option" data-filter="division_employee">Division Employee
+                    {% for employee_id, employee_name in unique_division_employees %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Division Employee" data-field="division_employee" class="filter-checkbox" value="{{ employee_name }}" checked>
                             <label for="employee{{ employee_id }}">{{ employee_name }}</label>
                         </div>
                     {% endfor %}
@@ -400,7 +464,7 @@
                 <a href="#" class="filter-option" data-filter="broker_name">Broker Name
                     {% for broker_id, broker_name in unique_broker_names %}
                         <div>
-                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_id }}" checked>
+                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_name }}" checked>
                             <label for="broker{{ broker_id }}">{{ broker_name }}</label>
                         </div>
                     {% endfor %}
@@ -408,6 +472,53 @@
             </div>
         </form>
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function filterTable() {
+                var rows = document.querySelectorAll('#support-table tbody tr');
+                rows.forEach(function (row) {
+                    var displayRow = true;
+        
+                    // Iterate through each type of filter
+                    var filterCategories = [
+                        'customer_type', 'priority', 'issue', 'status', 
+                        'division_assigned_to', 'support_employee', 'division_employee', 'branch_id', 'broker_name'];
+                    filterCategories.forEach(function (category) {
+                        var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
+                        if (checkboxes.length > 0) {
+                            var selectedValues = Array.from(checkboxes).map(function (checkbox) {
+                                return checkbox.value.toUpperCase();
+                            });
+        
+                            var cell = row.querySelector('td[data-field="' + category + '"]');
+                            if (cell) {
+                                var text = cell.textContent || cell.innerText;
+                                var select = cell.querySelector('select');
+                                if (select) {
+                                    text = select.options[select.selectedIndex].text;
+                                }
+                                if (!selectedValues.includes(text.toUpperCase())) {
+                                    displayRow = false;
+                                }
+                            }
+                        }
+                    });
+        
+                    row.style.display = displayRow ? '' : 'none';
+                });
+            }
+        
+            // Add event listeners for all checkboxes
+            var checkboxes = document.querySelectorAll('.filter-checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', filterTable);
+            });
+        
+            // Initial filter to set the table correctly based on default checked checkboxes
+            filterTable();
+        });        
+    </script>
     
     {% block content %}
     <div>

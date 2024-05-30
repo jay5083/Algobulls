@@ -321,8 +321,66 @@
     </nav>
     
     <div class="sidebar">
-        <!-- This will be dynamically populated by JavaScript -->
+        <form id="filter-form">
+            {% csrf_token %}
+            <div class="filter-options">
+                <a href="#" class="filter-option" data-filter="employee_id">Employee ID
+                    {% for employee_id, employee_name in unique_employee_ids %}
+                        <div>
+                            <input type="checkbox" id="employee{{ employee_id }}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
+                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                        </div>
+                    {% endfor %}
+                </a>            
+            </div>
+        </form>
     </div>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            function filterTable() {
+                var rows = document.querySelectorAll('#strategies-table tbody tr');
+                rows.forEach(function (row) {
+                    var displayRow = true;
+        
+                    // Iterate through each type of filter
+                    var filterCategories = ['employee_id'];
+                    filterCategories.forEach(function (category) {
+                        var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
+                        if (checkboxes.length > 0) {
+                            var selectedValues = Array.from(checkboxes).map(function (checkbox) {
+                                return checkbox.value;
+                            });
+        
+                            var cell = row.querySelector('td[data-field="' + category + '"]');
+                            if (cell) {
+                                var select = cell.querySelector('select');
+                                var text;
+                                if (select) {
+                                    text = select.options[select.selectedIndex].value;  // Get the employee_id
+                                } else {
+                                    text = cell.textContent || cell.innerText;
+                                }
+                                if (!selectedValues.includes(text)) {
+                                    displayRow = false;
+                                }
+                            }
+                        }
+                    });
+        
+                    row.style.display = displayRow ? '' : 'none';
+                });
+            }
+        
+            // Add event listeners for all checkboxes
+            var checkboxes = document.querySelectorAll('.filter-checkbox');
+            checkboxes.forEach(function (checkbox) {
+                checkbox.addEventListener('change', filterTable);
+            });
+        
+            // Initial filter to set the table correctly based on default checked checkboxes
+            filterTable();
+        });        
+    </script>
     
     {% block content %}
     <div>
