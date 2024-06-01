@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import AlgobullsDivision, AlgobullsEmployee, AuthPermission, AuthRole, Branch, BranchEmployee, Broker, Build, PermissionAccessTable, Sales, Strategies, Support, TechTask
+from .models import AlgobullsDivision, AlgobullsEmployee, AuthPermission, AuthRole, Branch, BranchEmployee, Broker, Build, PermissionAccessTable, Sales, Strategies, Support, TechTask, Rms
 from django.contrib.auth.admin import UserAdmin
 from django.contrib.auth.models import User
 
@@ -16,3 +16,4 @@ admin.site.register(Sales)
 admin.site.register(Strategies)
 admin.site.register(Support)
 admin.site.register(TechTask)
+admin.site.register(Rms)

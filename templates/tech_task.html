@@ -322,7 +322,7 @@
                         <script>
                             function redirectToLoginPage() {
                                 // Redirect to the login page
-                                window.location.href = '/accounts/login/';
+                                window.location.href = '/logout/';
                             }
                         </script> 
                     </div>
@@ -361,89 +361,148 @@
             <a href="/filter_by_status/tech-task/Open/" class="sidebar-link">Open</a>
         </div>
     </div> {% endcomment %}
+    <style>
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+    
+        .dropdown-content div {
+            padding: 12px 16px;
+        }
+    
+        .dropdown-content div:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var toggle = dropdown.querySelector('.filter-option');
+                var menu = dropdown.querySelector('.dropdown-content');
+    
+                toggle.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                });
+    
+                document.addEventListener('click', function(event) {
+                    if (!dropdown.contains(event.target)) {
+                        menu.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
 
     <div class="sidebar">
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
-                <a href="#" class="filter-option" data-filter="nature">Nature
-                    <div>
-                        <input type="checkbox" id="Core Change" name="Nature" data-field="nature" class="filter-checkbox" value="Core Change" checked>
-                        <label for="Core Change">Core Change</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Strategy Change" name="Nature" data-field="nature" class="filter-checkbox" value="Strategy Change" checked>
-                        <label for="Strategy Change">Strategy Change</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="None Core Request" name="Nature" data-field="nature" class="filter-checkbox" value="None Core Request" checked>
-                        <label for="None Core Request">None Core Request</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Broker Integration" name="Nature" data-field="nature" class="filter-checkbox" value="Broker Integration" checked>
-                        <label for="Broker Integration">Broker Integration</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Operations" name="Nature" data-field="nature" class="filter-checkbox" value="Operations" checked>
-                        <label for="Operations">Operations</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="task_status">Task Status 
-                    <div>
-                        <input type="checkbox" id="Pending Development" name="Task Status" data-field="task_status" class="filter-checkbox" value="Pending Development" checked>
-                        <label for="Pending Development">Pending Development</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Under Development" name="Task Status" data-field="task_status" class="filter-checkbox" value="Under Development" checked>
-                        <label for="Under Development">Under Development</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Under Testing" name="Task Status" data-field="task_status" class="filter-checkbox" value="Under Testing" checked>
-                        <label for="Under Testing">Under Testing</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Bugs Reported" name="Task Status" data-field="task_status" class="filter-checkbox" value="Bugs Reported" checked>
-                        <label for="Bugs Reported">Bugs Reported</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Delivered or Closed" name="Task Status" data-field="task_status" class="filter-checkbox" value="Delivered or Closed" checked>
-                        <label for="Delivered or Closed">Delivered or Closed</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="In Progress" name="Task Status" data-field="task_status" class="filter-checkbox" value="In Progress" checked>
-                        <label for="In Progress">In Progress</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="On Hold" name="Task Status" data-field="task_status" class="filter-checkbox" value="On Hold" checked>
-                        <label for="On Hold">On Hold</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Open" name="Task Status" data-field="task_status" class="filter-checkbox" value="Open" checked>
-                        <label for="Open">Open</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="priority">Priority
-                    <div>
-                        <input type="checkbox" id="Low" name="Priority" data-field="priority" class="filter-checkbox" value="Low" checked>
-                        <label for="Low">Low</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Medium" name="Priority" data-field="priority" class="filter-checkbox" value="Medium" checked>
-                        <label for="Medium">Medium</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="High" name="Priority" data-field="priority" class="filter-checkbox" value="High" checked>
-                        <label for="High">High</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="employee_id">Employee ID
-                    {% for employee_id, employee_name in unique_employee_ids %}
-                        <div>
-                            <input type="checkbox" id="employee{{ employee_id }}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="{{ employee_name }}" checked>
-                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                        <a href="#" class="filter-option" data-filter="nature" id="dropdownToggle">Nature</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            <div>
+                                <input type="checkbox" id="Core Change" name="Nature" data-field="nature" class="filter-checkbox" value="Core Change" checked>
+                                <label for="Core Change">Core Change</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Strategy Change" name="Nature" data-field="nature" class="filter-checkbox" value="Strategy Change" checked>
+                                <label for="Strategy Change">Strategy Change</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="None Core Request" name="Nature" data-field="nature" class="filter-checkbox" value="None Core Request" checked>
+                                <label for="None Core Request">None Core Request</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Broker Integration" name="Nature" data-field="nature" class="filter-checkbox" value="Broker Integration" checked>
+                                <label for="Broker Integration">Broker Integration</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Operations" name="Nature" data-field="nature" class="filter-checkbox" value="Operations" checked>
+                                <label for="Operations">Operations</label>
+                            </div>
                         </div>
-                    {% endfor %}
-                </a>            
+                    </div> 
+                </div>  
+                <div class="dropdown">
+                    <div class="sidebar-item">      
+                        <a href="#" class="filter-option" data-filter="task_status" id="dropdownToggle">Task Status</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            <div>
+                                <input type="checkbox" id="Pending Development" name="Task Status" data-field="task_status" class="filter-checkbox" value="Pending Development" checked>
+                                <label for="Pending Development">Pending Development</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Under Development" name="Task Status" data-field="task_status" class="filter-checkbox" value="Under Development" checked>
+                                <label for="Under Development">Under Development</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Under Testing" name="Task Status" data-field="task_status" class="filter-checkbox" value="Under Testing" checked>
+                                <label for="Under Testing">Under Testing</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Bugs Reported" name="Task Status" data-field="task_status" class="filter-checkbox" value="Bugs Reported" checked>
+                                <label for="Bugs Reported">Bugs Reported</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Delivered or Closed" name="Task Status" data-field="task_status" class="filter-checkbox" value="Delivered or Closed" checked>
+                                <label for="Delivered or Closed">Delivered or Closed</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="In Progress" name="Task Status" data-field="task_status" class="filter-checkbox" value="In Progress" checked>
+                                <label for="In Progress">In Progress</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="On Hold" name="Task Status" data-field="task_status" class="filter-checkbox" value="On Hold" checked>
+                                <label for="On Hold">On Hold</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Open" name="Task Status" data-field="task_status" class="filter-checkbox" value="Open" checked>
+                                <label for="Open">Open</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                        <a href="#" class="filter-option" data-filter="priority" id="dropdownToggle">Priority</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            <div>
+                                <input type="checkbox" id="Low" name="Priority" data-field="priority" class="filter-checkbox" value="Low" checked>
+                                <label for="Low">Low</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Medium" name="Priority" data-field="priority" class="filter-checkbox" value="Medium" checked>
+                                <label for="Medium">Medium</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="High" name="Priority" data-field="priority" class="filter-checkbox" value="High" checked>
+                                <label for="High">High</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                        <a href="#" class="filter-option" data-filter="employee_id" id="dropdownToggle">Employee ID</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            {% for employee_id, employee_name in unique_employee_ids %}
+                                <div>
+                                    <input type="checkbox" id="employee{{ employee_id }}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="{{ employee_name }}" checked>
+                                    <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                                </div>
+                            {% endfor %}
+                            </div> 
+                        </div> 
+                    </div> 
+                </div>            
             </div>
         </form>
     </div>

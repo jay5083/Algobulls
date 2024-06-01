@@ -308,7 +308,7 @@
                         <script>
                             function redirectToLoginPage() {
                                 // Redirect to the login page
-                                window.location.href = '/accounts/login/';
+                                window.location.href = '/logout/';
                             }
                         </script> 
                     </div>
@@ -316,103 +316,176 @@
             </div>
         </div>
     </nav>
+    <style>
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+    
+        .dropdown-content div {
+            padding: 12px 16px;
+        }
+    
+        .dropdown-content div:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var toggle = dropdown.querySelector('.filter-option');
+                var menu = dropdown.querySelector('.dropdown-content');
+    
+                toggle.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                });
+    
+                document.addEventListener('click', function(event) {
+                    if (!dropdown.contains(event.target)) {
+                        menu.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
     
     <div class="sidebar">
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
-                <a href="#" class="filter-option" data-filter="source_type">Source Type
-                    <div>
-                        <input type="checkbox" id="WebinarCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Webinar" checked>
-                        <label for="WebinarCheckbox">Webinar</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="BranchCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Branch" checked>
-                        <label for="BranchCheckbox">Branch</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="CPAPCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="CP/AP" checked>
-                        <label for="CPAPCheckbox">CP/AP</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="category">Category
-                    <div>
-                        <input type="checkbox" id="RetailCheckbox" name="Category" data-field="category" class="filter-checkbox" value="Retail" checked>
-                        <label for="RetailCheckbox">Retail</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="HNICheckbox" name="Category" data-field="category" class="filter-checkbox" value="HNI" checked>
-                        <label for="HNICheckbox">HNI</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="UltraHNICheckbox" name="Category" data-field="category" class="filter-checkbox" value="Ultra HNI" checked>
-                        <label for="UltraHNICheckbox">Ultra HNI</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="risk_appetite">Risk Appetite
-                    <div>
-                        <input type="checkbox" id="Low" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="Low" checked>
-                        <label for="Low">Low</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Medium" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="Medium" checked>
-                        <label for="Medium">Medium</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="High" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="High" checked>
-                        <label for="High">High</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="status">Status
-                    <div>
-                        <input type="checkbox" id="Converted" name="Status" data-field="status" class="filter-checkbox" value="Converted" checked>
-                        <label for="Converted">Converted</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Dropped" name="Status" data-field="status" class="filter-checkbox" value="Dropped" checked>
-                        <label for="Dropped">Dropped</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Follow up" name="Status" data-field="status" class="filter-checkbox" value="Follow up" checked>
-                        <label for="Follow up">Follow up</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="No Answer" name="Status" data-field="status" class="filter-checkbox" value="No Answer" checked>
-                        <label for="No Answer">No Answer</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="Not Interested" name="Status" data-field="status" class="filter-checkbox" value="Not Interested" checked>
-                        <label for="Not Interested">Not Interested</label>
-                    </div>
-                    <div>
-                        <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
-                        <label for="In Progress">In Progress</label>
-                    </div>
-                </a>
-                <a href="#" class="filter-option" data-filter="sales_employee_id">Sales Employee ID
-                    {% for employee_id, employee_name in unique_sales_employees %}
-                        <div>
-                            <input type="checkbox" id="employee{{ employee_id }}" name="Sales Employee ID" data-field="sales_employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
-                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                        <a href="#" class="filter-option" data-filter="source_type" id="dropdownToggle">Source Type</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            <div>
+                                <input type="checkbox" id="WebinarCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Webinar" checked>
+                                <label for="WebinarCheckbox">Webinar</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="BranchCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="Branch" checked>
+                                <label for="BranchCheckbox">Branch</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="CPAPCheckbox" name="Source Type" data-field="source_type" class="filter-checkbox" value="CP/AP" checked>
+                                <label for="CPAPCheckbox">CP/AP</label>
+                            </div>
                         </div>
-                    {% endfor %}
-                </a>  
-                <a href="#" class="filter-option" data-filter="branch_id">Branch ID
-                    {% for branch_id, branch_name in unique_branch_ids %}
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                    <a href="#" class="filter-option" data-filter="category" id="dropdownToggle">Category</a>
+                    <div id="dropdownMenu" class="dropdown-content">
                         <div>
-                            <input type="checkbox" id="branch{{ branch_id }}" name="Branch ID" data-field="branch_id" class="filter-checkbox" value="{{ branch_id }}" checked>
-                            <label for="branch{{ branch_id }}">{{ branch_name }}</label>
+                            <input type="checkbox" id="RetailCheckbox" name="Category" data-field="category" class="filter-checkbox" value="Retail" checked>
+                            <label for="RetailCheckbox">Retail</label>
                         </div>
-                    {% endfor %}
-                </a>
-                <a href="#" class="filter-option" data-filter="broker_name">Broker Name
-                    {% for broker_id, broker_name in unique_broker_names %}
                         <div>
-                            <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_name }}" checked>
-                            <label for="broker{{ broker_id }}">{{ broker_name }}</label>
+                            <input type="checkbox" id="HNICheckbox" name="Category" data-field="category" class="filter-checkbox" value="HNI" checked>
+                            <label for="HNICheckbox">HNI</label>
                         </div>
-                    {% endfor %}
-                </a>            
+                        <div>
+                            <input type="checkbox" id="UltraHNICheckbox" name="Category" data-field="category" class="filter-checkbox" value="Ultra HNI" checked>
+                            <label for="UltraHNICheckbox">Ultra HNI</label>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                    <a href="#" class="filter-option" data-filter="risk_appetite" id="dropdownToggle">Risk Appetite</a>
+                    <div id="dropdownMenu" class="dropdown-content">    
+                        <div>
+                            <input type="checkbox" id="Low" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="Low" checked>
+                            <label for="Low">Low</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Medium" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="Medium" checked>
+                            <label for="Medium">Medium</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="High" name="Risk Appetite" data-field="risk_appetite" class="filter-checkbox" value="High" checked>
+                            <label for="High">High</label>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                    <a href="#" class="filter-option" data-filter="status" id="dropdownToggle">Status</a>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        <div>
+                            <input type="checkbox" id="Converted" name="Status" data-field="status" class="filter-checkbox" value="Converted" checked>
+                            <label for="Converted">Converted</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Dropped" name="Status" data-field="status" class="filter-checkbox" value="Dropped" checked>
+                            <label for="Dropped">Dropped</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Follow up" name="Status" data-field="status" class="filter-checkbox" value="Follow up" checked>
+                            <label for="Follow up">Follow up</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="No Answer" name="Status" data-field="status" class="filter-checkbox" value="No Answer" checked>
+                            <label for="No Answer">No Answer</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Not Interested" name="Status" data-field="status" class="filter-checkbox" value="Not Interested" checked>
+                            <label for="Not Interested">Not Interested</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
+                            <label for="In Progress">In Progress</label>
+                        </div>
+                    </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                    <a href="#" class="filter-option" data-filter="sales_employee_id" id="dropdownToggle">Sales Employee ID</a>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        {% for employee_id, employee_name in unique_sales_employees %}
+                            <div>
+                                <input type="checkbox" id="employee{{ employee_id }}" name="Sales Employee ID" data-field="sales_employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
+                                <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </div>
+                <div class="dropdown"> 
+                    <div class="sidebar-item"> 
+                    <a href="#" class="filter-option" data-filter="branch_id" id="dropdownToggle">Branch ID</a>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        {% for branch_id, branch_name in unique_branch_ids %}
+                            <div>
+                                <input type="checkbox" id="branch{{ branch_id }}" name="Branch ID" data-field="branch_id" class="filter-checkbox" value="{{ branch_id }}" checked>
+                                <label for="branch{{ branch_id }}">{{ branch_name }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                    <a href="#" class="filter-option" data-filter="broker_name" id="dropdownToggle">Broker Name</a>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        {% for broker_id, broker_name in unique_broker_names %}
+                            <div>
+                                <input type="checkbox" id="broker{{ broker_id }}" name="Broker Name" data-field="broker_name" class="filter-checkbox" value="{{ broker_name }}" checked>
+                                <label for="broker{{ broker_id }}">{{ broker_name }}</label>
+                            </div>
+                        {% endfor %}
+                    </div> 
+                </div>   
+                </div>           
             </div>
         </form>
     </div>
@@ -779,7 +852,7 @@
                                     {% endfor %}
                                     {% if "Can edit the Lead ID field of Sales" not in user_permissions %}
                                         contenteditable="false"
-                                    {%endif%}
+                                    {% endif %}
                                     >{{ lead.lead_id }}</td>
                                 {% endif %}
                             {% endfor %}
@@ -979,13 +1052,16 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Purchase Date field of Sales" %}
                                     <td class="editable-14" data-field="purchase_date">
-                                        {% for permission in user_permissions %}
+                                        {% comment %} {% for permission in user_permissions %}
                                             {% if permission.name == "Can edit the Purchase Date field of Sales" %}
                                                 <input type="date" id="purchase_date" name="purchase_date" value="{{ lead.purchase_date}}"><br><br>
-                                            {% comment %} {% else %}
-                                                {{ lead.purchase_date|date:'Y-m-d' }}<br><br> {% endcomment %}
                                             {% endif %}
-                                        {% endfor %}
+                                        {% endfor %} {% endcomment %}
+                                        {% if "Can edit the Purchase Date field of Sales" not in permissions_name %}
+                                            {{ lead.purchase_date }}
+                                        {% else %}
+                                            <input type="date" id="purchase_date" name="purchase_date" value="{{ lead.purchase_date}}"><br><br>
+                                        {%endif%}
                                     </td>
                                 {% endif %}
                             {% endfor %}
@@ -993,13 +1069,16 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Purchase Date field of Sales" %}
                                     <td class="editable-14" data-field="entry_date">
-                                        {% for permission in user_permissions %}
+                                        {% comment %} {% for permission in user_permissions %}
                                             {% if permission.name == "Can edit the Purchase Date field of Sales" %}
                                                 <input type="date" id="entry_date" name="entry_date" value="{{ lead.entry_date}}"><br><br>
-                                            {% comment %} {% else %}
-                                                {{ lead.purchase_date|date:'Y-m-d' }}<br><br> {% endcomment %}
                                             {% endif %}
-                                        {% endfor %}
+                                        {% endfor %} {% endcomment %}
+                                        {% if "Can edit the Purchase Date field of Sales" not in permissions_name %}
+                                            {{ lead.entry_date }}
+                                        {% else %}
+                                            <input type="date" id="entry_date" name="entry_date" value="{{ lead.entry_date}}"><br><br>
+                                        {%endif%}
                                     </td>
                                 {% endif %}
                             {% endfor %}

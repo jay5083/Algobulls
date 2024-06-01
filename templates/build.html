@@ -307,7 +307,7 @@
                         <script>
                             function redirectToLoginPage() {
                                 // Redirect to the login page
-                                window.location.href = '/accounts/login/';
+                                window.location.href = '/logout/';
                             }
                         </script> 
                     </div>
@@ -320,17 +320,64 @@
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
-                <a href="#" class="filter-option" data-filter="strategist_name">Strategist Name
-                    {% for employee_id, employee_name in unique_strategist_names %}
-                        <div>
-                            <input type="checkbox" id="employee{{ employee_id }}" name="Strategist Name" data-field="strategist_name" class="filter-checkbox" value="{{ employee_id }}" checked>
-                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
-                        </div>
-                    {% endfor %}
-                </a>            
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                    <a href="#" class="filter-option" id="dropdownToggle">Strategist Name</a>
+                    <div id="dropdownMenu" class="dropdown-content">
+                        {% for employee_id, employee_name in unique_strategist_names %}
+                            <div>
+                                <input type="checkbox" id="employee{{ employee_id }}" name="strategist_name" data-field="strategist_name" class="filter-checkbox" value="{{ employee_id }}" checked>
+                                <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    </div>
+                </div>       
             </div>
         </form>
     </div>
+    
+    <style>
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+    
+        .dropdown-content div {
+            padding: 12px 16px;
+        }
+    
+        .dropdown-content div:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdownToggle = document.getElementById('dropdownToggle');
+            var dropdownMenu = document.getElementById('dropdownMenu');
+    
+            dropdownToggle.addEventListener('click', function(event) {
+                event.preventDefault();
+                if (dropdownMenu.style.display === 'block') {
+                    dropdownMenu.style.display = 'none';
+                } else {
+                    dropdownMenu.style.display = 'block';
+                }
+            });
+    
+            document.addEventListener('click', function(event) {
+                if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
+                    dropdownMenu.style.display = 'none';
+                }
+            });
+        });
+    </script>
+    
+    
     <script>
         document.addEventListener('DOMContentLoaded', function () {
             function filterTable() {
@@ -541,11 +588,16 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Date field of Build" %}
                             <td class="editable-build" data-field="date">
-                                {% for permission in user_permissions %}
+                                {% comment %} {% for permission in user_permissions %}
                                     {% if permission.name == "Can edit the Date field of Build" %}
                                         <input type="date" id="date" name="date" value="{{ build.date}}"><br><br>
                                     {% endif %}
-                                {% endfor %}
+                                {% endfor %} {% endcomment %}
+                                {% if "Can edit the Date field of Build" not in permissions_name %}
+                                    {{ build.date }}
+                                {% else %}
+                                    <input type="date" id="date" name="date" value="{{ build.date}}"><br><br>
+                                {% endif %}
                             </td>
                         {% endif %}
                     {% endfor %}
@@ -583,11 +635,16 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Payment Date field of Build" %}
                             <td class="editable-build" data-field="payment_date">
-                                {% for permission in user_permissions %}
+                                {% comment %} {% for permission in user_permissions %}
                                     {% if permission.name == "Can edit the Payment Date field of Build" %}
                                         <input type="date" id="payment_date" name="payment_date" value="{{ build.payment_date}}"><br><br>
                                     {% endif %}
-                                {% endfor %}
+                                {% endfor %} {% endcomment %}
+                                {% if "Can edit the Payment Date field of Build" not in permissions_name %}
+                                    {{ build.payment_date }}
+                                {% else %}
+                                    <input type="date" id="payment_date" name="payment_date" value="{{ build.payment_date}}"><br><br>
+                                {%endif%}
                             </td>
                         {% endif %}
                     {% endfor %}
@@ -610,11 +667,16 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Delivery Date field of Build" %}
                             <td class="editable-build" data-field="delivery_date">
-                                {% for permission in user_permissions %}
+                                {% comment %} {% for permission in user_permissions %}
                                     {% if permission.name == "Can edit the Delivery Date field of Build" %}
                                         <input type="date" id="delivery_date" name="delivery_date" value="{{ build.delivery_date}}"><br><br>
                                     {% endif %}
-                                {% endfor %}
+                                {% endfor %} {% endcomment %}
+                                {% if "Can edit the Delivery Date field of Build" not in permissions_name %}
+                                    {{ build.delivery_date }}
+                                {% else %}
+                                    <input type="date" id="delivery_date" name="delivery_date" value="{{ build.delivery_date}}"><br><br>
+                                {%endif%}
                             </td>
                         {% endif %}
                     {% endfor %}

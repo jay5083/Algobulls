@@ -311,7 +311,7 @@
                         <script>
                             function redirectToLoginPage() {
                                 // Redirect to the login page
-                                window.location.href = '/accounts/login/';
+                                window.location.href = '/logout/';
                             }
                         </script> 
                     </div>
@@ -319,19 +319,62 @@
             </div>
         </div>
     </nav>
+    <style>
+        .dropdown-content {
+            display: none;
+            position: absolute;
+            background-color: #f9f9f9;
+            min-width: 160px;
+            box-shadow: 0px 8px 16px 0px rgba(0,0,0,0.2);
+            z-index: 1;
+        }
+    
+        .dropdown-content div {
+            padding: 12px 16px;
+        }
+    
+        .dropdown-content div:hover {
+            background-color: #f1f1f1;
+        }
+    </style>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var toggle = dropdown.querySelector('.filter-option');
+                var menu = dropdown.querySelector('.dropdown-content');
+    
+                toggle.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                });
+    
+                document.addEventListener('click', function(event) {
+                    if (!dropdown.contains(event.target)) {
+                        menu.style.display = 'none';
+                    }
+                });
+            });
+        });
+    </script>
     
     <div class="sidebar">
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
-                <a href="#" class="filter-option" data-filter="employee_id">Employee ID
-                    {% for employee_id, employee_name in unique_employee_ids %}
-                        <div>
-                            <input type="checkbox" id="employee{{ employee_id }}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
-                            <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                        <a href="#" class="filter-option" data-filter="employee_id" id="dropdownToggle">Employee ID</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            {% for employee_id, employee_name in unique_employee_ids %}
+                                <div>
+                                    <input type="checkbox" id="employee{{ employee_id }}" name="Employee ID" data-field="employee_id" class="filter-checkbox" value="{{ employee_id }}" checked>
+                                    <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                                </div>
+                            {% endfor %}
                         </div>
-                    {% endfor %}
-                </a>            
+                    </div>
+                </div>            
             </div>
         </form>
     </div>

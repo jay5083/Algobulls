@@ -54,7 +54,7 @@ def home(request):
     strategies = Strategies.objects.all().order_by('strategy_id')
     # name = algobulls_employee.name
     user_group = user_groups[0].name
-    print(user_group)
+    
     
     # Fetch the name of the first user group
     if user_group == "Branch Employee":
@@ -87,19 +87,64 @@ def home(request):
 import time
 import pyotp
 import qrcode
+import base64
+from io import BytesIO
+from django.shortcuts import render, redirect
+from django.contrib.auth import logout as auth_logout
+from datetime import datetime, timedelta
 
 def auth(request):
     if request.method == 'POST':
         otp = request.POST.get('otp')
         key = "Prospace"
         totp = pyotp.TOTP(key)
+        
+        # Debug: Print session keys
+        print("Session keys:", request.session.keys())
+
+        # Check if the last login was within the last 5 minutes
+        last_login_time = request.session.get('last_login_time')
+        print("Last login time:", last_login_time)  # Debug
+
+        if last_login_time:
+            last_login_time = datetime.fromisoformat(last_login_time)
+            current_time = datetime.now()
+            print("Current time:", current_time)  # Debug
+            if current_time - last_login_time < timedelta(minutes=5):
+                request.session['authenticated'] = True
+                request.session['last_login_time'] = current_time.isoformat()
+                return redirect('/home/')
+        
+        # If OTP is required or not within 5 minutes
         if totp.verify(otp):
+            request.session['authenticated'] = True
+            request.session['last_login_time'] = datetime.now().isoformat()
+            print("New last login time set:", request.session['last_login_time'])  # Debug
             return redirect('/home/')
         else:
             return render(request, 'auth.html', {'error': 'OTP Not Verified'})
     else:
-        return render(request, 'auth.html')
+        key = "Prospace"
+        uri = pyotp.totp.TOTP(key).provisioning_uri(name="pspace", issuer_name="ahil")
+        qr = qrcode.make(uri)
+        buffered = BytesIO()
+        qr.save(buffered)  # No need to specify format as it defaults to PNG
+        qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
         
+        context = {'qr': qr_base64}
+        return render(request, 'auth.html', context)
+
+def custom_logout(request):
+    # Retain session data before logout
+    if 'authenticated' in request.session:
+        auth_logout(request)
+        # Optionally reset session data
+        request.session['authenticated'] = False
+        print("User logged out, session cleared.")  # Debug
+
+    # Redirect to the login page after logout
+    return redirect('/accounts/login/')
+
 from django.shortcuts import render
 from .models import Sales, Support, AlgobullsEmployee, BranchEmployee
 

@@ -45,6 +45,7 @@ urlpatterns = [
     path('sales_filter/', views.sales_filter, name='sales_filter'),
     path('apply_filters/', views.apply_filters, name='apply_filters'),
     path('fetch_employee_ids/', views.fetch_employee_ids, name='fetch_employee_ids'),
+    path('logout/', views.custom_logout, name='custom_logout'),
 ]
 
     

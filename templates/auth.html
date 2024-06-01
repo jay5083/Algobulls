@@ -87,6 +87,12 @@
         border: none; /* Remove button border */
         cursor: pointer; /* Change cursor to pointer on hover */
     }
+
+    .qr-code {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+    }
 </style>
 
 <div class="logo-circle">
@@ -106,6 +112,18 @@
             <p style="color: red;">{{ error }}</p>
         {% endif %}
     </form>
+    <button class="btn btn-success" id="show-qr-button">Show QR</button>
+    <div class="qr-code" id="qr-code">
+        {% if qr %}
+            <img src="data:image/png;base64,{{ qr }}" alt="QR Code for OTP">
+        {% endif %}
+    </div>
 </div>
+
+<script>
+    document.getElementById('show-qr-button').addEventListener('click', function() {
+        document.getElementById('qr-code').style.display = 'block';
+    });
+</script>
 
 {% endblock content %}
