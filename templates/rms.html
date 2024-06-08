@@ -729,14 +729,15 @@
                         {% for permission in user_permissions %}
                             {% if permission.name == "Can view the Date field of Rms" %}
                                 <td class="editable-rms" data-field="date">
-                                    {% for permission in user_permissions %}
-                                        {% if permission.name == "Can edit the Date field of Rms" %}
-                                            <input type="date" id="date" name="date" value="{{rms.date}}"><br><br>
-                                        {% endif %}
-                                    {% endfor %}
+                                    {% if "Can edit the Date field of Rms" not in permissions_name %}
+                                        {{ rms.date }}
+                                    {% else %}
+                                        <input type="date" id="date" name="date" value="{{rms.date}}"><br><br>
+                                    {% endif %}
                                 </td>
                             {% endif %}
                         {%endfor%}
+                        
         
                         {% for permission in user_permissions %}
                             {% if permission.name == "Can view the Broking ID field of Rms" %}
@@ -902,11 +903,11 @@
                         {% for permission in user_permissions %}
                             {% if permission.name == "Can view the Date of Closing field of Rms" %}
                                 <td class="editable-rms" data-field="date_of_closing">
-                                    {% for permission in user_permissions %}
-                                        {% if permission.name == "Can edit the Date of Closing field of Rms" %}
-                                            <input type="date" id="date_of_closing" name="date_of_closing" value="{{rms.date_of_closing}}"><br><br>
-                                        {% endif %}
-                                    {% endfor %}
+                                    {% if "Can edit the Date of Closing field of Rms" not in permissions_name %}
+                                        {{ rms.date_of_closing }}
+                                    {% else %}
+                                        <input type="date" id="date_of_closing" name="date_of_closing" value="{{rms.date_of_closing}}"><br><br>
+                                    {% endif %}
                                 </td>
                             {% endif %}
                         {% endfor %}
@@ -958,7 +959,6 @@
                                 </td>
                             {% endif %}
                         {% endfor %}
-                        
                     </tr>
                 {% endfor %}
             </tbody>

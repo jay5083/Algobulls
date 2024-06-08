@@ -120,13 +120,13 @@
         {% csrf_token %}
 
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Strategy ID field of Strategies" %}
+            {% if permission.name == "Can view the Strategy ID field of Strategies" %}
                 <label for="strategy_id">Strategy ID:</label>
                 <input type="text" id="strategy_id" name="strategy_id" required><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Employee ID field of Strategies" %}
+            {% if permission.name == "Can view the Employee ID field of Strategies" %}
                 <label for="employee_id">Employee ID:</label>
                 <select id="employee_id" name="employee_id">
                     {% for sales_employee in sales_employees %}
@@ -136,25 +136,25 @@
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Name field of Strategies" %}
+            {% if permission.name == "Can view the Name field of Strategies" %}
                 <label for="name">Name:</label>
                 <input type="text" id="name" name="name"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Mobile Number field of Strategies" %}
+            {% if permission.name == "Can view the Mobile Number field of Strategies" %}
                 <label for="mobile_number">Mobile Number:</label>
                 <input type="text" id="mobile_number" name="mobile_number"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Broking House field of Strategies" %}
+            {% if permission.name == "Can view the Broking House field of Strategies" %}
                 <label for="broking_house">Broking House:</label>
                 <input type="text" id="broking_house" name="broking_house"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Client ID field of Strategies" %}
+            {% if permission.name == "Can view the Client ID field of Strategies" %}
                 <label for="client_id">Client ID:</label>
                 <input type="text" id="client_id" name="client_id"><br><br>
             {% endif %}

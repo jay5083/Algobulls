@@ -136,3 +136,12 @@ EMAIL_PORT = 587
 EMAIL_HOST_USER = 'jay2004.1729@gmail.com'
 EMAIL_HOST_PASSWORD = 'duqz mzhu evcv ixsw'
 EMAIL_USE_TLS = True
+
+# Session Configuration
+SESSION_ENGINE = 'django.contrib.sessions.backends.db'  # Ensure using the DB for session storage
+SESSION_COOKIE_NAME = 'sessionid'  # Default cookie name
+SESSION_COOKIE_AGE = 1209600  # 2 weeks
+SESSION_COOKIE_SECURE = False  # Set to True in production with HTTPS
+SESSION_COOKIE_HTTPONLY = True
+SESSION_SAVE_EVERY_REQUEST = True  # Save the session to the database on every request
+SESSION_EXPIRE_AT_BROWSER_CLOSE = False

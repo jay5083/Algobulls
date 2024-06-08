@@ -3,6 +3,7 @@ from .views import home, update_sales_leads, delete_sales, add_sales_leads, add_
 from . import views
 
 urlpatterns = [ 
+    path("", views.to_login, name="to_login"),
     path("accounts/", include("django.contrib.auth.urls")),
     path('accounts/profile/', views.auth, name='auth'),
     path('home/', home, name='home'),
@@ -39,9 +40,11 @@ urlpatterns = [
     path('to_support_analysis/', views.to_support_analysis, name='to_support_analysis'),
     path('to_rms_analysis/', views.to_rms_analysis, name='to_rms_analysis'),
     path('to_tech_task_analysis/', views.to_tech_task_analysis, name='to_tech_task_analysis'),
+    path('to_build_analysis/', views.to_build_analysis, name='to_build_analysis'),
     path('support_analysis_data/', views.support_analysis_data, name='support_analysis_data'),  
     path('rms_analysis_data/', views.rms_analysis_data, name='rms_analysis_data'),  
     path('tech_task_analysis_data/', views.tech_task_analysis_data, name='tech_task_analysis_data'),  
+    path('build_analysis_data/', views.build_analysis_data, name='build_analysis_data'),  
     path('sales_filter/', views.sales_filter, name='sales_filter'),
     path('apply_filters/', views.apply_filters, name='apply_filters'),
     path('fetch_employee_ids/', views.fetch_employee_ids, name='fetch_employee_ids'),

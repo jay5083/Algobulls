@@ -6,7 +6,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Support Analysis</title>
+    <title>Build Analysis</title>
     <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
@@ -319,26 +319,6 @@
                         <canvas class="pie-chart-canvas" id="statusPieChart"></canvas>
                     </div>
                 </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2>Weekly Priority Wise Split</h2>
-                        <canvas class="chart-canvas" id="priorityBarChart"></canvas>
-                    </div>
-                    <div class="col-md-6">
-                        <h2>Priority Wise Split</h2>
-                        <canvas class="pie-chart-canvas" id="priorityPieChart"></canvas>
-                    </div>
-                </div>
-                <div class="row">
-                    <div class="col-md-6">
-                        <h2>Weekly Division Wise Split</h2>
-                        <canvas class="chart-canvas" id="divisionBarChart"></canvas>
-                    </div>
-                    <div class="col-md-6">
-                        <h2>Division Wise Split</h2>
-                        <canvas class="pie-chart-canvas" id="divisionPieChart"></canvas>
-                    </div>
-                </div>
             </div>
         </div>
     </div>
@@ -346,7 +326,7 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-        var weeklyBarChartInstance, statusPieChartInstance, priorityBarChartInstance, priorityPieChartInstance, divisionBarChartInstance, divisionPieChartInstance;
+        var weeklyBarChartInstance, statusPieChartInstance;
 
         function getCookie(name) {
             let cookieValue = null;
@@ -370,7 +350,7 @@
                 var end_date = $('#end_date').val();
     
                 $.ajax({
-                    url: '/support_analysis_data/',
+                    url: '/build_analysis_data/',
                     method: 'POST',
                     headers: {
                         'X-CSRFToken': getCookie('csrftoken'),
@@ -384,7 +364,7 @@
                         updateCharts(response);
                     },
                     error: function(xhr, status, error) {
-                        console.error('Error updating Support:', error);
+                        console.error('Error updating Build:', error);
                     }
                 });
             });
@@ -397,10 +377,6 @@
         function updateCharts(response) {
             updateWeeklyBarChart(response.results1);
             updateStatusPieChart(response.results2);
-            updatePriorityBarChart(response.results3);
-            updatePriorityPieChart(response.results4);
-            updateDivisionBarChart(response.results5);
-            updateDivisionPieChart(response.results6);
         }
 
         function updateWeeklyBarChart(results1) {
@@ -518,219 +494,6 @@
                             formatter: (value) => {
                                 return value;
                             }
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        } 
-        
-        function updatePriorityBarChart(results3) {
-            const ctx = document.getElementById('priorityBarChart').getContext('2d');
-        
-            if (priorityBarChartInstance) {
-                priorityBarChartInstance.destroy();
-            }
-        
-            priorityBarChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: results3.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}).*/, '$1')), // Extracting only the date part
-                    datasets: results3.datasets.map((dataset, index) => ({
-                        label: dataset.label || '', // Prevents 'undefined' label
-                        data: dataset.data.map(value => value !== 0 ? value : ''), // Convert 0 to empty string
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
-                        borderWidth: 1
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'start',
-                            color: '#000',
-                            font: {
-                                weight: 'bold',
-                                size: 15
-                            },
-                            formatter: (value, context) => {
-                                // Only display the value if it's not an empty string
-                                return context.dataset.data[context.dataIndex] !== '' ? value : '';
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Week'
-                            }
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }                        
-        
-        function updatePriorityPieChart(results4) {
-            const ctx = document.getElementById('priorityPieChart').getContext('2d');
-        
-            if (priorityPieChartInstance) {
-                priorityPieChartInstance.destroy();
-            }
-        
-            priorityPieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: results4.labels,
-                    datasets: results4.datasets
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.raw !== null) {
-                                        label += context.raw;
-                                    }
-                                    return label;
-                                }
-                            }
-                        },
-                        datalabels: {
-                            color: '#fff',
-                            anchor: 'end',
-                            align: 'start',
-                            offset: -10,
-                            borderWidth: 2,
-                            borderColor: '#fff',
-                            borderRadius: 25,
-                            backgroundColor: (context) => context.dataset.backgroundColor,
-                            font: {
-                                weight: 'bold',
-                                size: 35
-                            },
-                            formatter: (value) => value
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
-
-        function updateDivisionBarChart(results5) {
-            const ctx = document.getElementById('divisionBarChart').getContext('2d');
-        
-            if (divisionBarChartInstance) {
-                divisionBarChartInstance.destroy();
-            }
-        
-            divisionBarChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: results5.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}).*/, '$1')), // Extracting only the date part
-                    datasets: results5.datasets.map((dataset, index) => ({
-                        label: dataset.label || '', // Prevents 'undefined' label
-                        data: dataset.data.map(value => value !== 0 ? value : ''), // Convert 0 to empty string
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
-                        borderWidth: 1
-                    }))
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        datalabels: {
-                            anchor: 'end',
-                            align: 'start',
-                            color: '#000',
-                            font: {
-                                weight: 'bold',
-                                size: 12
-                            },
-                            formatter: (value, context) => {
-                                // Only display the value if it's not an empty string
-                                return context.dataset.data[context.dataIndex] !== '' ? value : '';
-                            }
-                        }
-                    },
-                    scales: {
-                        x: {
-                            title: {
-                                display: true,
-                                text: 'Week'
-                            }
-                        }
-                    }
-                },
-                plugins: [ChartDataLabels]
-            });
-        }
-        
-        
-        function updateDivisionPieChart(results6) {
-            const ctx = document.getElementById('divisionPieChart').getContext('2d');
-        
-            if (divisionPieChartInstance) {
-                divisionPieChartInstance.destroy();
-            }
-        
-            divisionPieChartInstance = new Chart(ctx, {
-                type: 'pie',
-                data: {
-                    labels: results6.labels,
-                    datasets: results6.datasets
-                },
-                options: {
-                    responsive: true,
-                    plugins: {
-                        legend: {
-                            position: 'top',
-                        },
-                        tooltip: {
-                            callbacks: {
-                                label: function(context) {
-                                    let label = context.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.raw !== null) {
-                                        label += context.raw;
-                                    }
-                                    return label;
-                                }
-                            }
-                        },
-                        datalabels: {
-                            color: '#fff',
-                            anchor: 'end',
-                            align: 'start',
-                            offset: -10,
-                            borderWidth: 2,
-                            borderColor: '#fff',
-                            borderRadius: 25,
-                            backgroundColor: (context) => context.dataset.backgroundColor,
-                            font: {
-                                weight: 'bold',
-                                size: 35
-                            },
-                            formatter: (value) => value
                         }
                     }
                 },

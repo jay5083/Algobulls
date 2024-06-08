@@ -766,11 +766,11 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Date field of Support" %}
                                     <td class="editable-support" data-field="date">
-                                        {% for permission in user_permissions %}
-                                            {% if permission.name == "Can edit the Date field of Support" %}
-                                                <input type="date" id="date" name="date" value="{{support.date}}"><br><br>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if "Can edit the Date field of Support" not in permissions_name %}
+                                            {{ support.date }}
+                                        {% else %}
+                                            <input type="date" id="date" name="date" value="{{support.date}}"><br><br>
+                                        {% endif %}
                                     </td>
                                 {% endif %}
                             {% endfor %}
@@ -838,11 +838,11 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Date Of Error field of Support" %}
                                     <td class="editable-support" data-field="date_of_error">
-                                        {% for permission in user_permissions %}
-                                            {% if permission.name == "Can edit the Date Of Error field of Support" %}
-                                                <input type="date" id="date_of_error" name="date_of_error" value="{{support.date_of_error}}"><br><br>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if "Can edit the Date Of Error field of Support" not in permissions_name %}
+                                            {{ support.date_of_error }}
+                                        {% else %}
+                                            <input type="date" id="date_of_error" name="date_of_error" value="{{support.date_of_error}}"><br><br>
+                                        {% endif %}
                                     </td>
                                 {% endif %}
                             {% endfor %}
@@ -1000,14 +1000,14 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Date of Closing field of Support" %}
                                     <td class="editable-support" data-field="date_of_closing">
-                                        {% for permission in user_permissions %}
-                                            {% if permission.name == "Can edit the Date of Closing field of Support" %}
-                                                <input type="date" id="date_of_closing" name="date_of_closing" value="{{support.date_of_closing}}"><br><br>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if "Can edit the Date of Closing field of Support" not in permissions_name %}
+                                            {{ support.date_of_closing }}
+                                        {% else %}
+                                            <input type="date" id="date_of_closing" name="date_of_closing" value="{{support.date_of_closing}}"><br><br>
+                                        {% endif %}
                                     </td>
                                 {% endif %}
-                            {% endfor %}
+                            {% endfor %}                           
 
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Division Assigned To field of Support" %}

@@ -13,6 +13,9 @@ from datetime import datetime, date
 from .models import Support, BranchEmployee, AlgobullsEmployee
 from django.shortcuts import render, redirect
 
+def to_login(request):
+    return redirect("/accounts/login/")
+
 # Create your views here.
 @login_required
 def home(request):
@@ -84,56 +87,73 @@ def home(request):
 
     return render(request, 'base.html', context)
 
-import time
 import pyotp
 import qrcode
 import base64
 from io import BytesIO
 from django.shortcuts import render, redirect
-from django.contrib.auth import logout as auth_logout
+from django.contrib.auth.decorators import login_required
+from django.utils import timezone
 from datetime import datetime, timedelta
 
+def generate_totp_key():
+    return "Prospace"
+
+def get_totp(key):
+    return pyotp.TOTP(key)
+
+def generate_qr_code_base64(uri):
+    qr = qrcode.make(uri)
+    buffered = BytesIO()
+    qr.save(buffered)
+    return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+@login_required
 def auth(request):
+    current_time = timezone.now()
+    last_login_time_str = request.session.get('last_login_time')
+    request.session.save()
+    # Debugging: Print current and last login time
+    print("Current time:", current_time)
+    print("Last login time from session:", last_login_time_str)
+    
+    if last_login_time_str:
+        last_login_time = datetime.fromisoformat(last_login_time_str)
+        print("Parsed last login time:", last_login_time)
+        
+        if current_time - last_login_time < timedelta(minutes=5):
+            request.session['authenticated'] = True
+            request.session['last_login_time'] = current_time.isoformat()
+            request.session.modified = True
+            request.session.save()  # Explicitly save the session
+            return redirect('/home/')
+    
     if request.method == 'POST':
         otp = request.POST.get('otp')
-        key = "Prospace"
-        totp = pyotp.TOTP(key)
+        key = generate_totp_key()
+        totp = get_totp(key)
         
-        # Debug: Print session keys
-        print("Session keys:", request.session.keys())
+        print("Session keys before verifying OTP:", request.session.keys())
 
-        # Check if the last login was within the last 5 minutes
-        last_login_time = request.session.get('last_login_time')
-        print("Last login time:", last_login_time)  # Debug
-
-        if last_login_time:
-            last_login_time = datetime.fromisoformat(last_login_time)
-            current_time = datetime.now()
-            print("Current time:", current_time)  # Debug
-            if current_time - last_login_time < timedelta(minutes=5):
-                request.session['authenticated'] = True
-                request.session['last_login_time'] = current_time.isoformat()
-                return redirect('/home/')
-        
-        # If OTP is required or not within 5 minutes
         if totp.verify(otp):
             request.session['authenticated'] = True
-            request.session['last_login_time'] = datetime.now().isoformat()
-            print("New last login time set:", request.session['last_login_time'])  # Debug
+            request.session['last_login_time'] = current_time.isoformat()
+            request.session.modified = True
+            request.session.save()  # Explicitly save the session
+            print("New last_login_time set:", request.session['last_login_time'])
+            print("Session keys after setting last_login_time:", request.session.keys())
             return redirect('/home/')
         else:
             return render(request, 'auth.html', {'error': 'OTP Not Verified'})
     else:
-        key = "Prospace"
-        uri = pyotp.totp.TOTP(key).provisioning_uri(name="pspace", issuer_name="ahil")
-        qr = qrcode.make(uri)
-        buffered = BytesIO()
-        qr.save(buffered)  # No need to specify format as it defaults to PNG
-        qr_base64 = base64.b64encode(buffered.getvalue()).decode('utf-8')
-        
+        key = generate_totp_key()
+        uri = get_totp(key).provisioning_uri(name="pspace", issuer_name="ahil")
+        qr_base64 = generate_qr_code_base64(uri)
         context = {'qr': qr_base64}
         return render(request, 'auth.html', context)
-
+   
+from django.contrib.auth import logout as auth_logout
+     
 def custom_logout(request):
     # Retain session data before logout
     if 'authenticated' in request.session:
@@ -295,6 +315,10 @@ def update_sales_leads(request):
     else:
         return JsonResponse({'error': 'Invalid request method'})
 
+from django.db.models import Max
+from django.db.models import IntegerField
+from django.db.models.functions import Cast
+
 def add_sales_leads(request):
     if request.method == 'POST':
         # Extract form data
@@ -315,6 +339,7 @@ def add_sales_leads(request):
 
         # Validate and convert purchase_date format
         purchase_date= request.POST.get('purchase_date')
+        entry_date= request.POST.get('entry_date')
         # try:
         #     purchase_date = datetime.strptime(purchase_date_str, '%d-%m-%Y').date()
         # except ValueError:
@@ -355,6 +380,7 @@ def add_sales_leads(request):
             comments=comments,
             amount=amount,
             purchase_date=purchase_date,
+            entry_date=entry_date,
             status=status,
             reason_for_dropped=reason_for_dropped,
         )
@@ -369,17 +395,31 @@ def add_sales_leads(request):
         branch_employees = BranchEmployee.objects.all()
         sales_employees = AlgobullsEmployee.objects.all()
         today_date = date.today()
+        
+        max_lead_id = Sales.objects.aggregate(max_lead_id=Max('lead_id'))['max_lead_id']
+        max_lead_id = int(max_lead_id)
+        new_lead_id = max_lead_id + 1
+        
+        ascending_sales = Sales.objects.annotate(
+            lead_id_as_int=Cast('lead_id', IntegerField())
+        ).order_by('lead_id_as_int')
 
+        for sale in ascending_sales:
+            print(sale.lead_id)
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
             user_permissions.extend(group.permissions.all())
+            
+        # last_lead = Sales.objects.order_by('lead_id').last()
+        # print(last_lead.lead_id)
 
         context = {
             'user_permissions': user_permissions,
             'branch_employees': branch_employees,
             'sales_employees' : sales_employees,
             'today_date': today_date,
+            'new_lead_id': new_lead_id,
         }
 
         return render(request, 'add_sales_leads.html', context)
@@ -457,7 +497,7 @@ def add_build(request):
             manage_by=manage_by,
         )
 
-        return redirect('/accounts/profile/')
+        return redirect('/build/')
 
     else:
         # Fetch user groups
@@ -522,7 +562,7 @@ def add_tech_task(request):
             comments=comments,
         )
 
-        return redirect('/accounts/profile/')
+        return redirect('/tech_task/')
 
     else:
         # Fetch user groups
@@ -1087,6 +1127,11 @@ def sales(request):
         end_date = datetime.strptime(end_date, '%Y-%m-%d')
 
         sales_leads = Sales.objects.filter(entry_date__range=[start_date, end_date]).order_by('lead_id')
+
+    # sales_leads = Sales.objects.all().order_by('lead_id')
+    sales_leads = Sales.objects.annotate(
+            lead_id_as_int=Cast('lead_id', IntegerField())
+        ).order_by('lead_id_as_int')
     
     context = {
         'user_groups': user_groups,
@@ -1652,6 +1697,17 @@ def to_tech_task_analysis(request):
     
     return render(request, 'tech_task_analysis.html', context)
 
+def to_build_analysis(request):
+    end_date = datetime.today()
+    start_date = end_date - timedelta(days=30)
+    
+    context = {
+        'start_date': start_date.strftime('%Y-%m-%d'),
+        'end_date': end_date.strftime('%Y-%m-%d')
+    }
+    
+    return render(request, 'build_analysis.html', context)
+
 from django.db import connection
 
 def execute_raw_sql(query, params):
@@ -1682,21 +1738,24 @@ def sales_analysis_data(request):
         filter_conditions = []
         params = [start_date, end_date]
 
+        def handle_empty_string(value):
+            return None if value == '' else value
+
         if source_types:
             filter_conditions.append('"Source Type" IN %s')
-            params.append(tuple(source_types))
+            params.append(tuple(handle_empty_string(x) for x in source_types if x))
         if categories:
             filter_conditions.append('"Category" IN %s')
-            params.append(tuple(categories))
+            params.append(tuple(handle_empty_string(x) for x in categories if x))
         if risk_appetites:
             filter_conditions.append('"Risk Appetite" IN %s')
-            params.append(tuple(risk_appetites))
+            params.append(tuple(handle_empty_string(x) for x in risk_appetites if x))
         if statuses:
             filter_conditions.append('"Status" IN %s')
-            params.append(tuple(statuses))
+            params.append(tuple(handle_empty_string(x) for x in statuses if x))
         if employee_ids:
             filter_conditions.append('"Sales Employee ID" IN %s')
-            params.append(tuple(employee_ids))
+            params.append(tuple(handle_empty_string(x) for x in employee_ids if x))
 
         filter_sql = ' AND '.join(filter_conditions)
 
@@ -1732,7 +1791,7 @@ def sales_analysis_data(request):
             SELECT
                 DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) AS week_start,
                 (DATE_TRUNC('week', TO_DATE("Purchase Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
-                SUM(CAST("Amount" AS DECIMAL)) AS total_revenue
+                SUM(CAST(NULLIF("Amount", '') AS DECIMAL)) AS total_revenue
             FROM "Sales"
             WHERE "Purchase Date" BETWEEN %s AND %s
             {f"AND {filter_sql}" if filter_sql else ""}
@@ -1742,7 +1801,7 @@ def sales_analysis_data(request):
         query4 = f"""
             SELECT
                 "Branch Employee ID",
-                SUM(CAST("Amount" AS DECIMAL)) AS branch_revenue
+                SUM(CAST(NULLIF("Amount", '') AS DECIMAL)) AS branch_revenue
             FROM "Sales"
             WHERE "Purchase Date" BETWEEN %s AND %s
             {f"AND {filter_sql}" if filter_sql else ""}
@@ -1778,14 +1837,14 @@ def sales_analysis_data(request):
             weekly_data[week_start][status] += total_leads
             
         response1 = {
-                'labels': list(weekly_data.keys()),
-                'datasets': [
-                    {
-                        'name': status,
-                        'data': [weekly_data[week].get(status, 0) for week in weekly_data]
-                    } for status in statuses
-                ]
-            }
+            'labels': list(weekly_data.keys()),
+            'datasets': [
+                {
+                    'name': status,
+                    'data': [weekly_data[week].get(status, 0) for week in weekly_data]
+                } for status in statuses
+            ]
+        }
         print(results2)
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
@@ -1894,18 +1953,21 @@ def support_analysis_data(request):
         results6 = execute_raw_sql(query6, [start_date, end_date])
         
         # Prepare data for weekly status chart
-        weekly_data = {}
+        weekly_data = OrderedDict()
         statuses = ['Open', 'In Progress', 'Hold', 'Resolved']
 
         for row in results1:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             status = row[2]
             total_leads = row[3]
 
-            if week_start not in weekly_data:
-                weekly_data[week_start] = {status: 0 for status in statuses}
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in weekly_data:
+                weekly_data[week_label] = {status: 0 for status in statuses}
             
-            weekly_data[week_start][status] += total_leads
+            weekly_data[week_label][status] += total_leads
             
         response1 = {
             'labels': list(weekly_data.keys()),
@@ -1948,18 +2010,21 @@ def support_analysis_data(request):
         }
 
         # Prepare data for weekly priority chart
-        priority_weekly_data = {}
+        priority_weekly_data = OrderedDict()
         priorities = ['High', 'Medium', 'Low']
 
         for row in results3:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             priority = row[2]
             total_leads = row[3]
 
-            if week_start not in priority_weekly_data:
-                priority_weekly_data[week_start] = {priority: 0 for priority in priorities}
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in priority_weekly_data:
+                priority_weekly_data[week_label] = {priority: 0 for priority in priorities}
             
-            priority_weekly_data[week_start][priority] += total_leads
+            priority_weekly_data[week_label][priority] += total_leads
             
         response3 = {
             'labels': list(priority_weekly_data.keys()),
@@ -1996,18 +2061,21 @@ def support_analysis_data(request):
         }
 
         # Prepare data for weekly division chart
-        division_weekly_data = {}
+        division_weekly_data = OrderedDict()
         divisions = ['Tech', 'Build', 'RMS', 'Sales', 'Strategy', 'Support']
 
         for row in results5:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             division = row[2]
             total_leads = row[3]
 
-            if week_start not in division_weekly_data:
-                division_weekly_data[week_start] = {division: 0 for division in divisions}
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in division_weekly_data:
+                division_weekly_data[week_label] = {division: 0 for division in divisions}
             
-            division_weekly_data[week_start][division] += total_leads
+            division_weekly_data[week_label][division] += total_leads
             
         response5 = {
             'labels': list(division_weekly_data.keys()),
@@ -2163,20 +2231,21 @@ def rms_analysis_data(request):
         statuses = ['Open', 'In Progress', 'Hold', 'Resolved']
 
         for row in results1:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             status = row[2]
             total_leads = row[3]
 
             if week_start not in weekly_data:
                 weekly_data[week_start] = {status: 0 for status in statuses}
-            
+
             weekly_data[week_start][status] += total_leads
-            
+
         response1 = {
-            'labels': list(weekly_data.keys()),
+            'labels': [f"{week_start} to {weekly_data[week_start].get('week_end', '')}" for week_start in weekly_data.keys()],
             'datasets': [
                 {
-                    'label': status,
+                    'name': status,
                     'data': [weekly_data[week].get(status, 0) for week in weekly_data],
                     'backgroundColor': 'rgba(255, 99, 132, 0.2)',
                     'borderColor': 'rgba(255, 99, 132, 1)',
@@ -2184,6 +2253,7 @@ def rms_analysis_data(request):
                 } for status in statuses
             ]
         }
+
         
         # Prepare data for status pie chart
         status_data = {row[0]: row[1] for row in results2}
@@ -2217,7 +2287,8 @@ def rms_analysis_data(request):
         issues = ['Strategy Development', 'Live Trading and RMS', 'Package and Funds', 'Front End Issues', 'General Info', 'Sales Related', 'Others']
 
         for row in results3:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = (row[0] + timedelta(days=6)).strftime('%Y-%m-%d')
             issue = row[2]
             total_leads = row[3]
 
@@ -2225,12 +2296,12 @@ def rms_analysis_data(request):
                 issue_weekly_data[week_start] = {issue: 0 for issue in issues}
             
             issue_weekly_data[week_start][issue] += total_leads
-            
+
         response3 = {
-            'labels': list(issue_weekly_data.keys()),
+            'labels': [f"{week_start} to {week_end}" for week_start in issue_weekly_data.keys()],
             'datasets': [
                 {
-                    'label': issue,
+                    'name': issue,
                     'data': [issue_weekly_data[week].get(issue, 0) for week in issue_weekly_data],
                     'backgroundColor': 'rgba(255, 159, 64, 0.2)',
                     'borderColor': 'rgba(255, 159, 64, 1)',
@@ -2238,6 +2309,7 @@ def rms_analysis_data(request):
                 } for issue in issues
             ]
         }
+
 
         # Prepare data for priority pie chart
         issue_data = {row[0]: row[1] for row in results4}
@@ -2265,7 +2337,8 @@ def rms_analysis_data(request):
         customer_types = ['Choose', 'Build', 'Others']
 
         for row in results5:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = (row[0] + timedelta(days=6)).strftime('%Y-%m-%d')
             customer_type = row[2]
             total_leads = row[3]
 
@@ -2273,12 +2346,12 @@ def rms_analysis_data(request):
                 customer_type_weekly_data[week_start] = {customer_type: 0 for customer_type in customer_types}
             
             customer_type_weekly_data[week_start][customer_type] += total_leads
-            
+
         response5 = {
-            'labels': list(customer_type_weekly_data.keys()),
+            'labels': [f"{week_start} to {week_end}" for week_start in customer_type_weekly_data.keys()],
             'datasets': [
                 {
-                    'label': customer_type,
+                    'name': customer_type,
                     'data': [customer_type_weekly_data[week].get(customer_type, 0) for week in customer_type_weekly_data],
                     'backgroundColor': 'rgba(75, 192, 192, 0.2)',
                     'borderColor': 'rgba(75, 192, 192, 1)',
@@ -2286,6 +2359,7 @@ def rms_analysis_data(request):
                 } for customer_type in customer_types
             ]
         }
+
 
         # Prepare data for division pie chart
         customer_type_data = {row[0]: row[1] for row in results6}
@@ -2339,6 +2413,8 @@ def rms_analysis_data(request):
     except Exception as e:
         logger.error("Error in rms_analysis_data view: %s", e)
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+from collections import OrderedDict
 
 def tech_task_analysis_data(request):
     try:
@@ -2398,18 +2474,21 @@ def tech_task_analysis_data(request):
         results4 = execute_raw_sql(query4, [start_date, end_date])
         
         # Prepare data for weekly status chart
-        weekly_data = {}
+        weekly_data = OrderedDict()
         task_statuses = ['Pending Development', 'Under Development', 'Under Testing', 'Bugs Reported', 'Delivered or Closed', 'In Progress', 'On Hold', 'Open']
 
         for row in results1:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             task_status = row[2]
             total_leads = row[3]
 
-            if week_start not in weekly_data:
-                weekly_data[week_start] = {task_status: 0 for task_status in task_statuses}
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in weekly_data:
+                weekly_data[week_label] = {task_status: 0 for task_status in task_statuses}
             
-            weekly_data[week_start][task_status] += total_leads
+            weekly_data[week_label][task_status] += total_leads
             
         response1 = {
             'labels': list(weekly_data.keys()),
@@ -2452,18 +2531,21 @@ def tech_task_analysis_data(request):
         }
 
         # Prepare data for weekly priority chart
-        nature_weekly_data = {}
+        nature_weekly_data = OrderedDict()
         natures = ['Core Change', 'Strategy Change', 'None Core Request', 'Broker Integration', 'Operations']
 
         for row in results3:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             nature = row[2]
             total_leads = row[3]
 
-            if week_start not in nature_weekly_data:
-                nature_weekly_data[week_start] = {priority: 0 for priority in natures}
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in nature_weekly_data:
+                nature_weekly_data[week_label] = {nature: 0 for nature in natures}
             
-            nature_weekly_data[week_start][nature] += total_leads
+            nature_weekly_data[week_label][nature] += total_leads
             
         response3 = {
             'labels': list(nature_weekly_data.keys()),
@@ -2519,6 +2601,112 @@ def tech_task_analysis_data(request):
             return render(request, 'tech_task_analysis.html', context)
     except Exception as e:
         logger.error("Error in tech_task_analysis_data view: %s", e)
+        return JsonResponse({'error': 'Internal Server Error'}, status=500)
+
+def build_analysis_data(request):
+    try:
+        start_date = request.POST.get('start_date')
+        end_date = request.POST.get('end_date')
+        
+        # Query for weekly data
+        query1 = f"""
+            SELECT
+                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
+                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
+                "Status",
+                COUNT(*) AS total_leads
+            FROM "Build"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY week_start, week_end, "Status"
+            ORDER BY week_start, "Status";
+        """
+        results1 = execute_raw_sql(query1, [start_date, end_date])
+        
+        # Query for status-wise data
+        query2 = f"""
+            SELECT
+                "Status",
+                COUNT(*) AS count
+            FROM "Build"
+            WHERE "Date" BETWEEN %s AND %s
+            GROUP BY "Status"
+            ORDER BY "Status";
+        """
+        results2 = execute_raw_sql(query2, [start_date, end_date])
+        
+        # Prepare data for weekly status chart
+        weekly_data = OrderedDict()
+        statuses = ['Open', 'In Progress', 'Hold', 'Resolved']
+
+        for row in results1:
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
+            status = row[2]
+            total_leads = row[3]
+
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in weekly_data:
+                weekly_data[week_label] = {status: 0 for status in statuses}
+            
+            weekly_data[week_label][status] += total_leads
+            
+        response1 = {
+            'labels': list(weekly_data.keys()),
+            'datasets': [
+                {
+                    'label': status,
+                    'data': [weekly_data[week].get(status, 0) for week in weekly_data],
+                    'backgroundColor': 'rgba(255, 99, 132, 0.2)',
+                    'borderColor': 'rgba(255, 99, 132, 1)',
+                    'borderWidth': 1
+                } for status in statuses
+            ]
+        }
+        
+        # Prepare data for status pie chart
+        status_data = {row[0]: row[1] for row in results2}
+        
+        response2 = {
+            'labels': list(status_data.keys()),
+            'datasets': [{
+                'data': list(status_data.values()),
+                'backgroundColor': [
+                    'rgba(255, 99, 132, 0.2)',
+                    'rgba(54, 162, 235, 0.2)',
+                    'rgba(255, 206, 86, 0.2)',
+                    'rgba(75, 192, 192, 0.2)',
+                    'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)'
+                ],
+                'borderColor': [
+                    'rgba(255, 99, 132, 1)',
+                    'rgba(54, 162, 235, 1)',
+                    'rgba(255, 206, 86, 1)',
+                    'rgba(75, 192, 192, 1)',
+                    'rgba(153, 102, 255, 1)',
+                    'rgba(255, 159, 64, 1)'
+                ],
+                'borderWidth': 1
+            }]
+        }
+
+        if request.headers.get('x-requested-with') == 'XMLHttpRequest':
+            data = {
+                'results1': response1,
+                'results2': response2,
+            }
+            return JsonResponse(data)
+        else:
+            context = {
+                'start_date': start_date,
+                'end_date': end_date,
+                'results1': response1,
+                'results2': response2,
+            }
+            return render(request, 'build_analysis.html', context)
+    except Exception as e:
+        logger.error("Error in build_analysis_data view: %s", e)
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 from django.http import JsonResponse

@@ -632,7 +632,7 @@
         
         function updateCharts(response) {
             updateWeeklyLeadsChart(response.results1);
-            updateBranchLeadsChart(results);
+            updateBranchLeadsChart(response.results2);
             updateWeeklyRevenueChart(response.results3);
             updateBranchRevenueChart(response.results4);
         }

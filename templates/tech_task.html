@@ -663,14 +663,14 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Date field of Tech Task" %}
                                     <td class="editable-tech-task" data-field="date">
-                                        {% for permission in user_permissions %}
-                                            {% if permission.name == "Can edit the Date field of Tech Task" %}
-                                                <input type="date" id="date" name="date" value="{{ task.date}}"><br><br>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if "Can edit the Date field of Tech Task" not in permissions_name %}
+                                            {{ task.date }}
+                                        {% else %}
+                                            <input type="date" id="date" name="date" value="{{ task.date}}"><br><br>
+                                        {% endif %}
                                     </td>
                                 {% endif %}
-                            {% endfor %}
+                            {% endfor %}                           
                             
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Task field of Tech Task" %}
@@ -746,11 +746,11 @@
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
                                     <td class="editable-tech-task" data-field="date_of_closing">
-                                        {% for permission in user_permissions %}
-                                            {% if permission.name == "Can edit the Date of Closing field of Tech Task" %}
-                                                <input type="date" id="date_of_closing" name="date_of_closing" value="{{ task.date_of_closing}}"><br><br>
-                                            {% endif %}
-                                        {% endfor %}
+                                        {% if "Can edit the Date of Closing field of Tech Task" not in permissions_name %}
+                                            {{ task.date_of_closing }}
+                                        {% else %}
+                                            <input type="date" id="date_of_closing" name="date_of_closing" value="{{ task.date_of_closing}}"><br><br>
+                                        {% endif %}
                                     </td>
                                 {% endif %}
                             {% endfor %}

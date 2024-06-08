@@ -122,15 +122,17 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can view the Lead ID field of Sales" %}
                 <label for="lead_id">Lead ID:</label>
-                <input type="text" id="lead_id" name="lead_id" required><br><br>
+                <input type="text" id="lead_id" name="lead_id" value = "{{new_lead_id}}" required><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
             {% if permission.name == "Can view the Branch Employee ID field of Sales" %}
                 <label for="branch_employee_id">Branch Employee:</label>
                 <select id="branch_employee_id" name="branch_employee_id" required>
-                    {% for branch_employee in branch_employees %}
-                        <option value="{{ branch_employee.branch_employee_id }}">{{ branch_employee.name }}</option>
+                    {% for branch_employee_id in branch_employees %}
+                        {%if branch_employee_id.role.role_name == "Branch Employee" %}
+                            <option value="{{ branch_employee_id.branch_employee_id }}">{{ branch_employee_id.name }}</option>
+                        {%endif%}
                     {% endfor %}
                 </select><br><br>
             {% endif %}
@@ -140,7 +142,9 @@
                 <label for="sales_employee_id">Sales Employee:</label>
                 <select id="sales_employee_id" name="sales_employee_id" required>
                     {% for sales_employee in sales_employees %}
-                        <option value="{{ sales_employee.employee_id }}">{{ sales_employee.name }}</option>
+                        {%if sales_employee.role_id.role_name == "Sales Employee" %}                                                    
+                            <option value="{{ sales_employee.employee_id }}">{{ sales_employee.name }}</option>
+                        {%endif%}
                     {% endfor %}
                 </select><br><br>
             {% endif %}
@@ -160,7 +164,7 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can view the Contact Number field of Sales" %}
                 <label for="contact_number">Contact Number:</label>
-                <input type="contact_number" id="contact_number" name="contact_number"><br><br>
+                <input type="text" id="contact_number" name="contact_number"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
@@ -220,6 +224,13 @@
                 <input type="date" id="purchase_date" name="purchase_date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
             {% endif %}
         {% endfor %}
+        {% for permission in user_permissions %}
+            {% if permission.name == "Can view the Purchase Date field of Sales" %}
+                <label for="entry_date">Entry Date</label>
+                <input type="date" id="entry_date" name="entry_date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
+            {% endif %}
+        {% endfor %}
+
         {% for permission in user_permissions %}
             {% if permission.name == "Can view the Status field of Sales" %}
                 <label for="status">Status</label>

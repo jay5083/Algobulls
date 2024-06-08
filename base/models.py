@@ -61,7 +61,7 @@ class BranchEmployee(models.Model):
     email_id = models.TextField(db_column='Email ID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
     password = models.TextField(db_column='Password', blank=True, null=True)  # Field name made lowercase.
     name = models.TextField(db_column='Name', blank=True, null=True)  # Field name made lowercase.
-    role = models.TextField(db_column='Role', blank=True, null=True)  # Field name made lowercase.
+    role = models.ForeignKey(AuthRole, models.DO_NOTHING, db_column='Role', blank=True, null=True)  # Field name made lowercase.
     branch_id = models.ForeignKey(Branch, models.DO_NOTHING, db_column='Branch ID', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
 
     class Meta:

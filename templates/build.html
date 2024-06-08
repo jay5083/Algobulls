@@ -8,6 +8,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@5.15.4/css/all.min.css">
     <link rel="stylesheet" href="https://www.w3schools.com/w3css/4/w3.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/4.7.0/css/font-awesome.min.css">
+    
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <style>
         body {
@@ -295,6 +296,14 @@
                             </li>
                         {% endif %}
                     {% endfor %}
+                    <div>
+                        <button class="btn btn-success" onclick="redirectbuild_analysis_dataURL()">Build Analysis</button>
+                    </div>
+                    <script>
+                        function redirectbuild_analysis_dataURL() {
+                            window.location.href = '/to_build_analysis/';
+                        }
+                    </script>
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -323,14 +332,37 @@
                 <div class="dropdown">
                     <div class="sidebar-item">
                     <a href="#" class="filter-option" id="dropdownToggle">Strategist Name</a>
-                    <div id="dropdownMenu" class="dropdown-content">
-                        {% for employee_id, employee_name in unique_strategist_names %}
-                            <div>
-                                <input type="checkbox" id="employee{{ employee_id }}" name="strategist_name" data-field="strategist_name" class="filter-checkbox" value="{{ employee_id }}" checked>
-                                <label for="employee{{ employee_id }}">{{ employee_name }}</label>
-                            </div>
-                        {% endfor %}
+                        <div id="dropdownMenu" class="dropdown-content">
+                            {% for employee_id, employee_name in unique_strategist_names %}
+                                <div>
+                                    <input type="checkbox" id="employee{{ employee_id }}" name="strategist_name" data-field="strategist_name" class="filter-checkbox" value="{{ employee_id }}" checked>
+                                    <label for="employee{{ employee_id }}">{{ employee_name }}</label>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
+                </div>
+                <div class="dropdown">
+                    <div class="sidebar-item">
+                        <a href="#" class="filter-option" id="dropdownToggle">Status</a>
+                        <div id="dropdownMenu" class="dropdown-content">
+                            <div>
+                                <input type="checkbox" id="Open" name="Status" data-field="status" class="filter-checkbox" value="Open" checked>
+                                <label for="Open">Open</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
+                                <label for="In Progress">In Progress</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Hold" name="Status" data-field="status" class="filter-checkbox" value="Hold" checked>
+                                <label for="Hold">Hold</label>
+                            </div>
+                            <div>
+                                <input type="checkbox" id="Resolved" name="Status" data-field="status" class="filter-checkbox" value="Resolved" checked>
+                                <label for="Resolved">Resolved</label>
+                            </div>
+                        </div>
                     </div>
                 </div>       
             </div>
@@ -357,22 +389,21 @@
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            var dropdownToggle = document.getElementById('dropdownToggle');
-            var dropdownMenu = document.getElementById('dropdownMenu');
+            var dropdowns = document.querySelectorAll('.dropdown');
+            dropdowns.forEach(function(dropdown) {
+                var toggle = dropdown.querySelector('.filter-option');
+                var menu = dropdown.querySelector('.dropdown-content');
     
-            dropdownToggle.addEventListener('click', function(event) {
-                event.preventDefault();
-                if (dropdownMenu.style.display === 'block') {
-                    dropdownMenu.style.display = 'none';
-                } else {
-                    dropdownMenu.style.display = 'block';
-                }
-            });
+                toggle.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    menu.style.display = menu.style.display === 'block' ? 'none' : 'block';
+                });
     
-            document.addEventListener('click', function(event) {
-                if (!dropdownToggle.contains(event.target) && !dropdownMenu.contains(event.target)) {
-                    dropdownMenu.style.display = 'none';
-                }
+                document.addEventListener('click', function(event) {
+                    if (!dropdown.contains(event.target)) {
+                        menu.style.display = 'none';
+                    }
+                });
             });
         });
     </script>
@@ -386,7 +417,7 @@
                     var displayRow = true;
         
                     // Iterate through each type of filter
-                    var filterCategories = ['strategist_name'];
+                    var filterCategories = ['strategist_name', 'status'];
                     filterCategories.forEach(function (category) {
                         var checkboxes = document.querySelectorAll('.filter-checkbox[data-field="' + category + '"]:checked');
                         if (checkboxes.length > 0) {
@@ -588,11 +619,6 @@
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Date field of Build" %}
                             <td class="editable-build" data-field="date">
-                                {% comment %} {% for permission in user_permissions %}
-                                    {% if permission.name == "Can edit the Date field of Build" %}
-                                        <input type="date" id="date" name="date" value="{{ build.date}}"><br><br>
-                                    {% endif %}
-                                {% endfor %} {% endcomment %}
                                 {% if "Can edit the Date field of Build" not in permissions_name %}
                                     {{ build.date }}
                                 {% else %}
@@ -698,16 +724,18 @@
 
                     {% for permission in user_permissions %}
                         {% if permission.name == "Can view the Status field of Build" %}
-                            <td class="editable-build" data-field="status"
-                                {% for permission in user_permissions %}
-                                    {% if permission.name == "Can edit the Status field of Build" %}
-                                        contenteditable="true"
-                                    {% endif %}
-                                {% endfor %}
-                                {% if "Can edit the Status field of Build" not in user_permissions %}
-                                    contenteditable="false"
-                                {% endif %}
-                            >{{ build.status }}</td>
+                            <td class="editable-build" data-field="status">
+                            {% if "Can edit the Status field of Build" not in permissions_name %}
+                                {{ build.status }}
+                            {% else %}
+                                <select class="build_status" id="build_status" name="build_status">
+                                    <option value="Open" {% if build.status == 'Open' %} selected {% endif %}>Open</option>
+                                    <option value="In Progress" {% if build.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                    <option value="Hold" {% if build.status == 'Hold' %} selected {% endif %}>Hold</option>
+                                    <option value="Resolved" {% if build.status == 'Resolved' %} selected {% endif %}>Resolved</option>        
+                                </select><br><br>
+                            {% endif %}
+                            </td>
                         {% endif %}
                     {% endfor %}
 
@@ -845,6 +873,13 @@
                                 } else {
                                     console.error('Strategist Name dropdown not found for buildId: ' + buildId);
                                 }
+                            } else if (fieldName === "status") {
+                                var statusDropdown = cell.querySelector('.build_status'); // Get the dropdown element
+                                if (statusDropdown) {
+                                    newValue = statusDropdown.value; // Get the selected value from the dropdown
+                                } else {
+                                    console.error('Status dropdown not found for buildId: ' + buildId);
+                                }
                             } else if (fieldName === "date" || fieldName === "payment_date" || fieldName === "delivery_date") {
                                 var dateInput = cell.querySelector('input[type="date"]'); // Get the date input element
                                 if (dateInput) {
@@ -891,7 +926,9 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Build" %}
                 <div class="btn-new-build-container">
-                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">New Build</button>    
+                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">
+                        <i class="fas fa-plus"></i>
+                    </button>
                 </div>
                 <script>
                     function redirectToNewBuildURL() {

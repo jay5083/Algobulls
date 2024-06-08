@@ -91,7 +91,7 @@
             max-height: 75vh; /* Use viewport height for a responsive maximum height */
             overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
             overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-            margin-top: 1%; /* Add margin at the top for spacing */
+            margin-top: 0%; /* Add margin at the top for spacing */
             margin-left: 15%; /* Add margin to the left side */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
@@ -841,7 +841,6 @@
                 {% for lead in sales_leads %}
                     {% comment %} {% if lead.status == selected_status %}  {% endcomment %}
                         <tr class="table-light">
-
                             {% for permission in user_permissions %}
                                 {% if permission.name == "Can view the Lead ID field of Sales" %}
                                     <td scope="row" class="editable-15" data-field="lead_id"

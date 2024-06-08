@@ -8,45 +8,45 @@
         <title>Add Build</title>
         <link rel="stylesheet" type="text/css" href="{% static 'css/bootstrap.css' %}">
         <style>
-            /* Add custom CSS styles here */
             body {
                 font-family: Arial, sans-serif;
-                background-color: #f8f9fa; /* Light gray background */
-                {% comment %} padding: 20px; /* Add padding to the body */ {% endcomment %}
+                background-color: #f8f9fa;
             }
             h1 {
-                color: #007bff; /* Blue heading */
+                color: #007bff;
             }
             form {
-                background-color: #fff; /* White background for the form */
-                padding: 20px; /* Add padding to the form */
-                border-radius: 8px; /* Rounded corners */
-                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
-                max-width: 600px; /* Limit form width */
-                margin: 0 auto; /* Center the form horizontally */
+                background-color: #fff;
+                padding: 20px;
+                border-radius: 8px;
+                box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+                max-width: 2000px;
+                margin: 0 auto;
             }
             label {
-                font-weight: bold; /* Make labels bold */
+                font-weight: bold;
             }
             input[type="text"],
+            input[type="email"],
+            input[type="date"],
             select {
-                width: 100%; /* Make inputs and selects fill the width */
-                padding: 10px; /* Add padding to inputs and selects */
-                margin-bottom: 20px; /* Add margin between inputs and selects */
-                border: 1px solid #ced4da; /* Add border */
-                border-radius: 4px; /* Rounded corners */
-                box-sizing: border-box; /* Include padding and border in element's total width and height */
+                width: 100%;
+                padding: 10px;
+                margin-bottom: 20px;
+                border: 1px solid #ced4da;
+                border-radius: 4px;
+                box-sizing: border-box;
             }
             button[type="submit"] {
-                background-color: #28a745; /* Green submit button */
-                color: #fff; /* White text */
-                padding: 10px 20px; /* Add padding to the button */
-                border: none; /* Remove border */
-                border-radius: 4px; /* Rounded corners */
-                cursor: pointer; /* Add pointer cursor */
+                background-color: #28a745;
+                color: #fff;
+                padding: 10px 20px;
+                border: none;
+                border-radius: 4px;
+                cursor: pointer;
             }
             button[type="submit"]:hover {
-                background-color: #218838; /* Darker green on hover */
+                background-color: #218838;
             }
         </style>
     </head>
@@ -54,27 +54,26 @@
     <header>
         <style>
             .navbar {
-                min-height: 50px; /* Adjust the value as needed */
+                min-height: 50px;
             }
             .logo-circle {
                 width: 40px;
                 height: 40px;
-                border-radius: 50%; /* Make it circular */
-                overflow: hidden; /* Hide overflow */
-                margin-right: 10px; /* Adjust margin as needed */
+                border-radius: 50%;
+                overflow: hidden;
+                margin-right: 10px;
             }
-            
             .logo-circle img {
-                width: 100%; /* Make the image fill the circle */
-                height: auto; /* Maintain aspect ratio */
+                width: 100%;
+                height: auto;
             }
             .container {
-                width: 100%; /* Adjust the width as needed */
-                max-height: 550px; /* Maximum height for vertical scroll */
-                overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
-                overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-                margin-top: 20px; /* Add margin at the top for spacing */
-                margin-left: 300px; /* Add margin to the left side */
+                width: 100%;
+                max-height: 550px;
+                overflow-x: auto;
+                overflow-y: auto;
+                margin-top: 20px;
+                margin-left: 200px;
               }
         </style>
         
@@ -118,110 +117,148 @@
     <div class="container">
     <form id="add-build-form" method="post">
         {% csrf_token %}
+        <div class="row">
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Build ID field of Build" %}
+                    <div class="col-md-3">
+                        <label for="build_id">Build ID:</label>
+                        <input type="text" id="build_id" name="build_id" required>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Strategist Name field of Build" %}
+                    <div class="col-md-3">
+                        <label for="strategist_name">Strategist Name:</label>
+                        <select id="strategist_name" name="strategist_name">
+                            {% for sales_employee in sales_employees %}
+                                {% if sales_employee.role_id.role_name == "Strategy Employee" %}
+                                    <option value="{{ sales_employee.employee_id }}">{{ sales_employee.name }}</option>
+                                {% endif %}
+                            {% endfor %}
+                        </select>
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Strategist Number field of Build" %}
+                    <div class="col-md-3">
+                        <label for="strategist_number">Strategist Number:</label>
+                        <input type="text" id="strategist_number" name="strategist_number">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Email ID field of Build" %}
+                    <div class="col-md-3">
+                        <label for="email_id">Email ID:</label>
+                        <input type="email" id="email_id" name="email_id">
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
 
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Build ID field of Build" %}
-                <label for="build_id">Build ID:</label>
-                <input type="text" id="build_id" name="build_id" required><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Strategist Name field of Build" %}
-                <label for="strategist_name">Strategist Name:</label>
-                <select id="strategist_name" name="strategist_name">
-                    {% for sales_employee in sales_employees %}
-                        <option value="{{ sales_employee.employee_id }}">{{ sales_employee.name }}</option>
-                    {% endfor %}
-                </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Strategist Number field of Build" %}
-                <label for="strategist_number">Strategist Number:</label>
-                <input type="text" id="strategist_number" name="strategist_number"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Email ID field of Build" %}
-                <label for="email_id">Email ID:</label>
-                <input type="email" id="email_id" name="email_id"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Date field of Build" %}
-                <label for="date">Date:</label>
-                <input type="date" id="date" name="date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Strategy field of Build" %}
-                <label for="strategy">Name:</label>
-                <input type="text" id="strategy" name="strategy"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Document field of Build" %}
-                <label for="document">Document:</label>
-                <input type="text" id="document" name="document"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Payment Date field of Build" %}
-                <label for="payment_date">Payment Date:</label>
-                <input type="date" id="payment_date" name="payment_date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Payment Amount field of Build" %}
-                <label for="payment_amount">Payment Amount:</label>
-                <input type="text" id="payment_amount" name="payment_amount"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Delivery Date field of Build" %}
-                <label for="delivery_date">Delivery Date:</label>
-                <input type="date" id="delivery_date" name="delivery_date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Remarks field of Build" %}
-                <label for="remarks">Remarks:</label>
-                <input type="text" id="remarks" name="remarks"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Status field of Build" %}
-                <label for="status">Status:</label>
-                <select id="status" name="status">
-                    <option value="Converted" {% if lead.status == 'Converted' %} selected {% endif %}>Converted</option>
-                    <option value="Dropped" {% if lead.status == 'Dropped' %} selected {% endif %}>Dropped</option>
-                    <option value="Follow up" {% if lead.status == 'Follow up' %} selected {% endif %}>Follow up</option>
-                    <option value="No Answer" {% if lead.status == 'No Answer' %} selected {% endif %}>No Answer</option>
-                    <option value="Not Interested" {% if lead.status == 'Not Interested' %} selected {% endif %}>Not Interested</option>
-                    <option value="In Progress" {% if lead.status == 'In Progress' %} selected {% endif %}>In Progress</option>
-                    <!-- Add more options as needed -->
-                </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Source field of Build" %}
-                <label for="source">Source:</label>
-                <input type="text" id="source" name="source"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Assign From field of Build" %}
-                <label for="assign_from">Assign From:</label>
-                <input type="text" id="assign_from" name="assign_from"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Manage By field of Build" %}
-                <label for="manage_by">Manage By:</label>
-                <input type="text" id="manage_by" name="manage_by"><br><br>
-            {% endif %}
-        {% endfor %}
-        <!-- Add more input fields as needed -->
+        <div class="row">
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Date field of Build" %}
+                    <div class="col-md-3">
+                        <label for="date">Date:</label>
+                        <input type="date" id="date" name="date" value="{{ today_date|date:'d-m-Y' }}">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Strategy field of Build" %}
+                    <div class="col-md-3">
+                        <label for="strategy">Strategy:</label>
+                        <input type="text" id="strategy" name="strategy">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Document field of Build" %}
+                    <div class="col-md-3">
+                        <label for="document">Document:</label>
+                        <input type="text" id="document" name="document">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Payment Date field of Build" %}
+                    <div class="col-md-3">
+                        <label for="payment_date">Payment Date:</label>
+                        <input type="date" id="payment_date" name="payment_date" value="{{ today_date|date:'d-m-Y' }}">
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Payment Amount field of Build" %}
+                    <div class="col-md-3">
+                        <label for="payment_amount">Payment Amount:</label>
+                        <input type="text" id="payment_amount" name="payment_amount">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Delivery Date field of Build" %}
+                    <div class="col-md-3">
+                        <label for="delivery_date">Delivery Date:</label>
+                        <input type="date" id="delivery_date" name="delivery_date" value="{{ today_date|date:'d-m-Y' }}">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Remarks field of Build" %}
+                    <div class="col-md-3">
+                        <label for="remarks">Remarks:</label>
+                        <input type="text" id="remarks" name="remarks">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Status field of Build" %}
+                    <div class="col-md-3">
+                        <label for="status">Status:</label>
+                        <select id="status" name="status">
+                            <option value="Open" {% if build.status == 'Open' %} selected {% endif %}>Open</option>
+                            <option value="In Progress" {% if build.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                            <option value="Hold" {% if build.status == 'Hold' %} selected {% endif %}>Hold</option>
+                            <option value="Resolved" {% if build.status == 'Resolved' %} selected {% endif %}>Resolved</option>    
+                        </select>
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
+
+        <div class="row">
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Source field of Build" %}
+                    <div class="col-md-3">
+                        <label for="source">Source:</label>
+                        <input type="text" id="source" name="source">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Assign From field of Build" %}
+                    <div class="col-md-3">
+                        <label for="assign_from">Assign From:</label>
+                        <input type="text" id="assign_from" name="assign_from">
+                    </div>
+                {% endif %}
+            {% endfor %}
+            {% for permission in user_permissions %}
+                {% if permission.name == "Can view the Manage By field of Build" %}
+                    <div class="col-md-3">
+                        <label for="manage_by">Manage By:</label>
+                        <input type="text" id="manage_by" name="manage_by">
+                    </div>
+                {% endif %}
+            {% endfor %}
+        </div>
 
         <button type="submit" class="btn btn-success">Submit</button>
     </form>

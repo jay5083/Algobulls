@@ -120,66 +120,68 @@
         {% csrf_token %}
 
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Task ID field of Tech Task" %}
+            {% if permission.name == "Can view the Task ID field of Tech Task" %}
                 <label for="task_id">Task ID:</label>
                 <input type="text" id="task_id" name="task_id" required><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Employee ID field of Tech Task" %}
+            {% if permission.name == "Can view the Employee ID field of Tech Task" %}
                 <label for="employee_id">Employee ID:</label>
                 <select id="employee_id" name="employee_id">
                     {% for sales_employee in sales_employees %}
-                        <option value="{{ sales_employee.employee_id }}">{{ sales_employee.employee_id }}</option>
+                        {%if sales_employee.role_id.role_name == "Tech Employee" %}                                                   
+                            <option value="{{ sales_employee.employee_id }}">{{ sales_employee.name }}</option>
+                        {%endif%}
                     {% endfor %}
                 </select><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Date field of Tech Task" %}
+            {% if permission.name == "Can view the Date field of Tech Task" %}
                 <label for="date">Date:</label>
                 <input type="date" id="date" name="date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Task field of Tech Task" %}
+            {% if permission.name == "Can view the Task field of Tech Task" %}
                 <label for="task">Task:</label>
                 <input type="text" id="task" name="task"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Nature field of Tech Task" %}
+            {% if permission.name == "Can view the Nature field of Tech Task" %}
                 <label for="nature">Nature:</label>
                 <input type="text" id="nature" name="nature"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Task Status field of Tech Task" %}
+            {% if permission.name == "Can view the Task Status field of Tech Task" %}
                 <label for="task_status">Task Status:</label>
                 <input type="text" id="task_status" name="task_status"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Priority field of Tech Task" %}
+            {% if permission.name == "Can view the Priority field of Tech Task" %}
                 <label for="priority">Priority:</label>
                 <input type="text" id="priority" name="priority"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Date of Closing field of Tech Task" %}
+            {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
                 <label for="date_of_closing">Date of Closing:</label>
                 <input type="date" id="date_of_closing" name="date_of_closing" value="{{ today_date|date:'d-m-Y' }}"><br><br>
             {% endif %}
         {% endfor %}
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Number Of Days field of Tech Task" %}
+            {% if permission.name == "Can view the Number Of Days field of Tech Task" %}
                 <label for="number_of_days">Number Of Days:</label>
                 <input type="text" id="number_of_days" name="number_of_days"><br><br>
             {% endif %}
         {% endfor %}
         
         {% for permission in user_permissions %}
-            {% if permission.name == "Can edit the Comments field of Tech Task" %}
+            {% if permission.name == "Can view the Comments field of Tech Task" %}
                 <label for="comments">Comments:</label>
                 <input type="text" id="comments" name="comments"><br><br>
             {% endif %}

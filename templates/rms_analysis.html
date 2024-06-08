@@ -392,7 +392,7 @@
             }, 0);
         });
 
-        var weeklyBarChartInstance, statusPieChartInstance, priorityBarChartInstance, priorityPieChartInstance, divisionBarChartInstance, divisionPieChartInstance;
+        var weeklyBarChartInstance, statusPieChartInstance, issueBarChartInstance, issuePieChartInstance, customerBarChartInstance, customerPieChartInstance;
         
         function updateCharts(response) {
             updateWeeklyBarChart(response.results1);
@@ -405,18 +405,18 @@
 
         function updateWeeklyBarChart(results1) {
             const ctx = document.getElementById('weeklyBarChart').getContext('2d');
-            
+        
             if (weeklyBarChartInstance) {
                 weeklyBarChartInstance.destroy();
             }
-            
+        
             weeklyBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results1.labels,
                     datasets: results1.datasets.map((dataset, index) => ({
-                        label: dataset.name,
-                        data: dataset.data,
+                        label: dataset.name || '',  // Ensure label is not undefined
+                        data: dataset.data.map(value => value !== 0 ? value : ''),  // Convert 0 to empty string
                         backgroundColor: getRandomColor(index),
                         borderColor: getRandomColor(index),
                         borderWidth: 1
@@ -426,7 +426,11 @@
                     responsive: true,
                     scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Week (Start to End)'
+                            }
                         },
                         y: {
                             beginAtZero: true
@@ -453,11 +457,13 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'start',
-                            formatter: (value) => value,
+                            formatter: (value, context) => {
+                                return context.dataset.data[context.dataIndex] !== '' ? value : '';
+                            },
                             color: 'black',
                             font: {
                                 weight: 'bold',
-                                size: '15'
+                                size: 15
                             }
                         }
                     }
@@ -465,6 +471,7 @@
                 plugins: [ChartDataLabels]
             });
         }
+        
     
         function updateStatusPieChart(results2) {
             const ctx = document.getElementById('statusPieChart').getContext('2d');
@@ -527,17 +534,17 @@
         function updateIssueBarChart(results3) {
             const ctx = document.getElementById('issueBarChart').getContext('2d');
         
-            if (priorityBarChartInstance) {
-                priorityBarChartInstance.destroy();
+            if (issueBarChartInstance) {
+                issueBarChartInstance.destroy();
             }
         
-            priorityBarChartInstance = new Chart(ctx, {
+            issueBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results3.labels,
                     datasets: results3.datasets.map((dataset, index) => ({
-                        label: dataset.name,
-                        data: dataset.data,
+                        label: dataset.name || '',  // Ensure label is not undefined
+                        data: dataset.data.map(value => value !== 0 ? value : ''),  // Convert 0 to empty string
                         backgroundColor: getRandomColor(index),
                         borderColor: getRandomColor(index),
                         borderWidth: 1
@@ -545,34 +552,63 @@
                 },
                 options: {
                     responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Week (Start to End)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
                     plugins: {
                         legend: {
                             position: 'top',
                         },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
                         datalabels: {
                             anchor: 'end',
                             align: 'start',
-                            color: '#000',
+                            formatter: (value, context) => {
+                                return context.dataset.data[context.dataIndex] !== '' ? value : '';
+                            },
+                            color: 'black',
                             font: {
                                 weight: 'bold',
                                 size: 15
-                            },
-                            formatter: (value) => value
+                            }
                         }
                     }
                 },
                 plugins: [ChartDataLabels]
             });
         }
+                
         
         function updateIssuePieChart(results4) {
             const ctx = document.getElementById('issuePieChart').getContext('2d');
         
-            if (priorityPieChartInstance) {
-                priorityPieChartInstance.destroy();
+            if (issuePieChartInstance) {
+                issuePieChartInstance.destroy();
             }
         
-            priorityPieChartInstance = new Chart(ctx, {
+            issuePieChartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: results4.labels,
@@ -622,17 +658,17 @@
         function updateCustomerBarChart(results5) {
             const ctx = document.getElementById('customerBarChart').getContext('2d');
         
-            if (divisionBarChartInstance) {
-                divisionBarChartInstance.destroy();
+            if (customerBarChartInstance) {
+                customerBarChartInstance.destroy();
             }
         
-            divisionBarChartInstance = new Chart(ctx, {
+            customerBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results5.labels,
                     datasets: results5.datasets.map((dataset, index) => ({
-                        label: dataset.name,
-                        data: dataset.data,
+                        label: dataset.name || '',  // Ensure label is not undefined
+                        data: dataset.data.map(value => value !== 0 ? value : ''),  // Convert 0 to empty string
                         backgroundColor: getRandomColor(index),
                         borderColor: getRandomColor(index),
                         borderWidth: 1
@@ -640,19 +676,47 @@
                 },
                 options: {
                     responsive: true,
+                    scales: {
+                        x: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Week (Start to End)'
+                            }
+                        },
+                        y: {
+                            beginAtZero: true
+                        }
+                    },
                     plugins: {
                         legend: {
                             position: 'top',
                         },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
                         datalabels: {
                             anchor: 'end',
                             align: 'start',
-                            color: '#000',
+                            formatter: (value, context) => {
+                                return context.dataset.data[context.dataIndex] !== '' ? value : '';
+                            },
+                            color: 'black',
                             font: {
                                 weight: 'bold',
                                 size: 12
-                            },
-                            formatter: (value) => value
+                            }
                         }
                     }
                 },
@@ -660,14 +724,15 @@
             });
         }
         
+        
         function updateCustomerPieChart(results6) {
             const ctx = document.getElementById('customerPieChart').getContext('2d');
         
-            if (divisionPieChartInstance) {
-                divisionPieChartInstance.destroy();
+            if (customerPieChartInstance) {
+                customerPieChartInstance.destroy();
             }
         
-            divisionPieChartInstance = new Chart(ctx, {
+            customerPieChartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
                     labels: results6.labels,
