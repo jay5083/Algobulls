@@ -87,17 +87,14 @@
 
           .container {
             width: 100%; /* Adjust the width as needed */
-            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            max-height: 80vh; /* Use viewport height for a responsive maximum height */
             overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
             overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-            margin-top: 1%; /* Add margin at the top for spacing */
-            margin-left: 15%; /* Add margin to the left side */
+            margin-top: 0%; /* Add margin at the top for spacing */
+            margin-left: 13%; /* Add margin to the left side */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
         
-          
-          /* Adjust other styles as needed */
-            
         </style>
     
     
@@ -287,14 +284,6 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    <div class="btn-rms-analysis-container">
-                        <button class="btn btn-success" onclick="redirectrms_analysis_dataURL()">Rms Analysis</button>
-                    </div>
-                    <script>
-                        function redirectrms_analysis_dataURL() {
-                            window.location.href = '/to_rms_analysis/';
-                        }
-                    </script>
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -355,6 +344,14 @@
     </script>
     
     <div class="sidebar">
+        <div class="sidebar-item">
+            <button class="btn btn-light" onclick="redirectrms_analysis_dataURL()">Rms Analysis</button>
+        </div>
+        <script>
+            function redirectrms_analysis_dataURL() {
+                window.location.href = '/to_rms_analysis/';
+            }
+        </script>
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
@@ -674,6 +671,11 @@
                             <th scope="col">Employee</th>
                         {% endif %}
                     {%endfor%}
+                    {% for permission in user_permissions %}
+                        {% if permission.name == "Can delete RMS" %}
+                            <th scope="col"></th>
+                        {% endif %}
+                    {% endfor %}
                 </tr>
             </thead>
             <tbody id="rms-table-body">
@@ -959,6 +961,50 @@
                                 </td>
                             {% endif %}
                         {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can delete RMS" %}
+                                <td>
+                                    <button onclick="deleteRMSAndRedirect('{{ rms.sr_no }}', this)" style="padding: 3px; color: white; background-color: red; border: none;">
+                                        <div style="font-size: 20px;">
+                                            <i class="fa fa-trash"></i>
+                                        </div>
+                                    </button>
+                                </td>
+                                
+                                <script>
+                                    function deleteRMSAndRedirect(srNo, element) {
+                                        deleteRMS(srNo, element);  // Pass the element to deleteRMS function
+                                    }
+                                
+                                    function deleteRMS(srNo, element) {
+                                        var csrfToken = "{{ csrf_token }}";  // Fetch the CSRF token from the template
+                                
+                                        $.ajax({
+                                            url: '/delete_rms/',
+                                            type: 'POST',
+                                            data: {
+                                                csrfmiddlewaretoken: csrfToken,  // Include the CSRF token in the data
+                                                sr_no: srNo
+                                            },
+                                            success: function(response) {
+                                                if (response.success) {
+                                                    // If the deletion is successful, remove the row from the table
+                                                    var row = element.closest('tr');  // Find the closest table row
+                                                    row.remove();  // Remove the row from the DOM
+                                                    alert('RMS deleted successfully');
+                                                } else {
+                                                    alert('Failed to delete RMS: ' + response.error);
+                                                }
+                                            },
+                                            error: function(xhr, status, error) {
+                                                alert('Failed to delete RMS: ' + error);
+                                            }
+                                        });
+                                    }
+                                </script>                            
+                            {% endif %}
+                        {% endfor %}
                     </tr>
                 {% endfor %}
             </tbody>
@@ -1147,7 +1193,7 @@
             .btn-submit-support-container{
                 position: fixed;
                 bottom: 10px;
-                left: 200px;
+                right: 20px;
                 z-index: 999; /* Ensure it's above other content */
             }
             .btn-submit-strategies-container{
@@ -1176,8 +1222,8 @@
             }
             .btn-new-support-container{
                 position: fixed;
-                bottom: 20px;
-                right: 20px;
+                top: 85px;
+                right: 10px;
                 z-index: 999; /* Ensure it's above other content */
             }
             .btn-new-strategies-container{

@@ -25,7 +25,7 @@
             height: 90%;
             overflow: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
-            {% comment %} border-radius: 0 0 100px 0; /* Curved bottom-right corner */ {% endcomment %}
+            border-radius: 0 0 100px 0; /* Curved bottom-right corner */
         }
         
         .sidebar-item {
@@ -87,20 +87,15 @@
 
           .container {
             width: 100%; /* Adjust the width as needed */
-            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            max-height: 80vh; /* Use viewport height for a responsive maximum height */
             overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
             overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-            margin-top: 1%; /* Add margin at the top for spacing */
-            margin-left: 15%; /* Add margin to the left side */
+            margin-top: 0%; /* Add margin at the top for spacing */
+            margin-left: 13%; /* Add margin to the left side */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
         
-          
-          /* Adjust other styles as needed */
-            
         </style>
-    
-    
 
     <style>
         .hidden {
@@ -302,14 +297,6 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    <div class="btn-tech-task-analysis-container">
-                        <button class="btn btn-success" onclick="redirecttech_task_analysis_dataURL()">Tech Task Analysis</button>
-                    </div>
-                    <script>
-                        function redirecttech_task_analysis_dataURL() {
-                            window.location.href = '/to_tech_task_analysis/';
-                        }
-                    </script>
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -401,6 +388,14 @@
     </script>
 
     <div class="sidebar">
+        <div class="sidebar-item">
+            <button class="btn btn-light" onclick="redirecttech_task_analysis_dataURL()">Tech Task Analysis</button>
+        </div>
+        <script>
+            function redirecttech_task_analysis_dataURL() {
+                window.location.href = '/to_tech_task_analysis/';
+            }
+        </script>
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
@@ -556,12 +551,11 @@
     
     {% block content %}
     <div>
-        
-        <div class="container">
 
         <div id="tech-task-text" style="text-align: center;" style="display: none;" class="heading-container">
             <h2>Tech Task</h2>
         </div>
+        <div class="container">
         <table id="tech-task-table" class="table table-hover" class="table-container">
             <!-- Tech Task Table Content -->
             <thead>
@@ -844,7 +838,7 @@
         <form id="update-tech-task-form" class="btn-submit-tech-task-container" method="post">
             {% csrf_token %}
             <input type="hidden" name="updated_data" id="updated-data">
-            <button id="submit-tech-task-btn" type="button" onclick="submitTechTaskAndRedirect()" class="btn btn-success">Submit Tech Task</button>
+            <button id="submit-tech-task-btn" type="button" onclick="submitTechTaskAndRedirect()" class="btn btn-success">Submit</button>
             <script>
                 function submitTechTaskAndRedirect() {
                     submitTechTask();          // Call the submitTechTask function
@@ -946,7 +940,7 @@
             .btn-submit-tech-task-container{
                 position: fixed;
                 bottom: 10px;
-                left: 200px;
+                right: 20px;
                 z-index: 999; /* Ensure it's above other content */
             }
             .btn-submit-support-container{
@@ -975,8 +969,8 @@
             }
             .btn-new-tech-task-container{
                 position: fixed;
-                bottom: 20px;
-                right: 20px;
+                top: 85px;
+                right: 10px;
                 z-index: 999; /* Ensure it's above other content */
             }
             .btn-new-support-container{

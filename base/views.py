@@ -110,6 +110,7 @@ def generate_qr_code_base64(uri):
 
 @login_required
 def auth(request):
+    print(request.session.get("email"))
     current_time = timezone.now()
     last_login_time_str = request.session.get('last_login_time')
     request.session.save()
@@ -121,7 +122,7 @@ def auth(request):
         last_login_time = datetime.fromisoformat(last_login_time_str)
         print("Parsed last login time:", last_login_time)
         
-        if current_time - last_login_time < timedelta(minutes=5):
+        if current_time - last_login_time < timedelta(minutes=1):
             request.session['authenticated'] = True
             request.session['last_login_time'] = current_time.isoformat()
             request.session.modified = True
@@ -137,6 +138,9 @@ def auth(request):
 
         if totp.verify(otp):
             request.session['authenticated'] = True
+            email = request.user.username
+            request.session["email"]=email
+            
             request.session['last_login_time'] = current_time.isoformat()
             request.session.modified = True
             request.session.save()  # Explicitly save the session
@@ -803,6 +807,21 @@ def delete_build(request):
     else:
         # If the request method is not POST, return an error response
         return JsonResponse({'success': False, 'error': 'Invalid request method'})
+    
+def delete_rms(request):
+    if request.method == 'POST':
+        sr_no = request.POST.get('sr_no')
+
+        try:
+            # Fetch the RMS entry from the database using sr_no
+            rms = Rms.objects.get(sr_no=sr_no)
+            # Delete the RMS entry
+            rms.delete()
+            return JsonResponse({'success': True})
+        except Rms.DoesNotExist:
+            return JsonResponse({'success': False, 'error': 'RMS does not exist'})
+    else:
+        return JsonResponse({'success': False, 'error': 'Invalid request method'})
 
 def update_build(request):
     if request.method == 'POST':
@@ -1204,13 +1223,8 @@ def support(request):
             if support.branch_employee_id.branch_id.broker_id:
                 unique_broker_names.add((support.branch_employee_id.branch_id.broker_id.broker_id, support.branch_employee_id.branch_id.broker_id.broker_name))
     
-    sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
-    build = Build.objects.all().order_by('build_id')
-    tech_task = TechTask.objects.all().order_by('task_id')
-    support = Support.objects.all().order_by('ticket_number')
-    strategies = Strategies.objects.all().order_by('strategy_id')
     # name = algobulls_employee.name
     user_group = user_groups[0].name
     
@@ -1218,21 +1232,21 @@ def support(request):
     if user_group == "Branch Employee":
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
+        
+    support = Support.objects.annotate(
+            ticket_number_as_int=Cast('ticket_number', IntegerField())
+        ).order_by('ticket_number_as_int')
     
     context = {
         'user_groups': user_groups,
         'user_permissions': user_permissions,
         'permissions_name': [i.name for i in user_permissions],
         'employee_id': employee_id,
-        "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
         # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
-        'builds' : build,
-        'tech_tasks' : tech_task,
         'supports' : support,
-        'strategies' : strategies,
         'selected_status': request.GET.get('status', ''),
         'unique_support_employees':unique_support_employees,
         'unique_division_employees':unique_division_employees,
@@ -1281,10 +1295,6 @@ def build(request):
     sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
-    build = Build.objects.all().order_by('build_id')
-    tech_task = TechTask.objects.all().order_by('task_id')
-    support = Support.objects.all().order_by('ticket_number')
-    strategies = Strategies.objects.all().order_by('strategy_id')
     # name = algobulls_employee.name
     user_group = user_groups[0].name
     
@@ -1292,6 +1302,10 @@ def build(request):
     if user_group == "Branch Employee":
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
+        
+    build = Build.objects.annotate(
+            build_id_as_int=Cast('build_id', IntegerField())
+        ).order_by('build_id_as_int')
     
     context = {
         'user_groups': user_groups,
@@ -1304,9 +1318,6 @@ def build(request):
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
         'builds' : build,
-        'tech_tasks' : tech_task,
-        'supports' : support,
-        'strategies' : strategies,
         'selected_status': request.GET.get('status', ''),
         'unique_strategist_names': unique_strategist_names,
     }
@@ -1347,15 +1358,9 @@ def strategies(request):
     for strategy in strategies:
         if strategy.employee_id:
             unique_employee_ids.add((strategy.employee_id.employee_id, strategy.employee_id.name))
-
     
-    sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
-    build = Build.objects.all().order_by('build_id')
-    tech_task = TechTask.objects.all().order_by('task_id')
-    support = Support.objects.all().order_by('ticket_number')
-    strategies = Strategies.objects.all().order_by('strategy_id')
     # name = algobulls_employee.name
     user_group = user_groups[0].name
     
@@ -1363,20 +1368,20 @@ def strategies(request):
     if user_group == "Branch Employee":
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
+        
+    strategies = Strategies.objects.annotate(
+            strategy_id_as_int=Cast('strategy_id', IntegerField())
+        ).order_by('strategy_id_as_int')
     
     context = {
         'user_groups': user_groups,
         'user_permissions': user_permissions,
         'permissions_name': [i.name for i in user_permissions],
         'employee_id': employee_id,
-        "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
         # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
-        'builds' : build,
-        'tech_tasks' : tech_task,
-        'supports' : support,
         'strategies' : strategies,
         'selected_status': request.GET.get('status', ''),
         'unique_employee_ids': unique_employee_ids,
@@ -1420,13 +1425,9 @@ def tech_task(request):
             unique_employee_ids.add((tech_task.employee_id.employee_id, tech_task.employee_id.name))
 
     
-    sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
-    build = Build.objects.all().order_by('build_id')
     tech_task = TechTask.objects.all().order_by('task_id')
-    support = Support.objects.all().order_by('ticket_number')
-    strategies = Strategies.objects.all().order_by('strategy_id')
     # name = algobulls_employee.name
     user_group = user_groups[0].name
     
@@ -1435,20 +1436,20 @@ def tech_task(request):
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
     
+    tech_task = TechTask.objects.annotate(
+            task_id_as_int=Cast('task_id', IntegerField())
+        ).order_by('task_id_as_int')
+    
     context = {
         'user_groups': user_groups,
         'user_permissions': user_permissions,
         'permissions_name': [i.name for i in user_permissions],
         'employee_id': employee_id,
-        "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
         # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
-        'builds' : build,
         'tech_tasks' : tech_task,
-        'supports' : support,
-        'strategies' : strategies,
         'selected_status': request.GET.get('status', ''),
         'unique_employee_ids': unique_employee_ids,
     }
@@ -1495,13 +1496,8 @@ def rms(request):
         if rms.broker.broker_id:
             unique_brokers.add((rms.broker.broker_id, rms.broker.broker_name))
 
-    sales_leads = Sales.objects.all().order_by('lead_id')
     branch_employees = BranchEmployee.objects.all()
     sales_employees = AlgobullsEmployee.objects.all()
-    build = Build.objects.all().order_by('build_id')
-    tech_task = TechTask.objects.all().order_by('task_id')
-    support = Support.objects.all().order_by('ticket_number')
-    strategies = Strategies.objects.all().order_by('strategy_id')
     rms = Rms.objects.all().order_by('sr_no')
     broker = Broker.objects.all()
     # name = algobulls_employee.name
@@ -1512,20 +1508,19 @@ def rms(request):
         sales_leads = sales_leads.filter(branch_employee_id=employee_id)
         support = support.filter(branch_employee_id=employee_id)
     
+    rms = Rms.objects.annotate(
+            sr_no_as_int=Cast('sr_no', IntegerField())
+        ).order_by('sr_no_as_int')
+    
     context = {
         'user_groups': user_groups,
         'user_permissions': user_permissions,
         'permissions_name': [i.name for i in user_permissions],
         'employee_id': employee_id,
-        "sales_leads": sales_leads,
         "role_name": user_group,  # Replace "Sales Head" with user_group
         # "name": name,
         'branch_employees': branch_employees,
         'sales_employees' : sales_employees,
-        'builds' : build,
-        'tech_tasks' : tech_task,
-        'supports' : support,
-        'strategies' : strategies,
         'rms_objects': rms,
         'brokers': broker,
         'selected_status': request.GET.get('status', ''),

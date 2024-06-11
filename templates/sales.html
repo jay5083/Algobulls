@@ -20,7 +20,7 @@
         .sidebar {
             margin: 0;
             padding: 0;
-            width: 150px;
+            width: 200px;
             background-color: lightwhite;
             position: fixed;
             height: 90%;
@@ -87,21 +87,17 @@
           }
 
           .container {
-            width: 100%; /* Adjust the width as needed */
-            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            width: 100%; /* Decrease the width to 50% of the parent container */
+            max-height: 80vh; /* Use viewport height for a responsive maximum height */
             overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
             overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-            margin-top: 0%; /* Add margin at the top for spacing */
-            margin-left: 15%; /* Add margin to the left side */
+            margin-top: 0; /* No margin at the top */
+            margin-left: 13%; /* Margin to the left side */
+            {% comment %} margin-right: 45%; /* Adjust right margin to 15% for balance */ {% endcomment %}
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
-        }
-        
-          
-          /* Adjust other styles as needed */
-            
-        </style>
-    
-    
+        }                
+
+        </style>    
 
     <style>
         .hidden {
@@ -288,14 +284,14 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    <div>
+                    {% comment %} <div>
                         <button class="btn btn-success" onclick="redirectsales_analysis_dataURL()"> Sales Analysis</button>
                     </div>
                     <script>
                         function redirectsales_analysis_dataURL() {
                             window.location.href = '/to_sales_analysis/';
                         }
-                    </script>
+                    </script> {% endcomment %}
                 </ul>
                 
                 <div class="d-flex align-items-center">
@@ -333,6 +329,12 @@
         .dropdown-content div:hover {
             background-color: #f1f1f1;
         }
+        {% comment %} .center-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Adjust based on your requirement */
+        } {% endcomment %}
     </style>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
@@ -356,6 +358,16 @@
     </script>
     
     <div class="sidebar">
+        <div class="sidebar-item">
+            <div class="center-container">
+                <button class="btn btn-light" class="align:center" onclick="redirectsales_analysis_dataURL()"> Sales Analysis</button>
+            </div>
+            <script>
+                function redirectsales_analysis_dataURL() {
+                    window.location.href = '/to_sales_analysis/';
+                }
+            </script>
+        </div>
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
@@ -443,6 +455,10 @@
                         <div>
                             <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
                             <label for="In Progress">In Progress</label>
+                        </div>
+                        <div>
+                            <input type="checkbox" id="Not Contacted" name="Status" data-field="status" class="filter-checkbox" value="Not Contacted" checked>
+                            <label for="Not Contacted">Not Contacted</label>
                         </div>
                     </div>
                     </div>
@@ -1095,6 +1111,7 @@
                                                     <option value="No Answer" {% if lead.status == 'No Answer' %} selected {% endif %}>No Answer</option>
                                                     <option value="Not Interested" {% if lead.status == 'Not Interested' %} selected {% endif %}>Not Interested</option>
                                                     <option value="In Progress" {% if lead.status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                                                    <option value="Not Contacted" {% if lead.status == 'Not Contacted' %} selected {% endif %}>Not Contacted</option>
                                                 </select><br><br>
                                         {% endif %}
                                     </td>
@@ -1175,7 +1192,7 @@
         <form id="update-sales-leads-form" class="btn-submit-sales-container" method="post">
             {% csrf_token %}
             <input type="hidden" name="updated_data" id="updated-data">
-            <button id="submit-sales-leads-btn" type="button" onclick="submitSalesAndRedirect()" class="btn btn-success">Submit Sales</button>
+            <button id="submit-sales-leads-btn" type="button" onclick="submitSalesAndRedirect()" class="btn btn-success">Submit</button>
             <script>
                 function submitSalesAndRedirect(leadId) {
                     submitSalesLeads();  // Call the deleteLead function
@@ -1339,66 +1356,20 @@
                 left: 850px;
                 z-index: 999; /* Ensure it's above other content */
             }
-            .btn-submit-sales-container{
+            .btn-new-sales-container{
                 position: fixed;
-                bottom: 10px;
-                left: 200px;
+                top: 85px;
+                right: 10px;
                 z-index: 999; /* Ensure it's above other content */
             }
-            .btn-submit-build-container{
+            
+            .btn-submit-sales-container {
                 position: fixed;
                 bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-submit-tech-task-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-submit-support-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-submit-strategies-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-sales-container {
-                position: fixed;
-                bottom: 20px;
                 right: 20px;
                 z-index: 999; /* Ensure it's above other content */
             }
-            .btn-new-build-container {
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-tech-task-container{
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-support-container{
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-strategies-container{
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
+            
         </style>
         
         </div>

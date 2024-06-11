@@ -19,6 +19,7 @@ urlpatterns = [
     path('delete_support/', views.delete_support, name='delete_support'),
     path('delete_tech_task/', views.delete_tech_task, name='delete_tech_task'),
     path('delete_build/', views.delete_build, name='delete_build'),
+    path('delete_rms/', views.delete_rms, name='delete_rms'),
     path('update_build/', views.update_build, name='update_build'),
     path('update_tech_task/', views.update_tech_task, name='update_tech_task'),
     path('update_support/', views.update_support, name='update_support'),

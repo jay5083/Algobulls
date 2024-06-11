@@ -12,27 +12,32 @@
             body {
                 font-family: Arial, sans-serif;
                 background-color: #f8f9fa; /* Light gray background */
-                {% comment %} padding: 20px; /* Add padding to the body */ {% endcomment %}
             }
-            h1 {
+            h2 {
                 color: #007bff; /* Blue heading */
+                text-align: center; /* Center align the heading */
+                margin-top: 20px; /* Add margin to the top */
             }
             form {
                 background-color: #fff; /* White background for the form */
                 padding: 20px; /* Add padding to the form */
                 border-radius: 8px; /* Rounded corners */
                 box-shadow: 0 0 10px rgba(0, 0, 0, 0.1); /* Shadow effect */
-                max-width: 600px; /* Limit form width */
+                max-width: 900px; /* Increase form width */
                 margin: 0 auto; /* Center the form horizontally */
+            }
+            .form-group {
+                margin-bottom: 20px; /* Add margin between form groups */
             }
             label {
                 font-weight: bold; /* Make labels bold */
             }
             input[type="text"],
+            input[type="date"],
+            input[type="email"],
             select {
                 width: 100%; /* Make inputs and selects fill the width */
                 padding: 10px; /* Add padding to inputs and selects */
-                margin-bottom: 20px; /* Add margin between inputs and selects */
                 border: 1px solid #ced4da; /* Add border */
                 border-radius: 4px; /* Rounded corners */
                 box-sizing: border-box; /* Include padding and border in element's total width and height */
@@ -48,223 +53,306 @@
             button[type="submit"]:hover {
                 background-color: #218838; /* Darker green on hover */
             }
+            .row {
+                display: flex; /* Flexbox for row layout */
+                flex-wrap: wrap; /* Allow rows to wrap */
+                justify-content: space-between; /* Space between items */
+            }
+            .col-md-3 {
+                flex: 0 0 calc(25% - 10px); /* Four columns per row */
+                margin-bottom: 20px; /* Space at the bottom */
+            }
+            .form-group {
+                margin-bottom: 20px; /* Space between form groups */
+            }
+            @media (max-width: 768px) {
+                .col-md-3 {
+                    flex: 0 0 calc(50% - 10px); /* Two columns per row on small screens */
+                }
+            }
+            @media (max-width: 576px) {
+                .col-md-3 {
+                    flex: 0 0 100%; /* One column per row on extra small screens */
+                }
+            }
         </style>
     </head>
-<body>
-    <header>
-        <style>
-            .navbar {
-                min-height: 50px; /* Adjust the value as needed */
-            }
-            .logo-circle {
-                width: 40px;
-                height: 40px;
-                border-radius: 50%; /* Make it circular */
-                overflow: hidden; /* Hide overflow */
-                margin-right: 10px; /* Adjust margin as needed */
-            }
-            
-            .logo-circle img {
-                width: 100%; /* Make the image fill the circle */
-                height: auto; /* Maintain aspect ratio */
-            }
-            .container {
-                width: 100%; /* Adjust the width as needed */
-                max-height: 550px; /* Maximum height for vertical scroll */
-                overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
-                overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-                margin-top: 20px; /* Add margin at the top for spacing */
-                margin-left: 300px; /* Add margin to the left side */
-              }
-        </style>
-        
-        <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
-            <div class="container-fluid">
-                <!-- Logo with man inside circle -->
-                <a class="navbar-brand" href="#">
-                    <div class="logo-circle">
-                        <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
-                    </div>
-                </a>
-                <!-- Name -->
-                <a class="navbar-brand" href="#">Algobulls</a>
-                <!-- Toggle Button -->
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <!-- Navbar Links -->
-                <div class="collapse navbar-collapse" id="navbarColor01">
-                    <ul class="navbar-nav me-auto">
-                        <li class="nav-item">
-                            <a class="nav-link active" href="#">
-                                <span class="visually-hidden">(current)</span>
-                            </a>
-                        </li>
-                    </ul>
-                    <!-- User Name -->
-                    <div class="d-flex align-items-center">
+    <body>
+        <header>
+            <style>
+                .navbar {
+                    min-height: 50px; /* Adjust the value as needed */
+                }
+                .logo-circle {
+                    width: 40px;
+                    height: 40px;
+                    border-radius: 50%; /* Make it circular */
+                    overflow: hidden; /* Hide overflow */
+                    margin-right: 10px; /* Adjust margin as needed */
+                }
+                .logo-circle img {
+                    width: 100%; /* Make the image fill the circle */
+                    height: auto; /* Maintain aspect ratio */
+                }
+                .container {
+                    width: 100%; /* Adjust the width as needed */
+                    max-height: 550px; /* Maximum height for vertical scroll */
+                    overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
+                    overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
+                    margin-top: 20px; /* Add margin at the top for spacing */
+                    margin-left: 300px; /* Add margin to the left side */
+                }
+            </style>
+
+            <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
+                <div class="container-fluid">
+                    <!-- Logo with man inside circle -->
+                    <a class="navbar-brand" href="#">
                         <div class="logo-circle">
-                            <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                            <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
                         </div>
-                        <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                    </a>
+                    <!-- Name -->
+                    <a class="navbar-brand" href="#">Algobulls</a>
+                    <!-- Toggle Button -->
+                    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarColor01" aria-controls="navbarColor01" aria-expanded="false" aria-label="Toggle navigation">
+                        <span class="navbar-toggler-icon"></span>
+                    </button>
+                    <!-- Navbar Links -->
+                    <div class="collapse navbar-collapse" id="navbarColor01">
+                        <ul class="navbar-nav me-auto">
+                            <li class="nav-item">
+                                <a class="nav-link active" href="#">
+                                    <span class="visually-hidden">(current)</span>
+                                </a>
+                            </li>
+                        </ul>
+                        <!-- User Name -->
+                        <div class="d-flex align-items-center">
+                            <div class="logo-circle">
+                                <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
+                            </div>
+                            <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
+                        </div>
                     </div>
                 </div>
+            </nav>
+
+            <div style="text-align: center;">
+                <h2>Add Support</h2>
             </div>
-        </nav>
-    
-        <div style="text-align: center;">
-            <h2>Add Support</h2>
-        </div>
-    <div class="container">
-    <form id="add-support-form" method="post">
-        {% csrf_token %}
 
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Ticket Number field of Support" %}
-                <label for="ticket_number">Ticket Number:</label>
-                <input type="text" id="ticket_number" name="ticket_number" required><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Branch Employee ID field of Support" %}
-                <label for="branch_employee_id">Branch Employee ID:</label>
-                <select id="branch_employee_id" name="branch_employee_id">
-                    {% for branch_employee in branch_employees %}
-                        <option value="{{ branch_employee.branch_employee_id }}">{{ branch_employee.branch_employee_id }}</option>
-                    {% endfor %}
-                </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Date field of Support" %}
-                <label for="date">Date</label>
-                <input type="date" id="date" name="date" value="{{ today_date|date:'d-m-Y' }}"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Broking ID field of Support" %}
-                <label for="broking_id">Broking ID:</label>
-                <input type="text" id="broking_id" name="broking_id"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Name field of Support" %}
-                <label for="name">Name:</label>
-                <input type="text" id="name" name="name"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Contact Number field of Support" %}
-                <label for="contact_number">Contact Number:</label>
-                <input type="contact_number" id="contact_number" name="contact_number"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Email ID field of Support" %}
-                <label for="email_id">Email ID:</label>
-                <input type="email" id="email_id" name="email_id"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Date Of Error field of Support" %}
-                <label for="date_of_error">Date Of Error</label>
-                <input type="date" id="date_of_error" name="date_of_error" value="{{ today_date|date:'d-m-Y' }}"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Strategy Code field of Support" %}
-                <label for="strategy_code">Strategy Code:</label>
-                <input type="text" id="strategy_code" name="strategy_code"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Strategy Instrument field of Support" %}
-                <label for="strategy_instrument">Strategy Instrument:</label>
-                <input type="text" id="strategy_instrument" name="strategy_instrument"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Customer Type field of Support" %}
-                <label for="customer_type">Customer Type</label>
-                    <select id="customer_type" name="customer_type">
-                        <option value="Choose">Choose</option>
-                        <option value="Build">Build</option>
-                    </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Priority field of Support" %}
-                <label for="priority">Priority</label>
-                    <select id="priority" name="priority">
-                    <option value="High">High</option>
-                    <option value="Medium">Medium</option>
-                    <option value="Low">Low</option>
-                    </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Issue field of Support" %}
-                <label for="issue">Issue</label>
-                    <select id="issue" name="issue">
-                        <option value="Strategy Development">Strategy Development</option>
-                        <option value="Live Trading and RMS">Live Trading and RMS</option>
-                        <option value="Package and Funds" >Package and Funds</option>
-                        <option value="Front End Issues" >Front End Issues</option>
-                        <option value="General Info">General Info</option>
-                        <option value="Hold">Hold</option>
-                        <option value="Resolved">Resolved</option>
-                        </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Comment field of Support" %}
-                <label for="comment">Comment</label>
-                <input type="text" id="comment" name="comment"><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Support Employee field of Support" %}
-                <label for="support_employee_id">Support Employee:</label>
-                <select id="support_employee_id" name="support_employee_id">
-                    {% for support_employee in sales_employees %}
-                        <option value="{{ support_employee.employee_id }}">{{ support_employee.employee_id }}</option>
-                    {% endfor %}
-                </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Division Employee field of Support" %}
-                <label for="division_employee_id">Division Employee:</label>
-                <select id="division_employee_id" name="division_employee_id">
-                    {% for division_employee in sales_employees %}
-                        <option value="{{ division_employee.employee_id }}">{{ division_employee.employee_id }}</option>
-                    {% endfor %}
-                </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Status field of Support" %}
-                <label for="status">Status</label>
-                <select id="status" name="status">
-                    <option value="Open">Open</option>
-                    <option value="In Progress">In Progress</option>
-                    <option value="Hold">Hold</option>
-                    <option value="Resolved">Resolved</option>
-                    <!-- Add more options as needed -->
-                </select><br><br>
-            {% endif %}
-        {% endfor %}
-        {% for permission in user_permissions %}
-            {% if permission.name == "Can view the Date of Closing field of Support" %}
-                <label for="date_of_closing">Date of Closing</label>
-                <input type="date" id="date_of_closing" name="date_of_closing" value="{{ today_date|date:'d-m-Y' }}"><br><br>
-            {% endif %}
-        {% endfor %}
-        <!-- Add more input fields as needed -->
+            <div class="container">
+                <form id="add-support-form" method="post">
+                    {% csrf_token %}
 
-        <button type="submit" class="btn btn-success">Submit</button>
-    </form>
-</div>
-</header>
-</body>
+                    <div class="row">
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Ticket Number field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="ticket_number">Ticket Number:</label>
+                                    <input type="text" id="ticket_number" name="ticket_number" required>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Branch Employee ID field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="branch_employee_id">Branch Employee ID:</label>
+                                    <select id="branch_employee_id" name="branch_employee_id">
+                                        {% for branch_employee in branch_employees %}
+                                            <option value="{{ branch_employee.branch_employee_id }}">{{ branch_employee.branch_employee_id }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Date field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="date">Date</label>
+                                    <input type="date" id="date" name="date" value="{{ today_date|date:'d-m-Y' }}">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Broking ID field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="broking_id">Broking ID:</label>
+                                    <input type="text" id="broking_id" name="broking_id">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="row">
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Name field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="name">Name:</label>
+                                    <input type="text" id="name" name="name">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Contact Number field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="contact_number">Contact Number:</label>
+                                    <input type="contact_number" id="contact_number" name="contact_number">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Email ID field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="email_id">Email ID:</label>
+                                    <input type="email" id="email_id" name="email_id">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Date Of Error field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="date_of_error">Date Of Error</label>
+                                    <input type="date" id="date_of_error" name="date_of_error" value="{{ today_date|date:'d-m-Y' }}">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="row">
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Strategy Code field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="strategy_code">Strategy Code:</label>
+                                    <input type="text" id="strategy_code" name="strategy_code">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Strategy Instrument field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="strategy_instrument">Strategy Instrument:</label>
+                                    <input type="text" id="strategy_instrument" name="strategy_instrument">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Customer Type field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="customer_type">Customer Type</label>
+                                    <select id="customer_type" name="customer_type">
+                                        <option value="Choose">Choose</option>
+                                        <option value="Build">Build</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Priority field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="priority">Priority</label>
+                                    <select id="priority" name="priority">
+                                        <option value="High">High</option>
+                                        <option value="Medium">Medium</option>
+                                        <option value="Low">Low</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="row">
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Issue field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="issue">Issue</label>
+                                    <select id="issue" name="issue">
+                                        <option value="Strategy Development">Strategy Development</option>
+                                        <option value="Live Trading and RMS">Live Trading and RMS</option>
+                                        <option value="Package and Funds" >Package and Funds</option>
+                                        <option value="Front End Issues" >Front End Issues</option>
+                                        <option value="General Info">General Info</option>
+                                        <option value="Hold">Hold</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Comment field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="comment">Comment</label>
+                                    <input type="text" id="comment" name="comment">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Support Employee field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="support_employee_id">Support Employee:</label>
+                                    <select id="support_employee_id" name="support_employee_id">
+                                        {% for support_employee in sales_employees %}
+                                            <option value="{{ support_employee.employee_id }}">{{ support_employee.employee_id }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Division Employee field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="division_employee_id">Division Employee:</label>
+                                    <select id="division_employee_id" name="division_employee_id">
+                                        {% for division_employee in sales_employees %}
+                                            <option value="{{ division_employee.employee_id }}">{{ division_employee.employee_id }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <div class="row">
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Status field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="status">Status</label>
+                                    <select id="status" name="status">
+                                        <option value="Open">Open</option>
+                                        <option value="In Progress">In Progress</option>
+                                        <option value="Hold">Hold</option>
+                                        <option value="Resolved">Resolved</option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Date of Closing field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="date_of_closing">Date of Closing</label>
+                                    <input type="date" id="date_of_closing" name="date_of_closing" value="{{ today_date|date:'d-m-Y' }}">
+                                </div>
+                            {% endif %}
+                        {% endfor %}
+                    </div>
+
+                    <button type="submit" class="btn btn-success">Submit</button>
+                </form>
+            </div>
+        </header>
+    </body>
 </html>

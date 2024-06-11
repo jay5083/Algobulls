@@ -19,7 +19,7 @@
         .sidebar {
             margin: 0;
             padding: 0;
-            width: 150px;
+            width: 200px;
             background-color: lightwhite;
             position: fixed;
             height: 90%;
@@ -58,7 +58,7 @@
             left: 0;
             width: 100%;
             height: 150px; /* Adjust the height as needed */
-            background-color: #2679c2bf; /* Set the color to blue */
+            {% comment %} background-color: #2679c2bf; /* Set the color to blue */ {% endcomment %}
             border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
         }
         
@@ -87,11 +87,11 @@
 
           .container {
             width: 100%; /* Adjust the width as needed */
-            max-height: 75vh; /* Use viewport height for a responsive maximum height */
+            max-height: 80vh; /* Use viewport height for a responsive maximum height */
             overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
             overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-            margin-top: 1%; /* Add margin at the top for spacing */
-            margin-left: 15%; /* Add margin to the left side */
+            margin-top: 0%; /* Add margin at the top for spacing */
+            margin-left: 13%; /* Add margin to the left side */
             box-sizing: border-box; /* Include padding and border in the element's total width and height */
         }
         
@@ -100,8 +100,6 @@
             
         </style>
     
-    
-
     <style>
         .hidden {
             display: none;
@@ -296,14 +294,7 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    <div>
-                        <button class="btn btn-success" onclick="redirectbuild_analysis_dataURL()">Build Analysis</button>
-                    </div>
-                    <script>
-                        function redirectbuild_analysis_dataURL() {
-                            window.location.href = '/to_build_analysis/';
-                        }
-                    </script>
+                    
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -326,6 +317,14 @@
     </nav>
     
     <div class="sidebar">
+        <div class="sidebar-item">
+            <button class="btn btn-light" onclick="redirectbuild_analysis_dataURL()">Build Analysis</button>
+        </div>
+        <script>
+            function redirectbuild_analysis_dataURL() {
+                window.location.href = '/to_build_analysis/';
+            }
+        </script>
         <form id="filter-form">
             {% csrf_token %}
             <div class="filter-options">
@@ -407,7 +406,6 @@
             });
         });
     </script>
-    
     
     <script>
         document.addEventListener('DOMContentLoaded', function () {
@@ -843,7 +841,7 @@
         <form id="update-build-form" class="btn-submit-build-container" method="post">
             {% csrf_token %}
             <input type="hidden" name="updated_data" id="updated-data">
-            <button id="submit-build-btn" type="button" onclick="submitBuildAndRedirect()" class="btn btn-success">Submit Build</button>
+            <button id="submit-build-btn" type="button" onclick="submitBuildAndRedirect()" class="btn btn-success">Submit</button>
             <script>
                 function submitBuildAndRedirect() {
                     submitBuild();          // Call the submitBuild function
@@ -926,8 +924,8 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Build" %}
                 <div class="btn-new-build-container">
-                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">
-                        <i class="fas fa-plus"></i>
+                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">New Build
+                        {% comment %} <i class="fas fa-plus"></i> {% endcomment %}
                     </button>
                 </div>
                 <script>
@@ -940,66 +938,21 @@
         {%endfor%}
 
         <style>
-            .btn-submit-sales-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
+            
             .btn-submit-build-container{
                 position: fixed;
                 bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-submit-tech-task-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-submit-support-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-submit-strategies-container{
-                position: fixed;
-                bottom: 10px;
-                left: 200px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-sales-container {
-                position: fixed;
-                bottom: 20px;
                 right: 20px;
                 z-index: 999; /* Ensure it's above other content */
             }
+            
             .btn-new-build-container {
                 position: fixed;
-                bottom: 20px;
-                right: 20px;
+                top: 85px;
+                right: 10px;
                 z-index: 999; /* Ensure it's above other content */
             }
-            .btn-new-tech-task-container{
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-support-container{
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
-            .btn-new-strategies-container{
-                position: fixed;
-                bottom: 20px;
-                right: 20px;
-                z-index: 999; /* Ensure it's above other content */
-            }
+            
         </style>
         
         </div>
