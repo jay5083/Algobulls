@@ -100,10 +100,10 @@
                     overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
                     overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
                     margin-top: 20px; /* Add margin at the top for spacing */
-                    margin-left: 300px; /* Add margin to the left side */
+                    margin-left: 200px; /* Add margin to the left side */
                 }
             </style>
-
+            
             <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
                 <div class="container-fluid">
                     <!-- Logo with man inside circle -->
@@ -162,7 +162,9 @@
                                     <label for="branch_employee_id">Branch Employee ID:</label>
                                     <select id="branch_employee_id" name="branch_employee_id">
                                         {% for branch_employee in branch_employees %}
-                                            <option value="{{ branch_employee.branch_employee_id }}">{{ branch_employee.branch_employee_id }}</option>
+                                            {% if branch_employee.role.role_name == "Branch Employee" %}
+                                                <option value="{{ branch_employee.branch_employee_id }}">{{ branch_employee.name }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -304,7 +306,9 @@
                                     <label for="support_employee_id">Support Employee:</label>
                                     <select id="support_employee_id" name="support_employee_id">
                                         {% for support_employee in sales_employees %}
-                                            <option value="{{ support_employee.employee_id }}">{{ support_employee.employee_id }}</option>
+                                            {% if support_employee.role_id.role_name == "Support Employee" %}
+                                                <option value="{{ support_employee.employee_id }}">{{ support_employee.name }}</option>
+                                            {%endif%}
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -315,9 +319,9 @@
                             {% if permission.name == "Can view the Division Employee field of Support" %}
                                 <div class="col-md-3 form-group">
                                     <label for="division_employee_id">Division Employee:</label>
-                                    <select id="division_employee_id" name="division_employee_id">
+                                    <select id="division_employee_id" name="division_employee_id" class="division_employee_id">
                                         {% for division_employee in sales_employees %}
-                                            <option value="{{ division_employee.employee_id }}">{{ division_employee.employee_id }}</option>
+                                            <option value="{{ division_employee.employee_id }}">{{ division_employee.name }}</option>
                                         {% endfor %}
                                     </select>
                                 </div>
@@ -348,6 +352,22 @@
                                 </div>
                             {% endif %}
                         {% endfor %}
+
+                        {% for permission in user_permissions %}
+                            {% if permission.name == "Can view the Division Assigned To field of Support" %}
+                                <div class="col-md-3 form-group">
+                                    <label for="division_assigned_to">Division Assigned To</label>
+                                    <select id="division_assigned_to" name="division_assigned_to">
+                                        <option value="Tech" {% if support.division_assigned_to == 'Tech' %} selected {% endif %}>Tech</option>
+                                        <option value="Sales" {% if support.division_assigned_to == 'Sales' %} selected {% endif %}>Sales</option>
+                                        <option value="Strategy" {% if support.division_assigned_to == 'Strategy' %} selected {% endif %}>Strategy</option>
+                                        <option value="Support" {% if support.division_assigned_to == 'Support' %} selected {% endif %}>Support</option>
+                                        <option value="RMS" {% if support.division_assigned_to == 'RMS' %} selected {% endif %}>RMS</option>
+                                        <option value="Build " {% if support.division_assigned_to == 'Build ' %} selected {% endif %}>Build </option>
+                                    </select>
+                                </div>
+                            {% endif %}
+                        {% endfor %}
                     </div>
 
                     <button type="submit" class="btn btn-success">Submit</button>
@@ -355,4 +375,48 @@
             </div>
         </header>
     </body>
+    <!-- Add jQuery from CDN -->
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Select all "Division Assigned To" dropdowns
+            var divisionAssignedToDropdowns = document.querySelectorAll('select[name="division_assigned_to"]');
+            
+            // Add event listener to each "Division Assigned To" dropdown
+            divisionAssignedToDropdowns.forEach(function(divisionDropdown) {
+                divisionDropdown.addEventListener('change', function() {
+                    var division = this.value; // Get the selected division
+                    // Find the closest "Division Employee" dropdown within the same form
+                    var divisionEmployeeDropdown = this.closest('form').querySelector('.division_employee_id');
+                    
+                    if (divisionEmployeeDropdown) { // Check if divisionEmployeeDropdown exists
+                        // Make an AJAX call to fetch employees based on the selected division
+                        $.ajax({
+                            url: '/get_division_employees/',
+                            type: 'GET',
+                            data: { 'division': division },
+                            success: function(response) {
+                                divisionEmployeeDropdown.innerHTML = ''; // Clear existing options
+                                // Populate the "Division Employee" dropdown with new options
+                                response.employees.forEach(function(employee) {
+                                    var option = document.createElement('option');
+                                    option.value = employee.employee_id;
+                                    option.text = employee.name;
+                                    divisionEmployeeDropdown.appendChild(option);
+                                });
+                            },
+                            error: function(xhr, status, error) {
+                                console.error('Error fetching division employees:', error);
+                            }
+                        });
+                    } else {
+                        console.error('Division Employee dropdown not found');
+                    }
+                });
+            });
+        });
+    </script>
+    
+    
 </html>

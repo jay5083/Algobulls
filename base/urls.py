@@ -1,7 +1,7 @@
 from django.urls import path, include
 from .views import home, update_sales_leads, delete_sales, add_sales_leads, add_build, add_tech_task, add_support, add_strategies, delete_strategy, delete_support
 from . import views
-
+    
 urlpatterns = [ 
     path("", views.to_login, name="to_login"),
     path("accounts/", include("django.contrib.auth.urls")),

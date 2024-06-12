@@ -606,6 +606,7 @@ def add_support(request):
         division_employee_id_id = request.POST.get('division_employee_id')
         status = request.POST.get('status')
         date_of_closing = request.POST.get('date_of_closing')
+        division_assigned_to = request.POST.get('division_assigned_to')
 
         # Validate and convert dates if needed
         # For example:
@@ -661,6 +662,7 @@ def add_support(request):
             division_employee=division_employee,
             status=status,
             date_of_closing=date_of_closing,
+            division_assigned_to=division_assigned_to,
         )
 
         return redirect('/accounts/profile/')
