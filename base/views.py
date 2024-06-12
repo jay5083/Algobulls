@@ -359,7 +359,6 @@ def add_sales_leads(request):
         else:
             branch_employee = None
 
-
         # Check if the provided sales_employee_id exists
         if sales_employee_id:
             try:
@@ -400,16 +399,9 @@ def add_sales_leads(request):
         sales_employees = AlgobullsEmployee.objects.all()
         today_date = date.today()
         
-        max_lead_id = Sales.objects.aggregate(max_lead_id=Max('lead_id'))['max_lead_id']
-        max_lead_id = int(max_lead_id)
-        new_lead_id = max_lead_id + 1
-        
-        ascending_sales = Sales.objects.annotate(
-            lead_id_as_int=Cast('lead_id', IntegerField())
-        ).order_by('lead_id_as_int')
-
-        for sale in ascending_sales:
-            print(sale.lead_id)
+        # max_lead_id = Sales.objects.aggregate(max_lead_id=Max('lead_id'))['max_lead_id']
+        # max_lead_id = int(max_lead_id)
+        # new_lead_id = max_lead_id + 1
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -423,7 +415,7 @@ def add_sales_leads(request):
             'branch_employees': branch_employees,
             'sales_employees' : sales_employees,
             'today_date': today_date,
-            'new_lead_id': new_lead_id,
+            # 'new_lead_id': new_lead_id,
         }
 
         return render(request, 'add_sales_leads.html', context)
