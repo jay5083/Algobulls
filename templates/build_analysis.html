@@ -470,29 +470,65 @@
 
         function updateWeeklyBarChart(results1) {
             const ctx = document.getElementById('weeklyBarChart').getContext('2d');
-            
-            if (weeklyBarChartInstance) {
-                weeklyBarChartInstance.destroy();
+        
+            // Destroy the previous chart instance if it exists
+            if (window.weeklyBarChartInstance) {
+                window.weeklyBarChartInstance.destroy();
             }
-            
-            weeklyBarChartInstance = new Chart(ctx, {
+        
+            // Predefined color sets for consistent formatting
+            const backgroundColors = [
+                'rgba(255, 99, 132, 0.2)',  // Light Red
+                'rgba(54, 162, 235, 0.2)',  // Light Blue
+                'rgba(255, 206, 86, 0.2)',  // Light Yellow
+                'rgba(75, 192, 192, 0.2)',  // Light Green
+                'rgba(153, 102, 255, 0.2)', // Light Purple
+                'rgba(255, 159, 64, 0.2)',  // Light Orange
+                'rgba(255, 99, 71, 0.2)',   // Light Tomato
+                'rgba(255, 182, 193, 0.2)'  // Light Pink
+            ];
+        
+            const borderColors = [
+                'rgba(255, 99, 132, 1)',  // Red
+                'rgba(54, 162, 235, 1)',  // Blue
+                'rgba(255, 206, 86, 1)',  // Yellow
+                'rgba(75, 192, 192, 1)',  // Green
+                'rgba(153, 102, 255, 1)', // Purple
+                'rgba(255, 159, 64, 1)',  // Orange
+                'rgba(255, 99, 71, 1)',   // Tomato
+                'rgba(255, 182, 193, 1)'  // Pink
+            ];
+        
+            const datasets = results1.datasets.map((dataset, index) => {
+                const filteredData = dataset.data.filter(value => value !== 0);
+                return {
+                    label: dataset.label,
+                    data: filteredData.length > 0 ? dataset.data : [null], // Handle empty dataset
+                    backgroundColor: backgroundColors[index % backgroundColors.length],
+                    borderColor: borderColors[index % borderColors.length],
+                    borderWidth: 1,
+                    hidden: filteredData.length === 0 // Hide dataset if all values are zero
+                };
+            });
+        
+            window.weeklyBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results1.labels,
-                    datasets: results1.datasets.map((dataset, index) => ({
-                        label: dataset.label,
-                        data: dataset.data.map(value => value !== undefined ? value : 0),
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
-                        borderWidth: 1,
-                        hidden: dataset.data.every(value => value === 0) // Hide dataset if all values are zero
-                    }))
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     scales: {
                         x: {
-                            beginAtZero: true
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Week (Start to End)'
+                            },
+                            ticks: {
+                                autoSkip: false, // Ensure all labels are shown
+                            }
                         },
                         y: {
                             beginAtZero: true
@@ -506,12 +542,8 @@
                             callbacks: {
                                 label: function(context) {
                                     let label = context.dataset.label || '';
-                                    if (label) {
-                                        label += ': ';
-                                    }
-                                    if (context.raw !== null) {
-                                        label += context.raw;
-                                    }
+                                    if (label) { label += ': '; }
+                                    if (context.raw !== null) { label += context.raw; }
                                     return label;
                                 }
                             }
@@ -519,7 +551,7 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'start',
-                            formatter: (value) => value,
+                            formatter: (value) => value === 0 ? '' : value, // Hide 0 values
                             color: 'black',
                             font: {
                                 weight: 'bold',
@@ -530,7 +562,7 @@
                 },
                 plugins: [ChartDataLabels]
             });
-        }
+        }        
     
         function updateStatusPieChart(results2) {
             const ctx = document.getElementById('statusPieChart').getContext('2d');

@@ -194,7 +194,7 @@
     </style>
     <style>
         .chart-canvas {
-            width: 75% !important;
+            width: 80% !important;
             height: auto !important;
         }
 
@@ -545,20 +545,41 @@
 
         function updateWeeklyBarChart(results1) {
             const ctx = document.getElementById('weeklyBarChart').getContext('2d');
-            
-            if (weeklyBarChartInstance) {
-                weeklyBarChartInstance.destroy();
+        
+            // Destroy the previous chart instance if it exists
+            if (window.weeklyBarChartInstance) {
+                window.weeklyBarChartInstance.destroy();
             }
-            
-            weeklyBarChartInstance = new Chart(ctx, {
+        
+            // Predefined color sets for consistent formatting
+            const backgroundColors = [
+                'rgba(255, 99, 132, 0.2)',  // Light Red
+                'rgba(54, 162, 235, 0.2)',  // Light Blue
+                'rgba(255, 206, 86, 0.2)',  // Light Yellow
+                'rgba(75, 192, 192, 0.2)',  // Light Green
+                'rgba(153, 102, 255, 0.2)', // Light Purple
+                'rgba(255, 159, 64, 0.2)'   // Light Orange
+            ];
+        
+            const borderColors = [
+                'rgba(255, 99, 132, 1)',  // Red
+                'rgba(54, 162, 235, 1)',  // Blue
+                'rgba(255, 206, 86, 1)',  // Yellow
+                'rgba(75, 192, 192, 1)',  // Green
+                'rgba(153, 102, 255, 1)', // Purple
+                'rgba(255, 159, 64, 1)'   // Orange
+            ];
+        
+            // Create the chart instance
+            window.weeklyBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results1.labels,
                     datasets: results1.datasets.map((dataset, index) => ({
-                        label: dataset.label,
+                        label: dataset.label || '',  // Ensure label is not undefined
                         data: dataset.data,
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
+                        backgroundColor: backgroundColors[index % backgroundColors.length],
+                        borderColor: borderColors[index % borderColors.length],
                         borderWidth: 1
                     }))
                 },
@@ -567,10 +588,12 @@
                     scales: {
                         x: {
                             beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Week (Start to End)'
+                            },
                             ticks: {
-                                autoSkip: false, // Ensure all labels are shown
-                                maxRotation: 45, // Rotate labels if they are too long
-                                minRotation: 45
+                                autoSkip: false,  // Ensure all labels are shown
                             }
                         },
                         y: {
@@ -609,7 +632,7 @@
                 },
                 plugins: [ChartDataLabels]
             });
-        }                        
+        }                                
     
         function updateStatusPieChart(results2) {
             const ctx = document.getElementById('statusPieChart').getContext('2d');
@@ -672,19 +695,44 @@
         function updatePriorityBarChart(results3) {
             const ctx = document.getElementById('priorityBarChart').getContext('2d');
         
-            if (priorityBarChartInstance) {
-                priorityBarChartInstance.destroy();
+            // Destroy the previous chart instance if it exists
+            if (window.priorityBarChartInstance) {
+                window.priorityBarChartInstance.destroy();
             }
         
-            priorityBarChartInstance = new Chart(ctx, {
+            // Predefined color sets for consistent formatting
+            const backgroundColors = [
+                'rgba(255, 99, 132, 0.2)',  // Light Red
+                'rgba(54, 162, 235, 0.2)',  // Light Blue
+                'rgba(255, 206, 86, 0.2)',  // Light Yellow
+                'rgba(75, 192, 192, 0.2)',  // Light Green
+                'rgba(153, 102, 255, 0.2)', // Light Purple
+                'rgba(255, 159, 64, 0.2)',  // Light Orange
+                'rgba(255, 99, 71, 0.2)',   // Light Tomato
+                'rgba(255, 182, 193, 0.2)'  // Light Pink
+            ];
+        
+            const borderColors = [
+                'rgba(255, 99, 132, 1)',  // Red
+                'rgba(54, 162, 235, 1)',  // Blue
+                'rgba(255, 206, 86, 1)',  // Yellow
+                'rgba(75, 192, 192, 1)',  // Green
+                'rgba(153, 102, 255, 1)', // Purple
+                'rgba(255, 159, 64, 1)',  // Orange
+                'rgba(255, 99, 71, 1)',   // Tomato
+                'rgba(255, 182, 193, 1)'  // Pink
+            ];
+        
+            // Create the chart instance
+            window.priorityBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results3.labels,
                     datasets: results3.datasets.map((dataset, index) => ({
-                        label: dataset.label,
+                        label: dataset.label || '',  // Ensure label is not undefined
                         data: dataset.data,
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
+                        backgroundColor: backgroundColors[index % backgroundColors.length],
+                        borderColor: borderColors[index % borderColors.length],
                         borderWidth: 1
                     }))
                 },
@@ -693,10 +741,12 @@
                     scales: {
                         x: {
                             beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Week (Start to End)'
+                            },
                             ticks: {
-                                autoSkip: false, // Ensure all labels are shown
-                                maxRotation: 45, // Rotate labels if they are too long
-                                minRotation: 45
+                                autoSkip: false,  // Ensure all labels are shown
                             }
                         },
                         y: {
@@ -707,21 +757,35 @@
                         legend: {
                             position: 'top',
                         },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
                         datalabels: {
                             anchor: 'end',
                             align: 'start',
+                            formatter: (value) => value === 0 ? '' : value, // Hide 0 values
                             color: '#000',
                             font: {
                                 weight: 'bold',
                                 size: 15
-                            },
-                            formatter: (value) => value === 0 ? '' : value // Hide 0 values
+                            }
                         }
                     }
                 },
                 plugins: [ChartDataLabels]
             });
-        }                              
+        }                                      
         
         function updatePriorityPieChart(results4) {
             const ctx = document.getElementById('priorityPieChart').getContext('2d');

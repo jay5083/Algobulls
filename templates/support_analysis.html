@@ -634,12 +634,24 @@
 
         function updateWeeklyBarChart(results1) {
             const ctx = document.getElementById('weeklyBarChart').getContext('2d');
-            
-            if (weeklyBarChartInstance) {
-                weeklyBarChartInstance.destroy();
+        
+            // Destroy the previous chart instance if it exists
+            if (window.weeklyBarChartInstance) {
+                window.weeklyBarChartInstance.destroy();
             }
-            
-            weeklyBarChartInstance = new Chart(ctx, {
+        
+            // Function to generate a random color for chart segments
+            function getRandomColor(index) {
+                const colors = [
+                    'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
+                    'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)', 'rgba(210, 159, 64, 0.2)'
+                ];
+                return colors[index % colors.length];
+            }
+        
+            // Create a new chart instance
+            window.weeklyBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
                     labels: results1.labels,
@@ -683,7 +695,7 @@
                         datalabels: {
                             anchor: 'end',
                             align: 'start',
-                            formatter: (value) => value,
+                            formatter: (value) => value === 0 ? '' : value, // Hide 0 values
                             color: 'black',
                             font: {
                                 weight: 'bold',
@@ -694,7 +706,7 @@
                 },
                 plugins: [ChartDataLabels]
             });
-        }
+        }        
     
         function updateStatusPieChart(results2) {
             const ctx = document.getElementById('statusPieChart').getContext('2d');
@@ -757,27 +769,67 @@
         function updatePriorityBarChart(results3) {
             const ctx = document.getElementById('priorityBarChart').getContext('2d');
         
-            if (priorityBarChartInstance) {
-                priorityBarChartInstance.destroy();
+            // Destroy the previous chart instance if it exists
+            if (window.priorityBarChartInstance) {
+                window.priorityBarChartInstance.destroy();
             }
         
-            priorityBarChartInstance = new Chart(ctx, {
+            // Function to generate a random color for chart segments
+            function getRandomColor(index) {
+                const colors = [
+                    'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
+                    'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)', 'rgba(210, 159, 64, 0.2)'
+                ];
+                return colors[index % colors.length];
+            }
+        
+            // Extract start and end dates from the label if they are in a specific format
+            const labels = results3.labels.map(label => {
+                // Example label: '2024-06-01 to 2024-06-07'
+                const match = label.match(/(\d{4}-\d{2}-\d{2})\s*to\s*(\d{4}-\d{2}-\d{2})/);
+                if (match) {
+                    return `${match[1]} to ${match[2]}`;
+                }
+                // If no match, return the original label
+                return label;
+            });
+        
+            // Prepare datasets for the chart
+            const datasets = results3.datasets.map((dataset, index) => ({
+                label: dataset.label || '',
+                data: dataset.data.map(value => value !== 0 ? value : ''),
+                backgroundColor: getRandomColor(index),
+                borderColor: getRandomColor(index),
+                borderWidth: 1
+            }));
+        
+            // Create a new chart instance
+            window.priorityBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results3.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}).*/, '$1')), // Extracting only the date part
-                    datasets: results3.datasets.map((dataset, index) => ({
-                        label: dataset.label || '', // Prevents 'undefined' label
-                        data: dataset.data.map(value => value !== 0 ? value : ''), // Convert 0 to empty string
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
-                        borderWidth: 1
-                    }))
+                    labels: labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: {
                             position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
                         },
                         datalabels: {
                             anchor: 'end',
@@ -788,7 +840,6 @@
                                 size: 15
                             },
                             formatter: (value, context) => {
-                                // Only display the value if it's not an empty string
                                 return context.dataset.data[context.dataIndex] !== '' ? value : '';
                             }
                         }
@@ -799,12 +850,15 @@
                                 display: true,
                                 text: 'Week'
                             }
+                        },
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 },
                 plugins: [ChartDataLabels]
             });
-        }                        
+        }                                
         
         function updatePriorityPieChart(results4) {
             const ctx = document.getElementById('priorityPieChart').getContext('2d');
@@ -863,27 +917,67 @@
         function updateDivisionBarChart(results5) {
             const ctx = document.getElementById('divisionBarChart').getContext('2d');
         
-            if (divisionBarChartInstance) {
-                divisionBarChartInstance.destroy();
+            // Destroy the previous chart instance if it exists
+            if (window.divisionBarChartInstance) {
+                window.divisionBarChartInstance.destroy();
             }
         
-            divisionBarChartInstance = new Chart(ctx, {
+            // Function to generate a random color for chart segments
+            function getRandomColor(index) {
+                const colors = [
+                    'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
+                    'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)', 'rgba(210, 159, 64, 0.2)'
+                ];
+                return colors[index % colors.length];
+            }
+        
+            // Extract start and end dates from the label if they are in a specific format
+            const labels = results5.labels.map(label => {
+                // Example label: '2024-06-01 to 2024-06-07'
+                const match = label.match(/(\d{4}-\d{2}-\d{2})\s*to\s*(\d{4}-\d{2}-\d{2})/);
+                if (match) {
+                    return `${match[1]} to ${match[2]}`;
+                }
+                // If no match, return the original label
+                return label;
+            });
+        
+            // Prepare datasets for the chart
+            const datasets = results5.datasets.map((dataset, index) => ({
+                label: dataset.label || '',
+                data: dataset.data.map(value => value !== 0 ? value : ''),
+                backgroundColor: getRandomColor(index),
+                borderColor: getRandomColor(index),
+                borderWidth: 1
+            }));
+        
+            // Create a new chart instance
+            window.divisionBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results5.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}).*/, '$1')), // Extracting only the date part
-                    datasets: results5.datasets.map((dataset, index) => ({
-                        label: dataset.label || '', // Prevents 'undefined' label
-                        data: dataset.data.map(value => value !== 0 ? value : ''), // Convert 0 to empty string
-                        backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
-                        borderWidth: 1
-                    }))
+                    labels: labels,
+                    datasets: datasets
                 },
                 options: {
                     responsive: true,
                     plugins: {
                         legend: {
                             position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
                         },
                         datalabels: {
                             anchor: 'end',
@@ -894,7 +988,6 @@
                                 size: 12
                             },
                             formatter: (value, context) => {
-                                // Only display the value if it's not an empty string
                                 return context.dataset.data[context.dataIndex] !== '' ? value : '';
                             }
                         }
@@ -905,12 +998,15 @@
                                 display: true,
                                 text: 'Week'
                             }
+                        },
+                        y: {
+                            beginAtZero: true
                         }
                     }
                 },
                 plugins: [ChartDataLabels]
             });
-        }
+        }        
         
         
         function updateDivisionPieChart(results6) {

@@ -621,6 +621,8 @@
         
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2.0.0"></script>
+
     <script>
         var weeklyLeadsChartInstance, branchLeadsChartInstance, weeklyRevenueChartInstance, branchRevenueChartInstance;
     
@@ -752,72 +754,88 @@
                 return;
             }
         
-            var ctx = document.getElementById('weeklyLeadsChart').getContext('2d');
+            const ctx = document.getElementById('weeklyLeadsChart').getContext('2d');
+        
             if (window.weeklyLeadsChartInstance) {
                 window.weeklyLeadsChartInstance.destroy();
             }
         
-            var statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress'];
-            var colors = [
+            const statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress'];
+            const colors = [
                 'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
                 'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
                 'rgba(255, 159, 64, 0.2)', 'rgba(210, 159, 64, 0.2)'
             ];
-            var borderColors = [
+            const borderColors = [
                 'rgba(255, 99, 132, 1)', 'rgba(54, 162, 235, 1)',
                 'rgba(75, 192, 192, 1)', 'rgba(153, 102, 255, 1)',
                 'rgba(255, 159, 64, 1)', 'rgba(210, 159, 64, 1)'
             ];
         
-            var datasets = statuses.map((status, index) => {
+            const datasets = statuses.map((status, index) => {
+                const dataset = results.datasets.find(dataset => dataset.name === status);
+                const filteredData = dataset.data.filter(value => value !== 0);
                 return {
                     label: status,
-                    data: results.datasets.find(dataset => dataset.name === status).data,
+                    data: filteredData.length > 0 ? dataset.data : [null], // Handle empty dataset
                     backgroundColor: colors[index % colors.length],
                     borderColor: borderColors[index % borderColors.length],
-                    borderWidth: 1
+                    borderWidth: 1,
+                    hidden: filteredData.length === 0 // Hide dataset if all values are zero
                 };
             });
         
-            var labels = results.labels;
+            const labels = results.labels;
         
             window.weeklyLeadsChartInstance = new Chart(ctx, {
-                type: 'bar', // Change from 'bar' to 'column'
+                type: 'bar',
                 data: {
                     labels: labels,
                     datasets: datasets
                 },
                 options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
-                        }
-                    },
                     responsive: true,
+                    scales: {
+                        x: { beginAtZero: true },
+                        y: { beginAtZero: true }
+                    },
                     plugins: {
-                        legend: {
-                            position: 'top',
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.raw !== null) { label += context.raw; }
+                                    return label;
+                                }
+                            }
                         },
-                        title: {
-                            display: true,
-                            text: 'Weekly Leads by Status'
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'start',
+                            formatter: (value) => value === 0 ? '' : value, // Hide 0 values
+                            color: 'black',
+                            font: { weight: 'bold', size: '15' }
                         }
                     },
                     onClick: function (evt, activeElements) {
                         if (activeElements.length) {
-                            var clickedIndex = activeElements[0].index;
-                            var clickedDatasetIndex = activeElements[0].datasetIndex;
-                            var value = datasets[clickedDatasetIndex].data[clickedIndex];
-                            var label = labels[clickedIndex];
+                            const clickedIndex = activeElements[0].index;
+                            const clickedDatasetIndex = activeElements[0].datasetIndex;
+                            const value = datasets[clickedDatasetIndex].data[clickedIndex];
+                            const label = labels[clickedIndex];
                             console.log('Clicked bar value:', value);
                             console.log('Label:', label);
                             // Perform additional actions based on the clicked bar
                             // For example, display the corresponding category and risk appetite
                         }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
-        }                                                                   
+        }
+                                                                           
         
         // Helper function to generate random color
         function getRandomColor() {
@@ -832,25 +850,37 @@
         var branchLeadsChartInstance;
         
         function updateBranchLeadsChart(results) {
-            var ctx = document.getElementById('branchLeadsChart').getContext('2d');
-            if (branchLeadsChartInstance) {
-                branchLeadsChartInstance.destroy();
+            const ctx = document.getElementById('branchLeadsChart').getContext('2d');
+        
+            // Destroy previous chart instance if exists
+            if (window.branchLeadsChartInstance) {
+                window.branchLeadsChartInstance.destroy();
             }
         
-            branchLeadsChartInstance = new Chart(ctx, {
+            // Extract labels and data from results
+            const labels = results.map(row => row[0]);
+            const data = results.map(row => row[1]);
+        
+            // Check if all data values are zero
+            const filteredData = data.filter(value => value !== 0);
+            const isEmpty = filteredData.length === 0;
+        
+            // Create new chart instance
+            window.branchLeadsChartInstance = new Chart(ctx, {
                 type: 'pie',
                 data: {
-                    labels: results.map(row => row[0]),
+                    labels: labels,
                     datasets: [{
                         label: 'Total Leads',
-                        data: results.map(row => row[1]),
+                        data: isEmpty ? [null] : data, // Handle empty dataset
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
                             'rgba(255, 206, 86, 0.2)',
                             'rgba(75, 192, 192, 0.2)',
                             'rgba(153, 102, 255, 0.2)',
-                            'rgba(255, 159, 64, 0.2)'
+                            'rgba(255, 159, 64, 0.2)',
+                            'rgba(210, 159, 64, 0.2)' // Extra color for additional branches
                         ],
                         borderColor: [
                             'rgba(255, 99, 132, 1)',
@@ -858,9 +888,11 @@
                             'rgba(255, 206, 86, 1)',
                             'rgba(75, 192, 192, 1)',
                             'rgba(153, 102, 255, 1)',
-                            'rgba(255, 159, 64, 1)'
+                            'rgba(255, 159, 64, 1)',
+                            'rgba(210, 159, 64, 1)' // Matching extra color for borders
                         ],
-                        borderWidth: 1
+                        borderWidth: 1,
+                        hidden: isEmpty // Hide dataset if all values are zero
                     }]
                 },
                 options: {
@@ -871,25 +903,53 @@
                         },
                         tooltip: {
                             callbacks: {
-                                label: function(tooltipItem) {
-                                    return tooltipItem.label + ': ' + tooltipItem.raw;
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
                                 }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'end',
+                            align: 'start',
+                            offset: -10,
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            borderRadius: 25,
+                            backgroundColor: (context) => {
+                                return context.dataset.backgroundColor;
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 35
+                            },
+                            formatter: (value) => {
+                                return value === 0 ? '' : value; // Hide 0 values
                             }
                         }
                     },
                     onClick: function (evt, activeElements) {
                         if (activeElements.length) {
-                            var clickedIndex = activeElements[0].index;
-                            var branchId = branchLeadsChartInstance.data.labels[clickedIndex];
-                            var branchData = results.find(row => row[0] === branchId);
+                            const clickedIndex = activeElements[0].index;
+                            const branchId = branchLeadsChartInstance.data.labels[clickedIndex];
+                            const branchData = results.find(row => row[0] === branchId);
                             if (branchData) {
                                 displayModal(branchData);
                             }
                         }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         }
+        
         
 
         function displayModal(branchData) {
@@ -910,56 +970,94 @@
             var myModal = new bootstrap.Modal(document.getElementById('detailsModal'));
             myModal.show();
         }
-
-        // Example results data
-        var results = [
-            ['Branch A', 30, { 'Converted': 10, 'Dropped': 5, 'Follow up': 8, 'No Answer': 3, 'Not Interested': 2, 'In Progress': 2 }],
-            ['Branch B', 20, { 'Converted': 5, 'Dropped': 7, 'Follow up': 3, 'No Answer': 2, 'Not Interested': 1, 'In Progress': 2 }],
-            // Add more branches as needed
-        ];
-
-        // Call the function to update the chart
-        updateBranchLeadsChart(results);
         
         function updateWeeklyRevenueChart(results) {
+            // Get the canvas context
             var ctx = document.getElementById('weeklyRevenueChart').getContext('2d');
-            if (weeklyRevenueChartInstance) {
-                weeklyRevenueChartInstance.destroy();
+        
+            // Destroy previous chart instance if exists
+            if (window.weeklyRevenueChartInstance) {
+                window.weeklyRevenueChartInstance.destroy();
             }
-            weeklyRevenueChartInstance = new Chart(ctx, {
+        
+            // Extract labels and data from results
+            var labels = results.map(row => row[0]);
+            var data = results.map(row => row[2]);
+        
+            // Check if all data values are zero
+            var filteredData = data.filter(value => value !== 0);
+            var isEmpty = filteredData.length === 0;
+        
+            // Create new chart instance
+            window.weeklyRevenueChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results.map(row => row[0]),
+                    labels: labels,
                     datasets: [{
                         label: 'Total Revenue',
-                        data: results.map(row => row[2]),
+                        data: isEmpty ? [null] : data, // Handle empty dataset
                         backgroundColor: 'rgba(75, 192, 192, 0.2)',
                         borderColor: 'rgba(75, 192, 192, 1)',
-                        borderWidth: 1
+                        borderWidth: 1,
+                        hidden: isEmpty // Hide dataset if all values are zero
                     }]
                 },
                 options: {
+                    responsive: true,
                     scales: {
-                        y: {
-                            beginAtZero: true
+                        x: { beginAtZero: true },
+                        y: { beginAtZero: true }
+                    },
+                    plugins: {
+                        legend: { position: 'top' },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.dataset.label || '';
+                                    if (label) { label += ': '; }
+                                    if (context.raw !== null) { label += context.raw; }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            anchor: 'end',
+                            align: 'start',
+                            formatter: (value) => value === 0 ? '' : value, // Hide 0 values
+                            color: 'black',
+                            font: { weight: 'bold', size: 15 }
                         }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         }
+        
     
         function updateBranchRevenueChart(results) {
-            var ctx = document.getElementById('branchRevenueChart').getContext('2d');
-            if (branchRevenueChartInstance) {
-                branchRevenueChartInstance.destroy();
+            const ctx = document.getElementById('branchRevenueChart').getContext('2d');
+        
+            // Destroy previous chart instance if exists
+            if (window.branchRevenueChartInstance) {
+                window.branchRevenueChartInstance.destroy();
             }
-            branchRevenueChartInstance = new Chart(ctx, {
-                type: 'pie', // Set the type to 'pie' for a pie chart
+        
+            // Extract labels and data from results
+            const labels = results.map(row => row[0]);
+            const data = results.map(row => row[1]);
+        
+            // Check if all data values are zero
+            const filteredData = data.filter(value => value !== 0);
+            const isEmpty = filteredData.length === 0;
+        
+            // Create new chart instance
+            window.branchRevenueChartInstance = new Chart(ctx, {
+                type: 'pie',
                 data: {
-                    labels: results.map(row => row[0]),
+                    labels: labels,
                     datasets: [{
                         label: 'Total Revenue',
-                        data: results.map(row => row[1]),
+                        data: isEmpty ? [null] : data, // Handle empty dataset
                         backgroundColor: [
                             'rgba(255, 99, 132, 0.2)',
                             'rgba(54, 162, 235, 0.2)',
@@ -967,7 +1065,6 @@
                             'rgba(75, 192, 192, 0.2)',
                             'rgba(153, 102, 255, 0.2)',
                             'rgba(255, 159, 64, 0.2)'
-                            // Add more colors as needed
                         ],
                         borderColor: [
                             'rgba(255, 99, 132, 1)',
@@ -976,20 +1073,66 @@
                             'rgba(75, 192, 192, 1)',
                             'rgba(153, 102, 255, 1)',
                             'rgba(255, 159, 64, 1)'
-                            // Add more colors as needed
                         ],
-                        borderWidth: 1
+                        borderWidth: 1,
+                        hidden: isEmpty // Hide dataset if all values are zero
                     }]
                 },
                 options: {
-                    scales: {
-                        y: {
-                            beginAtZero: true
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            position: 'top',
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function(context) {
+                                    let label = context.label || '';
+                                    if (label) {
+                                        label += ': ';
+                                    }
+                                    if (context.raw !== null) {
+                                        label += context.raw;
+                                    }
+                                    return label;
+                                }
+                            }
+                        },
+                        datalabels: {
+                            color: '#fff',
+                            anchor: 'end',
+                            align: 'start',
+                            offset: -10,
+                            borderWidth: 2,
+                            borderColor: '#fff',
+                            borderRadius: 25,
+                            backgroundColor: (context) => {
+                                return context.dataset.backgroundColor[context.dataIndex];
+                            },
+                            font: {
+                                weight: 'bold',
+                                size: 35
+                            },
+                            formatter: (value) => {
+                                return value === 0 ? '' : value; // Hide 0 values
+                            }
+                        }
+                    },
+                    onClick: function (evt, activeElements) {
+                        if (activeElements.length) {
+                            const clickedIndex = activeElements[0].index;
+                            const branchId = branchRevenueChartInstance.data.labels[clickedIndex];
+                            const branchData = results.find(row => row[0] === branchId);
+                            if (branchData) {
+                                displayModal(branchData);
+                            }
                         }
                     }
-                }
+                },
+                plugins: [ChartDataLabels]
             });
         }
+        
         
     </script>
 </body>

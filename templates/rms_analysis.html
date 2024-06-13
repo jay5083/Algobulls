@@ -623,17 +623,29 @@
         function updateWeeklyBarChart(results1) {
             const ctx = document.getElementById('weeklyBarChart').getContext('2d');
         
-            if (weeklyBarChartInstance) {
-                weeklyBarChartInstance.destroy();
+            // Destroy the previous chart instance if it exists
+            if (window.weeklyBarChartInstance) {
+                window.weeklyBarChartInstance.destroy();
             }
         
-            weeklyBarChartInstance = new Chart(ctx, {
+            // Function to generate a random color for chart segments
+            function getRandomColor(index) {
+                const colors = [
+                    'rgba(255, 99, 132, 0.2)', 'rgba(54, 162, 235, 0.2)',
+                    'rgba(75, 192, 192, 0.2)', 'rgba(153, 102, 255, 0.2)',
+                    'rgba(255, 159, 64, 0.2)', 'rgba(210, 159, 64, 0.2)'
+                ];
+                return colors[index % colors.length];
+            }
+        
+            // Create a new chart instance
+            window.weeklyBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results1.labels,
+                    labels: results1.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}) (\d{4}-\d{2}-\d{2})/, '$1 - $2')), // Update labels to include start and end date
                     datasets: results1.datasets.map((dataset, index) => ({
-                        label: dataset.name || '',  // Ensure label is not undefined
-                        data: dataset.data.map(value => value !== 0 ? value : ''),  // Convert 0 to empty string
+                        label: dataset.name || '', // Ensure label is not undefined
+                        data: dataset.data.map(value => value !== 0 ? value : ''), // Convert 0 to empty string
                         backgroundColor: getRandomColor(index),
                         borderColor: getRandomColor(index),
                         borderWidth: 1
@@ -688,8 +700,7 @@
                 plugins: [ChartDataLabels]
             });
         }
-        
-    
+
         function updateStatusPieChart(results2) {
             const ctx = document.getElementById('statusPieChart').getContext('2d');
         
@@ -751,19 +762,46 @@
         function updateIssueBarChart(results3) {
             const ctx = document.getElementById('issueBarChart').getContext('2d');
         
-            if (issueBarChartInstance) {
-                issueBarChartInstance.destroy();
+            // Destroy the previous chart instance if it exists
+            if (window.issueBarChartInstance) {
+                window.issueBarChartInstance.destroy();
             }
         
-            issueBarChartInstance = new Chart(ctx, {
+            // Function to generate a random color for chart segments
+            function getRandomColor(index) {
+                const colors = [
+                    'rgba(255, 99, 132, 0.2)',  // Light Red
+                    'rgba(54, 162, 235, 0.2)',  // Light Blue
+                    'rgba(255, 206, 86, 0.2)',  // Light Yellow
+                    'rgba(75, 192, 192, 0.2)',  // Light Green
+                    'rgba(153, 102, 255, 0.2)', // Light Purple
+                    'rgba(255, 159, 64, 0.2)'   // Light Orange
+                ];
+                return colors[index % colors.length];
+            }
+        
+            // Function to generate a matching border color
+            function getBorderColor(index) {
+                const borderColors = [
+                    'rgba(255, 99, 132, 1)',  // Red
+                    'rgba(54, 162, 235, 1)',  // Blue
+                    'rgba(255, 206, 86, 1)',  // Yellow
+                    'rgba(75, 192, 192, 1)',  // Green
+                    'rgba(153, 102, 255, 1)', // Purple
+                    'rgba(255, 159, 64, 1)'   // Orange
+                ];
+                return borderColors[index % borderColors.length];
+            }
+        
+            window.issueBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results3.labels,
+                    labels: results3.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}) (\d{4}-\d{2}-\d{2})/, '$1 - $2')), // Ensure both dates are displayed
                     datasets: results3.datasets.map((dataset, index) => ({
                         label: dataset.name || '',  // Ensure label is not undefined
                         data: dataset.data.map(value => value !== 0 ? value : ''),  // Convert 0 to empty string
                         backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
+                        borderColor: getBorderColor(index),
                         borderWidth: 1
                     }))
                 },
@@ -816,8 +854,8 @@
                 plugins: [ChartDataLabels]
             });
         }
-                
         
+                       
         function updateIssuePieChart(results4) {
             const ctx = document.getElementById('issuePieChart').getContext('2d');
         
@@ -875,19 +913,46 @@
         function updateCustomerBarChart(results5) {
             const ctx = document.getElementById('customerBarChart').getContext('2d');
         
-            if (customerBarChartInstance) {
-                customerBarChartInstance.destroy();
+            // Destroy the previous chart instance if it exists
+            if (window.customerBarChartInstance) {
+                window.customerBarChartInstance.destroy();
             }
         
-            customerBarChartInstance = new Chart(ctx, {
+            // Function to generate a random color for chart segments
+            function getRandomColor(index) {
+                const colors = [
+                    'rgba(255, 99, 132, 0.2)',  // Light Red
+                    'rgba(54, 162, 235, 0.2)',  // Light Blue
+                    'rgba(255, 206, 86, 0.2)',  // Light Yellow
+                    'rgba(75, 192, 192, 0.2)',  // Light Green
+                    'rgba(153, 102, 255, 0.2)', // Light Purple
+                    'rgba(255, 159, 64, 0.2)'   // Light Orange
+                ];
+                return colors[index % colors.length];
+            }
+        
+            // Function to generate a matching border color
+            function getBorderColor(index) {
+                const borderColors = [
+                    'rgba(255, 99, 132, 1)',  // Red
+                    'rgba(54, 162, 235, 1)',  // Blue
+                    'rgba(255, 206, 86, 1)',  // Yellow
+                    'rgba(75, 192, 192, 1)',  // Green
+                    'rgba(153, 102, 255, 1)', // Purple
+                    'rgba(255, 159, 64, 1)'   // Orange
+                ];
+                return borderColors[index % borderColors.length];
+            }
+        
+            window.customerBarChartInstance = new Chart(ctx, {
                 type: 'bar',
                 data: {
-                    labels: results5.labels,
+                    labels: results5.labels.map(label => label.replace(/(\d{4}-\d{2}-\d{2}) (\d{4}-\d{2}-\d{2})/, '$1 - $2')), // Ensure both dates are displayed
                     datasets: results5.datasets.map((dataset, index) => ({
                         label: dataset.name || '',  // Ensure label is not undefined
                         data: dataset.data.map(value => value !== 0 ? value : ''),  // Convert 0 to empty string
                         backgroundColor: getRandomColor(index),
-                        borderColor: getRandomColor(index),
+                        borderColor: getBorderColor(index),
                         borderWidth: 1
                     }))
                 },
@@ -939,8 +1004,7 @@
                 },
                 plugins: [ChartDataLabels]
             });
-        }
-        
+        }        
         
         function updateCustomerPieChart(results6) {
             const ctx = document.getElementById('customerPieChart').getContext('2d');
