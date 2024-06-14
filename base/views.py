@@ -84,6 +84,24 @@ def home(request):
         'selected_status': request.GET.get('status', '')
     }
     
+    for permission in user_permissions:
+        if (permission.name == "Can view Sales"):
+            return redirect('/sales-leads/')
+    for permission in user_permissions:
+        if (permission.name == "Can view Build"):
+            return redirect('/build/')
+    for permission in user_permissions:
+        if (permission.name == "Can view Tech Task"):
+            return redirect('/tech_task/')
+    for permission in user_permissions:
+        if (permission.name == "Can view Support"):
+            return redirect('/support/')
+    for permission in user_permissions:
+        if (permission.name == "Can view Strategies"):
+            return redirect('/strategies/')
+    for permission in user_permissions:
+        if (permission.name == "Can view RMS"):
+            return redirect('/rms/')
 
     return render(request, 'base.html', context)
 
@@ -1621,9 +1639,27 @@ def to_sales_analysis(request):
     end_date = datetime.today()
     start_date = end_date - timedelta(days=30)
     
+    # sales_leads = Sales.objects.select_related('sales_employee_id').all()
+    # unique_sales_employees = set()
+    # for lead in sales_leads:
+    #     if lead.sales_employee_id:
+    #         unique_sales_employees.add((lead.sales_employee_id.employee_id, lead.sales_employee_id.name))
+    
+    # sales_leads = Sales.objects.select_related('branch_employee_id__branch_id__broker_id').all()
+    # unique_branch_ids = set()
+    # unique_broker_names = set()
+    # for lead in sales_leads:
+    #     if lead.branch_employee_id and lead.branch_employee_id.branch_id:
+    #         unique_branch_ids.add((lead.branch_employee_id.branch_id.branch_id, lead.branch_employee_id.branch_id.branch_id))
+    #         if lead.branch_employee_id.branch_id.broker_id:
+    #             unique_broker_names.add((lead.branch_employee_id.branch_id.broker_id.broker_id, lead.branch_employee_id.branch_id.broker_id.broker_name))
+    
     context = {
         'start_date': start_date.strftime('%Y-%m-%d'),
-        'end_date': end_date.strftime('%Y-%m-%d')
+        'end_date': end_date.strftime('%Y-%m-%d'),
+        # 'unique_sales_employees': unique_sales_employees,
+        # 'unique_branch_ids': unique_branch_ids,
+        # 'unique_broker_names': unique_broker_names,
     }
     
     return render(request, 'sales_analysis.html', context)

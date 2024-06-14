@@ -8,102 +8,166 @@
         top: 55%;
         left: 50%;
         transform: translate(-50%, -50%);
-        max-width: 450px; /* Increased max-width */
-        padding: 50px; /* Increased padding */
-        background: linear-gradient(135deg, #287bb5, #1e5092); /* Gradient background */
+        max-width: 450px;
+        padding: 50px;
+        background: linear-gradient(135deg, #287bb5, #1e5092);
         border: 1px solid #ccc;
-        border-radius: 20px; /* Rounded corners */
-        font-size: 20px; /* Increased font size */
-        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3); /* Increased box shadow */
+        border-radius: 20px;
+        font-size: 20px;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     }
 
     /* Additional styles for login text */
     .login-text {
         text-align: center;
-        margin-bottom: 30px; /* Increased margin-bottom */
-        font-size: 28px; /* Increased font size */
-        color: #fff; /* Change the color to white */
+        margin-bottom: 30px;
+        font-size: 28px;
+        color: #fff;
     }
 
-    /* Increase the font size of input fields and buttons */
+    /* Input fields and buttons */
     .form-container input[type="text"],
     .form-container input[type="password"],
     .form-container button {
-        font-size: 20px; /* Increased font size */
-        padding: 15px; /* Increased padding */
-        width: 100%; /* Make input fields and buttons full width */
-        box-sizing: border-box; /* Include padding and border in the element's total width and height */
-        margin-bottom: 20px; /* Increased margin-bottom */
-        border-radius: 15px; /* Rounded corners */
-        border: none; /* Remove border */
-        background-color: #fff; /* White background for input fields */
-        color: #333; /* Default text color */
+        font-size: 20px;
+        padding: 15px;
+        width: 100%;
+        box-sizing: border-box;
+        margin-bottom: 20px;
+        border-radius: 15px;
+        border: none;
+        background-color: #fff;
+        color: #333;
     }
 
-    /* Add margin between submit button and password field */
+    /* Submit button */
     .form-container button[type="submit"] {
-        margin-top: 20px; /* Increased margin-top */
-        background-color: #1e5092; /* Change button background color */
-        color: #fff; /* Change button text color */
-        border: none; /* Remove button border */
-        cursor: pointer; /* Change cursor to pointer on hover */
-        border-radius: 15px; /* Rounded corners */
-        padding: 15px; /* Increased padding */
+        margin-top: 20px;
+        background-color: #1e5092;
+        color: #fff;
+        border: none;
+        cursor: pointer;
+        border-radius: 15px;
+        padding: 15px;
     }
 
-    /* Change button color on hover */
     .form-container button[type="submit"]:hover {
-        background-color: #174075; /* Darken button color on hover */
+        background-color: #174075;
     }
 
-    /* Set font color of username and password placeholder text to white */
+    /* Admin login button */
+    .admin-login-button {
+        display: block;
+        width: 90%;
+        text-align: center;
+        padding: 15px;
+        background-color: #4CAF50; /* Green background color */
+        color: white;
+        border: none;
+        border-radius: 15px;
+        text-decoration: none;
+        font-size: 20px;
+        margin-top: 15px;
+        cursor: pointer;
+    }
+
+    .admin-login-button:hover {
+        background-color: #45a049; /* Darker green on hover */
+    }
+
+    /* Placeholder text */
     .form-container input[type="text"]::placeholder,
     .form-container input[type="password"]::placeholder {
-        color: #fff; /* White text color for placeholder */
+        color: #fff;
     }
 
-    /* Set font color of "Username" and "Password" labels to white */
+    /* Label text */
     .form-container label {
-        color: #fff; /* White text color for labels */
+        color: #fff;
     }
+
+    /* Logo styling */
     .logo-circle {
         text-align: center;
         margin-bottom: 30px;
     }
-    
+
     .logo-circle img {
-        width: 100px; /* Adjust the width as needed */
-        height: 100px; /* Adjust the height as needed */
-        border-radius: 50%; /* Make it a circle */
+        width: 100px;
+        height: 100px;
+        border-radius: 50%;
     }
+
     .logo-text {
-        margin-left: 10px; /* Adjust the spacing between the logo and the text */
-        font-size: 35px; /* Adjust the font size as needed */
-        font-weight: bold
+        margin-left: 10px;
+        font-size: 35px;
+        font-weight: bold;
     }
+
     .form-container button[type="submit"] {
-        margin-top: 15px; /* Adjust the margin as needed */
-        background-color: green; /* Change button background color to green */
-        color: #fff; /* Change button text color to white */
-        border: none; /* Remove button border */
-        cursor: pointer; /* Change cursor to pointer on hover */
+        margin-top: 15px;
+        background-color: green;
+        color: #fff;
+        border: none;
+        cursor: pointer;
     }
-    
-    
+
+    /* Error message styling */
+    .error-message {
+        text-align: center;
+        color: red;
+        font-size: 18px;
+        margin-bottom: 20px;
+        margin-top: -35px;
+    }
+
+    .error-field {
+        color: red;
+        font-size: 14px;
+        margin-top: -15px;
+        margin-bottom: 10px;
+        text-align: center;
+    }
 </style>
+
 <div class="logo-circle">
     <img src="https://play-lh.googleusercontent.com/-EX-kc9xmIe8E_AOahTBT1u95MEomq-FB-pbtdro0ctrHiqXXE5u7g5_u7vMvS4trIL0=w240-h480-rw" alt="Man Logo">
     <div class="logo-text">
         Algobulls
     </div>
 </div>
+
+<!-- Error messages outside the form container -->
+{% if form.non_field_errors %}
+    <div class="error-message">
+        <ul>
+            {% for error in form.non_field_errors %}
+                <li>{{ error }}</li>
+            {% endfor %}
+        </ul>
+    </div>
+{% endif %}
+
 <div class="form-container">
     <form method="POST">
         {% csrf_token %}
         <div class="login-text">Login to your account</div>
-        {{ form }}
+        <!-- Display form fields without errors -->
+        {% for field in form %}
+            <div>
+                {{ field.label_tag }}
+                {{ field }}
+                {% if field.errors %}
+                    <div class="error-field">
+                        {{ field.errors|striptags }}
+                    </div>
+                {% endif %}
+            </div>
+        {% endfor %}
         <button type="submit">Submit</button>
     </form>
+    <!-- Admin Login Button -->
+    <a href="/admin/" class="admin-login-button">Admin Login</a>
 </div>
 
 {% endblock content %}

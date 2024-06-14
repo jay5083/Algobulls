@@ -306,15 +306,41 @@
                         <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
                     </div>
                     <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
-                    <div>
-                        <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
-                        <script>
-                            function redirectToLoginPage() {
-                                // Redirect to the login page
-                                window.location.href = '/logout/';
-                            }
-                        </script> 
+                    <div class="logout-container">
+                        <button class="logout-btn" onclick="redirectToLoginPage()">
+                            Log Out  
+                            <img src="https://www.svgrepo.com/show/132889/logout.svg" class="logout-icon" alt="Logout">
+                        </button>
                     </div>
+                    <script>
+                        function redirectToLoginPage() {
+                            // Redirect to the login page
+                            window.location.href = '/logout/';
+                        }
+                    </script> 
+                    <style>
+                        .logout-container {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100%;
+                        }
+                        .logout-btn {
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0;
+                            display: flex;
+                            align-items: center;
+                            font-size: 16px; /* Adjust font size if needed */
+                            color: black; /* Set the text color to black */
+                        }
+                        .logout-icon {
+                            width: 24px;
+                            height: 24px;
+                            margin-left: 8px; /* Add space between text and icon */
+                        }
+                    </style>
                 </div>
             </div>
         </div>

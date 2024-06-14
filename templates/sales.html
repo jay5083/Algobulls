@@ -299,20 +299,68 @@
                         <img src="https://as2.ftcdn.net/v2/jpg/03/16/12/51/1000_F_316125188_FYs3RbaUQ6gGwom3sfqSvgt2QGw3fKol.jpg" alt="Man Logo">
                     </div>
                     <p style="font-size: 20px; color: white; margin-bottom: 0;">{{ name }}</p>
-                    <div>
-                        <button class="btn btn-danger" id="logoutBtn" onclick="redirectToLoginPage()"> Log Out </button>
-                        <script>
-                            function redirectToLoginPage() {
-                                // Redirect to the login page
-                                window.location.href = '/logout/';
-                            }
-                        </script> 
+                    <div class="logout-container">
+                        <button class="logout-btn" onclick="redirectToLoginPage()">
+                            Log Out  
+                            <img src="https://www.svgrepo.com/show/132889/logout.svg" class="logout-icon" alt="Logout">
+                        </button>
                     </div>
+                    <script>
+                        function redirectToLoginPage() {
+                            // Redirect to the login page
+                            window.location.href = '/logout/';
+                        }
+                    </script> 
+                    <style>
+                        .logout-container {
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            height: 100%;
+                        }
+                        .logout-btn {
+                            background: none;
+                            border: none;
+                            cursor: pointer;
+                            padding: 0;
+                            display: flex;
+                            align-items: center;
+                            font-size: 16px; /* Adjust font size if needed */
+                            color: black; /* Set the text color to black */
+                        }
+                        .logout-icon {
+                            width: 24px;
+                            height: 24px;
+                            margin-left: 8px; /* Add space between text and icon */
+                        }
+                    </style>
                 </div>
             </div>
         </div>
     </nav>
     <style>
+        .logout-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            height: 100%;
+        }
+        .logout-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            padding: 0;
+            display: flex;
+            align-items: center;
+            font-size: 16px; /* Adjust font size if needed */
+            color: black; /* Set the text color to black */
+        }
+        .logout-icon {
+            width: 24px;
+            height: 24px;
+            margin-left: 8px; /* Add space between text and icon */
+        }
+
         .dropdown-content {
             display: none;
             position: absolute;
@@ -1302,15 +1350,30 @@
         
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Sales" %}
-                <div class="btn-new-sales-container">
-                    <button id="new-sales-leads-btn" onclick="redirectToURL()" class="btn btn-primary">New Sales</button>    
-                </div>
+            <div class="btn-new-sales-container">
+                <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy1lSCHY0CZ7e3opyr-6H0b1LCgOfMn1PL0Q&s" 
+                     alt="New Sales" 
+                     class="sales-image" 
+                     onclick="redirectToURL()">
+            </div>
                 <script>
                     function redirectToURL() {
                         // Redirect to the specified URL
                         window.location.href = '/accounts/profile/sales/add_sales_leads';
                     }
                 </script>
+                <style>
+                    .sales-image {
+                        width: 70px; /* Set width as per your design */
+                        height: auto; /* Maintain aspect ratio */
+                        cursor: pointer; /* Change cursor to pointer on hover */
+                        transition: transform 0.2s; /* Smooth transition for hover effect */
+                    }
+            
+                    .sales-image:hover {
+                        transform: scale(1.1); /* Slightly enlarge image on hover */
+                    }
+                </style>
             {%endif%}
         {%endfor%}
 
