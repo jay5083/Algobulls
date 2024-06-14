@@ -1186,7 +1186,11 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add RMS" %}
                 <div class="btn-new-support-container">
-                    <button id="new-support-btn" onclick="redirectToNewRMSURL()" class="btn btn-primary">New RMS</button>    
+                    {% comment %} <button id="new-support-btn" onclick="redirectToNewRMSURL()" class="btn btn-primary">New RMS</button> {% endcomment %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy1lSCHY0CZ7e3opyr-6H0b1LCgOfMn1PL0Q&s" 
+                        alt="New Rms" 
+                        class="rms-image" 
+                        onclick="redirectToNewRMSURL()">    
                 </div>
                 <script>
                     function redirectToNewRMSURL() {
@@ -1194,6 +1198,18 @@
                         window.location.href = '/accounts/profile/add_rms/';
                     }
                 </script>
+                <style>
+                    .rms-image {
+                        width: 70px; /* Set width as per your design */
+                        height: auto; /* Maintain aspect ratio */
+                        cursor: pointer; /* Change cursor to pointer on hover */
+                        transition: transform 0.2s; /* Smooth transition for hover effect */
+                    }
+            
+                    .rms-image:hover {
+                        transform: scale(1.1); /* Slightly enlarge image on hover */
+                    }
+                </style>
             {%endif%}
         {%endfor%}
 

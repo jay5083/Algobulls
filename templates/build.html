@@ -206,7 +206,6 @@
             background-color: #f0f0f0;
         }
         
-        
     </style>
     
     <nav class="navbar navbar-expand-lg bg-info" data-bs-theme="dark">
@@ -294,7 +293,6 @@
                             </li>
                         {% endif %}
                     {% endfor %}
-                    
                 </ul>
                 <!-- User Name -->
                 <div class="d-flex align-items-center">
@@ -950,9 +948,11 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Build" %}
                 <div class="btn-new-build-container">
-                    <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">New Build
-                        {% comment %} <i class="fas fa-plus"></i> {% endcomment %}
-                    </button>
+                    {% comment %} <button id="new-build-btn" onclick="redirectToNewBuildURL()" class="btn btn-primary">New Build</button> {% endcomment %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy1lSCHY0CZ7e3opyr-6H0b1LCgOfMn1PL0Q&s" 
+                        alt="New Build" 
+                        class="build-image" 
+                        onclick="redirectToNewBuildURL()">
                 </div>
                 <script>
                     function redirectToNewBuildURL() {
@@ -960,6 +960,18 @@
                         window.location.href = '/accounts/profile/add_build/';
                     }
                 </script>
+                <style>
+                    .build-image {
+                        width: 70px; /* Set width as per your design */
+                        height: auto; /* Maintain aspect ratio */
+                        cursor: pointer; /* Change cursor to pointer on hover */
+                        transition: transform 0.2s; /* Smooth transition for hover effect */
+                    }
+            
+                    .build-image:hover {
+                        transform: scale(1.1); /* Slightly enlarge image on hover */
+                    }
+                </style>
             {%endif%}
         {%endfor%}
 

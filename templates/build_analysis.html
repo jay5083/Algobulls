@@ -66,7 +66,6 @@
                 background-color: #2679c2bf; /* Set the color to blue */
                 border-radius: 0 0 10px 0; /* Match the bottom-right corner of the navbar */
             } {% endcomment %}
-            
     
             div.content {
                 margin-left: 200px; /* Adjust this value based on the width of your sidebar */
@@ -325,6 +324,100 @@
                 </div>
             </div>
         </nav>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+
+        <script>
+            $(document).ready(function() {
+                // Function to handle form submission and filtering logic
+                $('.start_end_date').on('submit', function(event) {
+                    event.preventDefault();
+    
+                    var start_date = $('#start_date').val();
+                    var end_date = $('#end_date').val();
+                    var filters = {
+                        strategist_name: [],
+                        status: []
+                    };
+    
+                    // Gather selected filters
+                    $('.filter-checkbox:checked').each(function() {
+                        var filter = $(this).data('field');
+                        var value = $(this).val();
+                        if (value) {
+                            filters[filter].push(value);
+                        }
+                    });
+    
+                    // Debugging
+                    console.log('Start Date:', start_date);
+                    console.log('End Date:', end_date);
+                    console.log('Filters:', filters);
+    
+                    // AJAX request to send the filters to the server
+                    $.ajax({
+                        url: '/build_analysis_data/',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: {
+                            'start_date': start_date,
+                            'end_date': end_date,
+                            'filters': JSON.stringify(filters)
+                        },
+                        success: function(response) {
+                            updateCharts(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error updating Build Analysis:', error);
+                        }
+                    });
+                });
+    
+                // Automatically submit form on page load
+                setTimeout(function() {
+                    $('.start_end_date button[type="submit"]').click();
+                }, 0);
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                function getSelectedFilters() {
+                    let filters = {
+                        strategist_name: [],
+                        status: []
+                    };
+        
+                    document.querySelectorAll('.filter-checkbox:checked').forEach(function(checkbox) {
+                        filters[checkbox.getAttribute('data-field')].push(checkbox.value);
+                    });
+        
+                    return filters;
+                }
+        
+                document.querySelectorAll('.filter-checkbox').forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        // Trigger the form submit to apply filters
+                        document.querySelector('.start_end_date button[type="submit"]').click();
+                    });
+                });
+            });
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }
+        </script>                
         <div class="sidebar">
             <div class="sidebar-item">
                 <button class="btn btn-light" onclick="redirectbuild_tableURL()">Build Table</button>
@@ -334,12 +427,12 @@
                     window.location.href = '/build/';
                 }
             </script>
-            <form id="filter-form">
+            <form id="filter-form" >
                 {% csrf_token %}
                 <div class="filter-options">
                     <div class="dropdown">
                         <div class="sidebar-item">
-                        <a href="#" class="filter-option" id="dropdownToggle">Strategist Name</a>
+                            <a href="#" class="filter-option" id="dropdownToggle">Strategist Name</a>
                             <div id="dropdownMenu" class="dropdown-content">
                                 {% for employee_id, employee_name in unique_strategist_names %}
                                     <div>
@@ -350,32 +443,34 @@
                             </div>
                         </div>
                     </div>
+            
+                
                     <div class="dropdown">
                         <div class="sidebar-item">
                             <a href="#" class="filter-option" id="dropdownToggle">Status</a>
                             <div id="dropdownMenu" class="dropdown-content">
                                 <div>
-                                    <input type="checkbox" id="Open" name="Status" data-field="status" class="filter-checkbox" value="Open" checked>
+                                    <input type="checkbox" id="Open" name="status" data-field="status" class="filter-checkbox" value="Open" checked>
                                     <label for="Open">Open</label>
                                 </div>
                                 <div>
-                                    <input type="checkbox" id="In Progress" name="Status" data-field="status" class="filter-checkbox" value="In Progress" checked>
+                                    <input type="checkbox" id="In Progress" name="status" data-field="status" class="filter-checkbox" value="In Progress" checked>
                                     <label for="In Progress">In Progress</label>
                                 </div>
                                 <div>
-                                    <input type="checkbox" id="Hold" name="Status" data-field="status" class="filter-checkbox" value="Hold" checked>
+                                    <input type="checkbox" id="Hold" name="status" data-field="status" class="filter-checkbox" value="Hold" checked>
                                     <label for="Hold">Hold</label>
                                 </div>
                                 <div>
-                                    <input type="checkbox" id="Resolved" name="Status" data-field="status" class="filter-checkbox" value="Resolved" checked>
+                                    <input type="checkbox" id="Resolved" name="status" data-field="status" class="filter-checkbox" value="Resolved" checked>
                                     <label for="Resolved">Resolved</label>
                                 </div>
                             </div>
                         </div>
-                    </div>       
+                    </div>
                 </div>
-            </form>
-        </div>
+            </form>            
+        </div>        
     </header>
     <style>
         .dropdown-content {

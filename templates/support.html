@@ -1258,7 +1258,11 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Support" %}
                 <div class="btn-new-support-container">
-                    <button id="new-support-btn" onclick="redirectToNewSupportURL()" class="btn btn-primary">New Support</button>    
+                    {% comment %} <button id="new-support-btn" onclick="redirectToNewSupportURL()" class="btn btn-primary">New Support</button>  {% endcomment %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy1lSCHY0CZ7e3opyr-6H0b1LCgOfMn1PL0Q&s" 
+                        alt="New Support" 
+                        class="support-image" 
+                        onclick="redirectToNewSupportURL()">   
                 </div>
                 <script>
                     function redirectToNewSupportURL() {
@@ -1266,6 +1270,18 @@
                         window.location.href = '/accounts/profile/add_support/';
                     }
                 </script>
+                <style>
+                    .support-image {
+                        width: 70px; /* Set width as per your design */
+                        height: auto; /* Maintain aspect ratio */
+                        cursor: pointer; /* Change cursor to pointer on hover */
+                        transition: transform 0.2s; /* Smooth transition for hover effect */
+                    }
+            
+                    .support-image:hover {
+                        transform: scale(1.1); /* Slightly enlarge image on hover */
+                    }
+                </style>
             {%endif%}
         {%endfor%}
 

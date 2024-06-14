@@ -728,7 +728,11 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Strategies" %}
                 <div class="btn-new-strategies-container">
-                    <button id="new-strategies-btn" onclick="redirectToNewStrategiesURL()" class="btn btn-primary">New Strategies</button>    
+                    {% comment %} <button id="new-strategies-btn" onclick="redirectToNewStrategiesURL()" class="btn btn-primary">New Strategies</button>  {% endcomment %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy1lSCHY0CZ7e3opyr-6H0b1LCgOfMn1PL0Q&s" 
+                        alt="New Strategies" 
+                        class="strategies-image" 
+                        onclick="redirectToNewStrategiesURL()">   
                 </div>
                 <script>
                     function redirectToNewStrategiesURL() {
@@ -736,6 +740,18 @@
                         window.location.href = '/accounts/profile/add_strategies/';
                     }
                 </script>
+                <style>
+                    .strategies-image {
+                        width: 70px; /* Set width as per your design */
+                        height: auto; /* Maintain aspect ratio */
+                        cursor: pointer; /* Change cursor to pointer on hover */
+                        transition: transform 0.2s; /* Smooth transition for hover effect */
+                    }
+            
+                    .strategies-image:hover {
+                        transform: scale(1.1); /* Slightly enlarge image on hover */
+                    }
+                </style>
             {%endif%}
         {%endfor%}
 

@@ -939,7 +939,11 @@
         {% for permission in user_permissions %}
             {% if permission.name == "Can add Tech Task" %}
                 <div class="btn-new-tech-task-container">
-                    <button id="new-tech-task-btn" onclick="redirectToNewTechTaskURL()" class="btn btn-primary">New Tech Task</button>    
+                    {% comment %} <button id="new-tech-task-btn" onclick="redirectToNewTechTaskURL()" class="btn btn-primary">New Tech Task</button>     {% endcomment %}
+                    <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcQy1lSCHY0CZ7e3opyr-6H0b1LCgOfMn1PL0Q&s" 
+                        alt="New Tech Task" 
+                        class="tech-task-image" 
+                        onclick="redirectToNewTechTaskURL()">
                 </div>
                 <script>
                     function redirectToNewTechTaskURL() {
@@ -947,6 +951,18 @@
                         window.location.href = '/accounts/profile/add_tech_task/';
                     }
                 </script>
+                <style>
+                    .tech-task-image {
+                        width: 70px; /* Set width as per your design */
+                        height: auto; /* Maintain aspect ratio */
+                        cursor: pointer; /* Change cursor to pointer on hover */
+                        transition: transform 0.2s; /* Smooth transition for hover effect */
+                    }
+            
+                    .tech-task-image:hover {
+                        transform: scale(1.1); /* Slightly enlarge image on hover */
+                    }
+                </style>
             {%endif%}
         {%endfor%}
 

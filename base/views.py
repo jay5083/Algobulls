@@ -1726,9 +1726,16 @@ def to_build_analysis(request):
     end_date = datetime.today()
     start_date = end_date - timedelta(days=30)
     
+    builds = Build.objects.select_related('strategist_name').all()
+    unique_strategist_names = set()
+    for build in builds:
+        if build.strategist_name:
+            unique_strategist_names.add((build.strategist_name.employee_id, build.strategist_name.name))
+    
     context = {
         'start_date': start_date.strftime('%Y-%m-%d'),
-        'end_date': end_date.strftime('%Y-%m-%d')
+        'end_date': end_date.strftime('%Y-%m-%d'), 
+        'unique_strategist_names': unique_strategist_names,
     }
     
     return render(request, 'build_analysis.html', context)
@@ -1852,14 +1859,17 @@ def sales_analysis_data(request):
         statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress']
 
         for row in results1:
-            week_start = row[0]
+            week_start = row[0].strftime('%Y-%m-%d')
+            week_end = row[1].strftime('%Y-%m-%d')
             status = row[2]
             total_leads = row[3]
-
-            if week_start not in weekly_data:
-                weekly_data[week_start] = {status: 0 for status in statuses}
             
-            weekly_data[week_start][status] += total_leads
+            week_label = f'{week_start} - {week_end}'
+
+            if week_label not in weekly_data:
+                weekly_data[week_label] = {status: 0 for status in statuses}
+            
+            weekly_data[week_label][status] += total_leads
             
         response1 = {
             'labels': list(weekly_data.keys()),
@@ -1870,7 +1880,6 @@ def sales_analysis_data(request):
                 } for status in statuses
             ]
         }
-        print(results2)
 
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             data = {
@@ -2628,12 +2637,56 @@ def tech_task_analysis_data(request):
         logger.error("Error in tech_task_analysis_data view: %s", e)
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
+from collections import OrderedDict
+from django.http import JsonResponse
+from django.shortcuts import render
+from datetime import timedelta
+
+
+import json
+from django.http import JsonResponse
+from django.shortcuts import render
+from collections import OrderedDict
+import logging
+
+logger = logging.getLogger(__name__)
+
 def build_analysis_data(request):
     try:
+        # Extract start_date and end_date from POST data
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
-        
-        # Query for weekly data
+
+        # Attempt to parse filters from POST data
+        filters = {}
+        try:
+            filters = json.loads(request.POST.get('filters', '{}'))
+        except json.JSONDecodeError as e:
+            logger.error("JSONDecodeError: %s", e)
+
+        # Extract statuses from filters
+        statuses = filters.get('status', [])
+        strategist_names = filters.get('strategist_name', [])
+
+        # Prepare filter conditions and parameters
+        filter_conditions = []
+        params = [start_date, end_date]
+
+        def handle_empty_string(value):
+            return None if value == '' else value
+
+        # Add status filter conditions if statuses are provided
+        if statuses:
+            filter_conditions.append('"Status" IN %s')
+            params.append(tuple(handle_empty_string(x) for x in statuses if x))
+        if strategist_names:
+            filter_conditions.append('"Strategist Name" IN %s')
+            params.append(tuple(handle_empty_string(x) for x in strategist_names if x))
+
+        # Join filter conditions
+        filter_sql = ' AND '.join(filter_conditions)    
+
+        # SQL query for weekly data
         query1 = f"""
             SELECT
                 DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
@@ -2642,26 +2695,28 @@ def build_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Build"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Status"
             ORDER BY week_start, "Status";
         """
-        results1 = execute_raw_sql(query1, [start_date, end_date])
-        
-        # Query for status-wise data
+        results1 = execute_raw_sql(query1, params)
+
+        # SQL query for status-wise data
         query2 = f"""
             SELECT
                 "Status",
                 COUNT(*) AS count
             FROM "Build"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Status"
             ORDER BY "Status";
         """
-        results2 = execute_raw_sql(query2, [start_date, end_date])
-        
+        results2 = execute_raw_sql(query2, params)
+
         # Prepare data for weekly status chart
         weekly_data = OrderedDict()
-        statuses = ['Open', 'In Progress', 'Hold', 'Resolved']
+        status_labels = ['Open', 'In Progress', 'Hold', 'Resolved']
 
         for row in results1:
             week_start = row[0].strftime('%Y-%m-%d')
@@ -2672,7 +2727,7 @@ def build_analysis_data(request):
             week_label = f'{week_start} - {week_end}'
 
             if week_label not in weekly_data:
-                weekly_data[week_label] = {status: 0 for status in statuses}
+                weekly_data[week_label] = {status: 0 for status in status_labels}
             
             weekly_data[week_label][status] += total_leads
             
@@ -2685,7 +2740,7 @@ def build_analysis_data(request):
                     'backgroundColor': 'rgba(255, 99, 132, 0.2)',
                     'borderColor': 'rgba(255, 99, 132, 1)',
                     'borderWidth': 1
-                } for status in statuses
+                } for status in status_labels
             ]
         }
         
@@ -2716,6 +2771,7 @@ def build_analysis_data(request):
             }]
         }
 
+        # Check if request is AJAX and respond accordingly
         if request.headers.get('x-requested-with') == 'XMLHttpRequest':
             data = {
                 'results1': response1,
@@ -2723,6 +2779,7 @@ def build_analysis_data(request):
             }
             return JsonResponse(data)
         else:
+            # Render the data in the template for non-AJAX requests
             context = {
                 'start_date': start_date,
                 'end_date': end_date,
