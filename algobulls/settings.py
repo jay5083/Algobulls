@@ -75,27 +75,17 @@ WSGI_APPLICATION = 'algobulls.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
 
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'NAME': 'algobulls_dbms',
-        'USER': 'postgres',
-        'PASSWORD': '123456',
-        'HOST': 'localhost',
-        'PORT': '5432', 
+        'NAME': 'algobullsdb',  # Ensure this matches the database name in RDS
+        'USER': 'algobullsuser',  # Ensure this matches your RDS username
+        'PASSWORD': '405501N',  # Ensure this matches your RDS password
+        'HOST': 'ec2-13-233-17-91.ap-south-1.compute.amazonaws.com',  # Ensure this is the correct RDS endpoint
+        'PORT': '5432',  # Ensure the port is correct
     }
 }
-
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'algobullsdb',  # Ensure this matches the database name in RDS
-#         'USER': 'algobullsuser',  # Ensure this matches your RDS username
-#         'PASSWORD': '405501N',  # Ensure this matches your RDS password
-#         'HOST': 'ec2-13-233-17-91.ap-south-1.compute.amazonaws.com',  # Ensure this is the correct RDS endpoint
-#         'PORT': '5432',  # Ensure the port is correct
-#     }
-# }
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
