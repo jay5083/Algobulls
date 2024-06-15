@@ -20,13 +20,14 @@
         .sidebar {
             margin: 0;
             padding: 0;
-            width: 200px;
+            width: 12vw;
             background-color: lightwhite;
             position: fixed;
             height: 90%;
             overflow: auto;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add shadow border */
             border-radius: 0 0 100px 0; /* Curved bottom-right corner */
+            {% comment %} top: 0; {% endcomment %}
         }
         
         .sidebar-item {
@@ -80,9 +81,12 @@
             .sidebar a {
                 float: left;
             }
-            div.content {
-                margin-left: 0; /* Reset margin for small screens */
-                padding: 20px; /* Maintain padding */
+            .container {
+                width: 100%;
+                margin-left: 0;
+                padding: 20px;
+                height: auto; /* Reset height for smaller screens */
+                overflow-y: auto; /* Ensure vertical scroll is maintained */
             }
         }
 
