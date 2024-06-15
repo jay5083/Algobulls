@@ -305,9 +305,7 @@
                                 <label for="employee">Employee:</label>
                                 <select id="employee" name="employee">
                                     {% for employee in sales_employees %}
-                                        {%if employee.role_id.role_name == "Rms Employee" %}                                    
-                                            <option value="{{ employee.employee_id }}">{{ employee.name }}</option>
-                                        {%endif%}
+                                        <option value="{{ employee.employee_id }}">{{ employee.name }}</option>
                                     {% endfor %}
                                 </select>
                             </div>

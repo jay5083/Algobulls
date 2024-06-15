@@ -1856,7 +1856,7 @@ def sales_analysis_data(request):
             user_permissions.extend(group.permissions.all())
             
         weekly_data = {}
-        statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress']
+        statuses = ['Converted', 'Dropped', 'Follow up', 'No Answer', 'Not Interested', 'In Progress', 'Not Contacted']
 
         for row in results1:
             week_start = row[0].strftime('%Y-%m-%d')
