@@ -64,38 +64,58 @@
         } {% endcomment %}
         
 
+        /* Base styles for the content area */
         div.content {
-            margin-left: 200px; /* Adjust this value based on the width of your sidebar */
+            margin-left: 200px; /* Matches the sidebar width */
             padding: 20px; /* Add padding to the content area */
-          }
-          
-          @media screen and (max-width: 700px) {
-            .sidebar {
-              width: 100%;
-              height: auto;
-              position: relative;
-            }
-            .sidebar a {float: left;}
-            div.content {margin-left: 0; padding: 20px;} /* Add padding to the content area */
-          }
-          
-          @media screen and (max-width: 400px) {
-            .sidebar a {
-              text-align: center;
-              float: none;
-            }
-          }
+        }
 
-          .container {
-            width: 100%; /* Decrease the width to 50% of the parent container */
-            max-height: 80vh; /* Use viewport height for a responsive maximum height */
-            overflow-x: auto; /* Add horizontal scroll bar if content overflows horizontally */
-            overflow-y: auto; /* Add vertical scroll bar if content overflows vertically */
-            margin-top: 0; /* No margin at the top */
-            margin-left: 13%; /* Margin to the left side */
-            {% comment %} margin-right: 45%; /* Adjust right margin to 15% for balance */ {% endcomment %}
-            box-sizing: border-box; /* Include padding and border in the element's total width and height */
-        }                
+        /* Responsive adjustments for smaller screens */
+        @media screen and (max-width: 1000px) {
+            .sidebar {
+                width: 100%;
+                height: auto;
+                position: relative;
+            }
+            .sidebar a {
+                float: left;
+            }
+            div.content {
+                margin-left: 0; /* Reset margin for small screens */
+                padding: 20px; /* Maintain padding */
+            }
+        }
+
+        /* Further adjustments for very small screens */
+        @media screen and (max-width: 400px) {
+            .sidebar a {
+                text-align: center;
+                float: none;
+            }
+        }
+
+        /* Updated container styles to increase width */
+                /* Container Styles */
+                .container {
+                    width: calc(100% - 20vw); /* Adjust width relative to viewport */
+                    max-width: calc(100% - 270px); /* Ensure max width considering the sidebar */
+                    height: 80vh; /* Use viewport height for responsive container height */
+                    max-height: 800px; /* Set a maximum height */
+                    overflow-y: auto; /* Enable vertical scroll if needed */
+                    overflow-x: auto; /* Disable horizontal scroll */
+                    margin-top: 0; /* No top margin */
+                    margin-left: 13vw; /* Adjust left margin based on viewport width */
+                    box-sizing: border-box; /* Include padding and border in width/height */
+                    padding: 10px; /* Internal padding for content spacing */
+                    background-color: #fff; /* Optional: background color */
+                    border: 1px solid #ddd; /* Optional: border */
+                    display: flex; /* Flexbox for layout adjustments */
+                    flex-direction: column; /* Vertical stacking of children */
+                }
+
+
+        
+        
 
         </style>    
 
