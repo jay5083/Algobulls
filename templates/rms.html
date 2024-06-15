@@ -980,7 +980,9 @@
                                     {% else %}
                                         <select name = "rms-employee-dropdown" id = "rms-employee-dropdown" class="rms-employee-dropdown">
                                             {% for employee in sales_employees %}
-                                                <option value="{{ employee.employee_id }}" {% if employee.employee_id == rms.employee.employee_id %} selected {% endif %}>{{ employee.name }}</option>
+                                                {%if employee.role_id.role_name == "Rms Employee" %}        
+                                                    <option value="{{ employee.employee_id }}" {% if employee.employee_id == rms.employee.employee_id %} selected {% endif %}>{{ employee.name }}</option>
+                                                {%endif%}
                                             {% endfor %}
                                         </select>
                                 {% endif %}
