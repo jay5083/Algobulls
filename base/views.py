@@ -124,7 +124,7 @@ def get_totp(key):
 def generate_qr_code_base64(uri):
     qr = qrcode.make(uri)
     buffered = BytesIO()
-    qr.save(buffered, format='PNG')
+    qr.save(buffered, 'PNG')
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 @login_required
