@@ -150,7 +150,7 @@ def send_welcome_email(sender, instance, created, **kwargs):
         
         # Save the QR code to a BytesIO buffer
         buffered = BytesIO()
-        qr_code.save(buffered, format='PNG')
+        qr_code.save(buffered, 'PNG')
         
         # Reset buffer position to the beginning
         buffered.seek(0)
