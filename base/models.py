@@ -5,7 +5,9 @@
 #   * Make sure each ForeignKey and OneToOneField has `on_delete` set to the desired behavior
 #   * Remove `managed = False` lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
+
 from django.db import models
+from django.contrib.auth.models import User
 
 
 class AlgobullsDivision(models.Model):
@@ -14,7 +16,8 @@ class AlgobullsDivision(models.Model):
     class Meta:
         managed = True
         db_table = 'Algobulls Division'
-
+    def __str__(self):
+        return self.division_name
 
 class AlgobullsEmployee(models.Model):
     employee_id = models.TextField(db_column='Employee ID', primary_key=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
@@ -28,15 +31,25 @@ class AlgobullsEmployee(models.Model):
         managed = True
         db_table = 'Algobulls Employee'
 
-
 class AuthPermission(models.Model):
-    permission_id = models.TextField(db_column='Permission ID', primary_key=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
-    permission_name = models.TextField(db_column='Permission Name', blank=True, null=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.
+    permission_id = models.TextField(db_column='Permission ID', primary_key=True)
+    permission_name = models.TextField(db_column='Permission Name', blank=True, null=True)
+    user = models.OneToOneField(
+        User, 
+        on_delete=models.CASCADE,
+        default=1,
+        blank=True, null=True  # Replace with the actual user ID you want to use as default
+    )
+    employee_type = models.CharField(
+        max_length=50, 
+        choices=[('Algobulls Employee', 'Algobulls Employee'), ('Branch Employee', 'Branch Employee')],
+        default='Algobulls Employee',   
+        blank=True, null=True  # Set your desired default here
+    )
 
     class Meta:
         managed = True
         db_table = 'Auth Permission'
-
 
 class AuthRole(models.Model):
     role_id = models.TextField(db_column='Role ID', primary_key=True)  # Field name made lowercase. Field renamed to remove unsuitable characters.

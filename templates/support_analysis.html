@@ -333,6 +333,112 @@
                 </div>
             </div>
         </nav>
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+        <script>
+            $(document).ready(function() {
+                // Function to handle form submission and filtering logic
+                $('.start_end_date').on('submit', function(event) {
+                    event.preventDefault();
+    
+                    var start_date = $('#start_date').val();
+                    var end_date = $('#end_date').val();
+                    
+                    var filters = {
+                        customer_type: [],
+                        priority: [],
+                        issue: [],
+                        status: [],
+                        division_assigned_to: [],
+                        support_employee: [],
+                        division_employee: []
+                    };
+    
+                    // Gather selected filters
+                    $('.filter-checkbox:checked').each(function() {
+                        var filter = $(this).data('field');
+                        var value = $(this).val();
+                        if (value) {
+                            filters[filter].push(value);
+                        }
+                    });                    
+    
+                    // Debugging
+                    console.log('Start Date:', start_date);
+                    console.log('End Date:', end_date);
+                    console.log('Filters:', filters);
+    
+                    // AJAX request to send the filters to the server
+                    // Debugging AJAX request
+                    $.ajax({
+                        url: '/support_analysis_data/',
+                        method: 'POST',
+                        headers: {
+                            'X-CSRFToken': getCookie('csrftoken'),
+                            'X-Requested-With': 'XMLHttpRequest'
+                        },
+                        data: {
+                            'start_date': start_date,
+                            'end_date': end_date,
+                            'filters': JSON.stringify(filters)
+                        },
+                        success: function(response) {
+                            console.log('Success response:', response);  // Log success response
+                            updateCharts(response);
+                        },
+                        error: function(xhr, status, error) {
+                            console.error('Error response:', xhr.responseText);  // Log error response
+                            console.error('Error updating Support Analysis:', error);
+                        }
+                    });               
+                });
+                // Automatically submit form on page load
+                setTimeout(function() {
+                    $('.start_end_date button[type="submit"]').click();
+                }, 0);
+            });
+
+            document.addEventListener('DOMContentLoaded', function() {
+                function getSelectedFilters() {
+                    let filters = {
+                        customer_type: [],
+                        priority: [],
+                        issue: [],
+                        status: [],
+                        division_assigned_to: [],
+                        support_employee: [],
+                        division_employee: [],
+                    };
+        
+                    document.querySelectorAll('.filter-checkbox:checked').forEach(function(checkbox) {
+                        filters[checkbox.getAttribute('data-field')].push(checkbox.value);
+                    }); 
+        
+                    return filters;
+                }
+        
+                document.querySelectorAll('.filter-checkbox').forEach(function(checkbox) {
+                    checkbox.addEventListener('change', function() {
+                        // Trigger the form submit to apply filters
+                        document.querySelector('.start_end_date button[type="submit"]').click();
+                    });
+                });
+            });
+
+            function getCookie(name) {
+                let cookieValue = null;
+                if (document.cookie && document.cookie !== '') {
+                    const cookies = document.cookie.split(';');
+                    for (let i = 0; i < cookies.length; i++) {
+                        const cookie = cookies[i].trim();
+                        if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                            cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                            break;
+                        }
+                    }
+                }
+                return cookieValue;
+            }            
+        </script>
         <div class="sidebar">
             <div class="sidebar-item">
                 <button class="btn btn-light" onclick="redirectsupport_tableURL()">Support Table</button>
@@ -474,7 +580,7 @@
                             <div id="dropdownMenu" class="dropdown-content">
                                 {% for employee_id, employee_name in unique_support_employees %}
                                     <div>
-                                        <input type="checkbox" id="employee{{ employee_id }}" name="Support Employee" data-field="support_employee" class="filter-checkbox" value="{{ employee_name }}" checked>
+                                        <input type="checkbox" id="employee{{ employee_id }}" name="Support Employee" data-field="support_employee" class="filter-checkbox" value="{{ employee_id }}" checked>
                                         <label for="employee{{ employee_id }}">{{ employee_name }}</label>
                                     </div>
                                 {% endfor %}
@@ -488,7 +594,7 @@
                             <div id="dropdownMenu" class="dropdown-content">
                                 {% for employee_id, employee_name in unique_division_employees %}
                                     <div>
-                                        <input type="checkbox" id="employee{{ employee_id }}" name="Division Employee" data-field="division_employee" class="filter-checkbox" value="{{ employee_name }}" checked>
+                                        <input type="checkbox" id="employee{{ employee_id }}" name="Division Employee" data-field="division_employee" class="filter-checkbox" value="{{ employee_id }}" checked>
                                         <label for="employee{{ employee_id }}">{{ employee_name }}</label>
                                     </div>
                                 {% endfor %}
@@ -627,7 +733,7 @@
             return cookieValue;
         }
     
-        $(document).ready(function() {
+        {% comment %} $(document).ready(function() {
             $('.start_end_date').on('submit', function(event) {
                 event.preventDefault();
                 var start_date = $('#start_date').val();
@@ -656,7 +762,7 @@
             setTimeout(function() {
                 $('.start_end_date button[type="submit"]').click();
             }, 0);
-        });
+        }); {% endcomment %}
     
         function updateCharts(response) {
             updateWeeklyBarChart(response.results1);

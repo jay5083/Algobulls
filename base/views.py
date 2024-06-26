@@ -114,8 +114,9 @@ from django.contrib.auth.decorators import login_required
 from django.utils import timezone
 from datetime import datetime, timedelta
 
-def generate_totp_key():
-    return "Prospace"
+def generate_totp_key(request):
+    # Ensure the key is a valid base32 encoded string
+    return base64.b32encode(request.user.username.encode('utf-8')).decode('utf-8')
 
 def get_totp(key):
     return pyotp.TOTP(key)
@@ -123,21 +124,23 @@ def get_totp(key):
 def generate_qr_code_base64(uri):
     qr = qrcode.make(uri)
     buffered = BytesIO()
-    qr.save(buffered)
+    qr.save(buffered, format='PNG')
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 @login_required
 def auth(request):
-    print(request.session.get("email"))
+    print("User email from session:", request.session.get("email"))
     current_time = timezone.now()
     last_login_time_str = request.session.get('last_login_time')
-    request.session.save()
+    
     # Debugging: Print current and last login time
     print("Current time:", current_time)
     print("Last login time from session:", last_login_time_str)
     
     if last_login_time_str:
         last_login_time = datetime.fromisoformat(last_login_time_str)
+        last_login_time = timezone.make_aware(last_login_time)  # Ensure aware datetime
+        
         print("Parsed last login time:", last_login_time)
         
         if current_time - last_login_time < timedelta(minutes=1):
@@ -149,7 +152,7 @@ def auth(request):
     
     if request.method == 'POST':
         otp = request.POST.get('otp')
-        key = generate_totp_key()
+        key = generate_totp_key(request)
         totp = get_totp(key)
         
         print("Session keys before verifying OTP:", request.session.keys())
@@ -157,7 +160,7 @@ def auth(request):
         if totp.verify(otp):
             request.session['authenticated'] = True
             email = request.user.username
-            request.session["email"]=email
+            request.session["email"] = email
             
             request.session['last_login_time'] = current_time.isoformat()
             request.session.modified = True
@@ -168,8 +171,8 @@ def auth(request):
         else:
             return render(request, 'auth.html', {'error': 'OTP Not Verified'})
     else:
-        key = generate_totp_key()
-        uri = get_totp(key).provisioning_uri(name="pspace", issuer_name="ahil")
+        key = generate_totp_key(request)
+        uri = get_totp(key).provisioning_uri(name=request.user.username, issuer_name="Algobulls")
         qr_base64 = generate_qr_code_base64(uri)
         context = {'qr': qr_base64}
         return render(request, 'auth.html', context)
@@ -1639,11 +1642,11 @@ def to_sales_analysis(request):
     end_date = datetime.today()
     start_date = end_date - timedelta(days=30)
     
-    # sales_leads = Sales.objects.select_related('sales_employee_id').all()
-    # unique_sales_employees = set()
-    # for lead in sales_leads:
-    #     if lead.sales_employee_id:
-    #         unique_sales_employees.add((lead.sales_employee_id.employee_id, lead.sales_employee_id.name))
+    sales_leads = Sales.objects.select_related('sales_employee_id').all()
+    unique_sales_employees = set()
+    for lead in sales_leads:
+        if lead.sales_employee_id:
+            unique_sales_employees.add((lead.sales_employee_id.employee_id, lead.sales_employee_id.name))
     
     # sales_leads = Sales.objects.select_related('branch_employee_id__branch_id__broker_id').all()
     # unique_branch_ids = set()
@@ -1657,7 +1660,7 @@ def to_sales_analysis(request):
     context = {
         'start_date': start_date.strftime('%Y-%m-%d'),
         'end_date': end_date.strftime('%Y-%m-%d'),
-        # 'unique_sales_employees': unique_sales_employees,
+        'unique_sales_employees': unique_sales_employees,
         # 'unique_branch_ids': unique_branch_ids,
         # 'unique_broker_names': unique_broker_names,
     }
@@ -1680,22 +1683,22 @@ def to_support_analysis(request):
         if support.division_employee:
             unique_division_employees.add((support.division_employee.employee_id, support.division_employee.name))
     
-    supports = Support.objects.select_related('branch_employee_id__branch_id__broker_id').all()
-    unique_branch_ids = set()
-    unique_broker_names = set()
-    for support in supports:
-        if support.branch_employee_id and support.branch_employee_id.branch_id:
-            unique_branch_ids.add((support.branch_employee_id.branch_id.branch_id, support.branch_employee_id.branch_id.branch_id))
-            if support.branch_employee_id.branch_id.broker_id:
-                unique_broker_names.add((support.branch_employee_id.branch_id.broker_id.broker_id, support.branch_employee_id.branch_id.broker_id.broker_name))
+    # supports = Support.objects.select_related('branch_employee_id__branch_id__broker_id').all()
+    # unique_branch_ids = set()
+    # unique_broker_names = set()
+    # for support in supports:
+    #     if support.branch_employee_id and support.branch_employee_id.branch_id:
+    #         unique_branch_ids.add((support.branch_employee_id.branch_id.branch_id, support.branch_employee_id.branch_id.branch_id))
+    #         if support.branch_employee_id.branch_id.broker_id:
+    #             unique_broker_names.add((support.branch_employee_id.branch_id.broker_id.broker_id, support.branch_employee_id.branch_id.broker_id.broker_name))
     
     context = {
         'start_date': start_date.strftime('%Y-%m-%d'),
         'end_date': end_date.strftime('%Y-%m-%d'),
         'unique_support_employees':unique_support_employees,
         'unique_division_employees':unique_division_employees,
-        'unique_branch_ids': unique_branch_ids,
-        'unique_broker_names': unique_broker_names,
+        # 'unique_branch_ids': unique_branch_ids,
+        # 'unique_broker_names': unique_broker_names,
     }
     
     return render(request, 'support_analysis.html', context)
@@ -1715,9 +1718,16 @@ def to_tech_task_analysis(request):
     end_date = datetime.today()
     start_date = end_date - timedelta(days=30)
     
+    tech_tasks = TechTask.objects.select_related('employee_id').all()
+    unique_employee_ids = set()
+    for tech_task in tech_tasks:
+        if tech_task.employee_id:
+            unique_employee_ids.add((tech_task.employee_id.employee_id, tech_task.employee_id.name))
+    
     context = {
         'start_date': start_date.strftime('%Y-%m-%d'),
-        'end_date': end_date.strftime('%Y-%m-%d')
+        'end_date': end_date.strftime('%Y-%m-%d'),
+        'unique_employee_ids': unique_employee_ids,
     }
     
     return render(request, 'tech_task_analysis.html', context)
@@ -1765,7 +1775,7 @@ def sales_analysis_data(request):
         categories = filters.get('category', [])
         risk_appetites = filters.get('risk_appetite', [])
         statuses = filters.get('status', [])
-        employee_ids = filters.get('employee_id', [])
+        sales_employee_ids = filters.get('sales_employee_id', [])
 
         filter_conditions = []
         params = [start_date, end_date]
@@ -1785,9 +1795,9 @@ def sales_analysis_data(request):
         if statuses:
             filter_conditions.append('"Status" IN %s')
             params.append(tuple(handle_empty_string(x) for x in statuses if x))
-        if employee_ids:
+        if sales_employee_ids:
             filter_conditions.append('"Sales Employee ID" IN %s')
-            params.append(tuple(handle_empty_string(x) for x in employee_ids if x))
+            params.append(tuple(handle_empty_string(x) for x in sales_employee_ids if x))
 
         filter_sql = ' AND '.join(filter_conditions)
 
@@ -1907,7 +1917,51 @@ def support_analysis_data(request):
     try:
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
+        filters = json.loads(request.POST.get('filters', '{}'))
         
+        logger.info(f"Start Date: {start_date}, End Date: {end_date}")
+        logger.info(f"Filters: {filters}")
+
+        # customer_types = filters.get('customer_type', [])
+        # priorities = filters.get('priority', [])
+        # issues = filters.get('issue', [])
+        # statuses = filters.get('status', [])
+        # division_assigned_tos = filters.get('division_assigned_to', [])
+        # support_employees = filters.get('support_employee', [])
+        # division_employees = filters.get('division_employee', [])
+        
+        filter_conditions = []
+        params = [start_date, end_date]
+
+        def handle_empty_string(value):
+            return None if value == '' else value
+        
+        # if customer_types:
+        #     filter_conditions.append('"Customer Type" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in customer_types if x))
+        # if priorities:
+        #     filter_conditions.append('"Priority" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in priorities if x))
+        # if issues:
+        #     filter_conditions.append('"Issue" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in issues if x))
+        # if statuses:
+        #     filter_conditions.append('"Status" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in statuses if x))
+        # if division_assigned_tos:
+        #     filter_conditions.append('"Division Assigned To" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in division_assigned_tos if x))
+        # if support_employees:
+        #     filter_conditions.append('"Support Employee" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in support_employees if x))
+        # if division_employees:
+        #     filter_conditions.append('"Division Employee" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in division_employees if x))
+        
+        filter_sql = ' AND '.join(filter_conditions)
+        
+        logger.info(f"Filter SQL: {filter_sql}")
+        logger.info(f"Params: {params}")        
         # Query for weekly data
         query1 = f"""
             SELECT
@@ -1917,11 +1971,16 @@ def support_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Support"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Status"
             ORDER BY week_start, "Status";
         """
         results1 = execute_raw_sql(query1, [start_date, end_date])
-        
+        if not results1:
+            logger.error(f"No results returned for the query: {query1} with params {start_date}, {end_date}")
+        else:
+            for result in results1:
+                logger.debug(f"Query result row: {result}")
         # Query for status-wise data
         query2 = f"""
             SELECT
@@ -1929,6 +1988,7 @@ def support_analysis_data(request):
                 COUNT(*) AS count
             FROM "Support"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Status"
             ORDER BY "Status";
         """
@@ -1943,11 +2003,12 @@ def support_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Support"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Priority"
             ORDER BY week_start, "Priority";
         """
         results3 = execute_raw_sql(query3, [start_date, end_date])
-        
+
         # Query for priority-wise data
         query4 = f"""
             SELECT
@@ -1955,6 +2016,7 @@ def support_analysis_data(request):
                 COUNT(*) AS count
             FROM "Support"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Priority"
             ORDER BY "Priority";
         """
@@ -1969,6 +2031,7 @@ def support_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Support"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Division Assigned To"
             ORDER BY week_start, "Division Assigned To";
         """
@@ -1981,6 +2044,7 @@ def support_analysis_data(request):
                 COUNT(*) AS count
             FROM "Support"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Division Assigned To"
             ORDER BY "Division Assigned To";
         """
@@ -2096,7 +2160,7 @@ def support_analysis_data(request):
 
         # Prepare data for weekly division chart
         division_weekly_data = OrderedDict()
-        divisions = ['Tech', 'Build', 'RMS', 'Sales', 'Strategy', 'Support']
+        divisions = ['Tech', 'Sales', 'Strategy', 'Support', 'RMS', 'Build']
 
         for row in results5:
             week_start = row[0].strftime('%Y-%m-%d')
@@ -2173,15 +2237,43 @@ def support_analysis_data(request):
                 'results6': response6,
             }
             return render(request, 'support_analysis.html', context)
+        
+    except IndexError as ie:
+        logger.error(f"Index error in support_analysis_data: {ie}")
+        # for result in results1:
+            # logger.debug(f"Result row: {result}")
+        return JsonResponse({'error': 'Index out of range error'}, status=500)
     except Exception as e:
-        logger.error("Error in support_analysis_data view: %s", e)
+        logger.error(f"Error in support_analysis_data: {e}")
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
-
+    
 def rms_analysis_data(request):
     try:
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
+        filters = json.loads(request.POST.get('filters', '{}'))
+
+        # customer_types = filters.get('customer_type', [])
+        # priorities = request.POST.getlist('priority[]')
+        # issues = request.POST.getlist('issue[]')
+        # assigned_to = request.POST.getlist('assigned_to[]')
+        # statuses = request.POST.getlist('status[]')
+        # rms_statuses = request.POST.getlist('rms_status[]')
+        # employees = request.POST.getlist('employee[]')
+        # brokers = request.POST.getlist('broker[]')
         
+        filter_conditions = []
+        params = [start_date, end_date]
+
+        def handle_empty_string(value):
+            return None if value == '' else value
+        
+        # if customer_types:
+        #     filter_conditions.append('"Customer Type" IN %s')
+        #     params.append(tuple(handle_empty_string(x) for x in customer_types if x))
+        
+        filter_sql = ' AND '.join(filter_conditions)
+
         # Query for weekly data
         query1 = f"""
             SELECT
@@ -2191,11 +2283,11 @@ def rms_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Rms"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Status"
             ORDER BY week_start, "Status";
         """
         results1 = execute_raw_sql(query1, [start_date, end_date])
-        
         # Query for status-wise data
         query2 = f"""
             SELECT
@@ -2203,6 +2295,7 @@ def rms_analysis_data(request):
                 COUNT(*) AS count
             FROM "Rms"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Status"
             ORDER BY "Status";
         """
@@ -2217,6 +2310,7 @@ def rms_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Rms"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Issue"
             ORDER BY week_start, "Issue";
         """
@@ -2229,6 +2323,7 @@ def rms_analysis_data(request):
                 COUNT(*) AS count
             FROM "Rms"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Issue"
             ORDER BY "Issue";
         """
@@ -2243,6 +2338,7 @@ def rms_analysis_data(request):
                 COUNT(*) AS total_leads
             FROM "Rms"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY week_start, week_end, "Customer Type"
             ORDER BY week_start, "Customer Type";
         """
@@ -2255,6 +2351,7 @@ def rms_analysis_data(request):
                 COUNT(*) AS count
             FROM "Rms"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Customer Type"
             ORDER BY "Customer Type";
         """
@@ -2449,97 +2546,139 @@ def rms_analysis_data(request):
         return JsonResponse({'error': 'Internal Server Error'}, status=500)
 
 from collections import OrderedDict
+import json
+import logging
+from collections import OrderedDict
+from django.http import JsonResponse
+from django.shortcuts import render
+
+logger = logging.getLogger(__name__)
 
 def tech_task_analysis_data(request):
     try:
         start_date = request.POST.get('start_date')
         end_date = request.POST.get('end_date')
-        
-        # Query for weekly data
-        query1 = f"""
+
+        # Parse filters from POST data
+        filters = {}
+        try:
+            filters_json = request.POST.get('filters')
+            if filters_json:
+                filters = json.loads(filters_json)
+        except json.JSONDecodeError as e:
+            logger.error("JSONDecodeError: %s", e)
+            return JsonResponse({'error': 'Invalid filter data'}, status=400)
+
+        # Extract filter criteria
+        natures = filters.get('nature', [])
+        task_statuses = filters.get('task_status', [])
+        priorities = filters.get('priority', [])
+        employee_ids = filters.get('employee_id', [])
+
+        # Initialize filter conditions and parameters
+        filter_conditions = []
+        params = [start_date, end_date]
+
+        # Helper function to handle empty strings
+        def handle_empty_string(value):
+            return None if value == '' else value
+
+        # Add filters to query conditions if not empty
+        if natures:
+            filter_conditions.append('"Nature" IN %s')
+            params.append(tuple(filter(None, (handle_empty_string(x) for x in natures))))
+
+        if task_statuses:
+            filter_conditions.append('"Task Status" IN %s')
+            params.append(tuple(filter(None, (handle_empty_string(x) for x in task_statuses))))
+
+        if priorities:
+            filter_conditions.append('"Priority" IN %s')
+            params.append(tuple(filter(None, (handle_empty_string(x) for x in priorities))))
+
+        if employee_ids:
+            filter_conditions.append('"Employee ID" IN %s')
+            params.append(tuple(filter(None, (handle_empty_string(x) for x in employee_ids))))
+
+        # Join filter conditions into SQL
+        filter_sql = ' AND '.join(filter_conditions)
+
+        # SQL queries
+        query_template = """
             SELECT
                 DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
                 (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
-                "Task Status",
-                COUNT(*) AS total_leads
+                "{group_by}",
+                COUNT(*) AS total_tasks
             FROM "Tech Task"
             WHERE "Date" BETWEEN %s AND %s
-            GROUP BY week_start, week_end, "Task Status"
-            ORDER BY week_start, "Task Status";
+            {filter_clause}
+            GROUP BY week_start, week_end, "{group_by}"
+            ORDER BY week_start, "{group_by}";
         """
-        results1 = execute_raw_sql(query1, [start_date, end_date])
-        
-        # Query for status-wise data
+
+        query1 = query_template.format(group_by='Task Status', filter_clause=f"AND {filter_sql}" if filter_sql else "")
+        results1 = execute_raw_sql(query1, params)
+
         query2 = f"""
             SELECT
                 "Task Status",
                 COUNT(*) AS count
             FROM "Tech Task"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Task Status"
             ORDER BY "Task Status";
         """
-        results2 = execute_raw_sql(query2, [start_date, end_date])
-        
-        # Query for weekly priority data
-        query3 = f"""
-            SELECT
-                DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) AS week_start,
-                (DATE_TRUNC('week', TO_DATE("Date", 'YYYY-MM-DD')) + INTERVAL '6 days') AS week_end,
-                "Nature",
-                COUNT(*) AS total_leads
-            FROM "Tech Task"
-            WHERE "Date" BETWEEN %s AND %s
-            GROUP BY week_start, week_end, "Nature"
-            ORDER BY week_start, "Nature";
-        """
-        results3 = execute_raw_sql(query3, [start_date, end_date])
-        
-        # Query for priority-wise data
+        results2 = execute_raw_sql(query2, params)
+
+        query3 = query_template.format(group_by='Nature', filter_clause=f"AND {filter_sql}" if filter_sql else "")
+        results3 = execute_raw_sql(query3, params)
+
         query4 = f"""
             SELECT
                 "Nature",
                 COUNT(*) AS count
             FROM "Tech Task"
             WHERE "Date" BETWEEN %s AND %s
+            {f"AND {filter_sql}" if filter_sql else ""}
             GROUP BY "Nature"
             ORDER BY "Nature";
         """
-        results4 = execute_raw_sql(query4, [start_date, end_date])
-        
-        # Prepare data for weekly status chart
+        results4 = execute_raw_sql(query4, params)
+
+        # Prepare data for charts
         weekly_data = OrderedDict()
-        task_statuses = ['Pending Development', 'Under Development', 'Under Testing', 'Bugs Reported', 'Delivered or Closed', 'In Progress', 'On Hold', 'Open']
+        task_status_labels = ['Pending Development', 'Under Development', 'Under Testing', 'Bugs Reported', 'Delivered or Closed', 'In Progress', 'On Hold', 'Open']
 
         for row in results1:
             week_start = row[0].strftime('%Y-%m-%d')
             week_end = row[1].strftime('%Y-%m-%d')
             task_status = row[2]
-            total_leads = row[3]
+            total_tasks = row[3]
 
             week_label = f'{week_start} - {week_end}'
 
             if week_label not in weekly_data:
-                weekly_data[week_label] = {task_status: 0 for task_status in task_statuses}
-            
-            weekly_data[week_label][task_status] += total_leads
-            
+                weekly_data[week_label] = {status: 0 for status in task_status_labels}
+
+            weekly_data[week_label][task_status] += total_tasks
+
         response1 = {
             'labels': list(weekly_data.keys()),
             'datasets': [
                 {
                     'label': task_status,
                     'data': [weekly_data[week].get(task_status, 0) for week in weekly_data],
-                    'backgroundColor': 'rgba(255, 99, 132, 0.2)',
-                    'borderColor': 'rgba(255, 99, 132, 1)',
+                    'backgroundColor': 'rgba(75, 192, 192, 0.2)',
+                    'borderColor': 'rgba(75, 192, 192, 1)',
                     'borderWidth': 1
-                } for task_status in task_statuses
+                } for task_status in task_status_labels
             ]
         }
-        
-        # Prepare data for status pie chart
+
         task_status_data = {row[0]: row[1] for row in results2}
-        
+
         response2 = {
             'labels': list(task_status_data.keys()),
             'datasets': [{
@@ -2564,23 +2703,22 @@ def tech_task_analysis_data(request):
             }]
         }
 
-        # Prepare data for weekly priority chart
         nature_weekly_data = OrderedDict()
-        natures = ['Core Change', 'Strategy Change', 'None Core Request', 'Broker Integration', 'Operations']
+        nature_labels = ['Core Change', 'Strategy Change', 'None Core Request', 'Broker Integration', 'Operations']
 
         for row in results3:
             week_start = row[0].strftime('%Y-%m-%d')
             week_end = row[1].strftime('%Y-%m-%d')
             nature = row[2]
-            total_leads = row[3]
+            total_tasks = row[3]
 
             week_label = f'{week_start} - {week_end}'
 
             if week_label not in nature_weekly_data:
-                nature_weekly_data[week_label] = {nature: 0 for nature in natures}
-            
-            nature_weekly_data[week_label][nature] += total_leads
-            
+                nature_weekly_data[week_label] = {nature: 0 for nature in nature_labels}
+
+            nature_weekly_data[week_label][nature] += total_tasks
+
         response3 = {
             'labels': list(nature_weekly_data.keys()),
             'datasets': [
@@ -2590,13 +2728,12 @@ def tech_task_analysis_data(request):
                     'backgroundColor': 'rgba(255, 159, 64, 0.2)',
                     'borderColor': 'rgba(255, 159, 64, 1)',
                     'borderWidth': 1
-                } for nature in natures
+                } for nature in nature_labels
             ]
         }
 
-        # Prepare data for priority pie chart
         nature_data = {row[0]: row[1] for row in results4}
-        
+
         response4 = {
             'labels': list(nature_data.keys()),
             'datasets': [{
@@ -2633,6 +2770,7 @@ def tech_task_analysis_data(request):
                 'results4': response4,
             }
             return render(request, 'tech_task_analysis.html', context)
+
     except Exception as e:
         logger.error("Error in tech_task_analysis_data view: %s", e)
         return JsonResponse({'error': 'Internal Server Error'}, status=500)

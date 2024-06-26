@@ -138,7 +138,7 @@
                 {% if permission.name == "Can view the Date field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="date">Date:</label>
-                        <input type="date" id="date" name="date" value="{{ today_date|date:'d-m-Y' }}">
+                        <input type="date" id="date" name="date" value="{{ today_date|date:'Y-m-d' }}">
                     </div>
                 {% endif %}
             {% endfor %}
@@ -157,7 +157,13 @@
                 {% if permission.name == "Can view the Nature field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="nature">Nature:</label>
-                        <input type="text" id="nature" name="nature">
+                        <select id="nature" name="nature" class="task-nature-dropdown">
+                            <option value="Core Change" {% if task.nature == 'Core Change' %} selected {% endif %}>Core Change</option>
+                            <option value="Strategy Change" {% if task.nature == 'Strategy Change' %} selected {% endif %}>Strategy Change</option>
+                            <option value="None Core Request" {% if task.nature == 'None Core Request' %} selected {% endif %}>None Core Request</option>
+                            <option value="Broker Integration" {% if task.nature == 'Broker Integration' %} selected {% endif %}>Broker Integration</option>
+                            <option value="Operations" {% if task.nature == 'Operations' %} selected {% endif %}>Operations</option>
+                        </select><br><br>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -165,7 +171,16 @@
                 {% if permission.name == "Can view the Task Status field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="task_status">Task Status:</label>
-                        <input type="text" id="task_status" name="task_status">
+                        <select id="task_status" name="task_status" class="task-status-dropdown">
+                            <option value="Pending Development" {% if task.task_status == 'Pending Development' %} selected {% endif %}>Pending Development</option>
+                            <option value="Under Development" {% if task.task_status == 'Under Development' %} selected {% endif %}>Under Development</option>
+                            <option value="Under Testing" {% if task.task_status == 'Under Testing' %} selected {% endif %}>Under Testing</option>
+                            <option value="Bugs Reported" {% if task.task_status == 'Bugs Reported' %} selected {% endif %}>Bugs Reported</option>
+                            <option value="Delivered or Closed" {% if task.task_status == 'Delivered or Closed' %} selected {% endif %}>Delivered or Closed</option>
+                            <option value="In Progress" {% if task.task_status == 'In Progress' %} selected {% endif %}>In Progress</option>
+                            <option value="On Hold" {% if task.task_status == 'On Hold' %} selected {% endif %}>On Hold</option>
+                            <option value="Open" {% if task.task_status == 'Open' %} selected {% endif %}>Open</option>
+                        </select><br><br>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -173,7 +188,11 @@
                 {% if permission.name == "Can view the Priority field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="priority">Priority:</label>
-                        <input type="text" id="priority" name="priority">
+                        <select id="priority" name="priority" class="task-priority-dropdown">
+                            <option value="High" {% if task.priority == 'High' %} selected {% endif %}>High</option>
+                            <option value="Medium" {% if task.priority == 'Medium' %} selected {% endif %}>Medium</option>
+                            <option value="Low" {% if task.priority == 'Low' %} selected {% endif %}>Low</option>
+                        </select><br><br>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -181,7 +200,7 @@
                 {% if permission.name == "Can view the Date of Closing field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="date_of_closing">Date of Closing:</label>
-                        <input type="date" id="date_of_closing" name="date_of_closing" value="{{ today_date|date:'d-m-Y' }}">
+                        <input type="date" id="date_of_closing" name="date_of_closing" value="{{ today_date|date:'Y-m-d' }}">
                     </div>
                 {% endif %}
             {% endfor %}
@@ -192,7 +211,7 @@
                 {% if permission.name == "Can view the Number Of Days field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="number_of_days">Number Of Days:</label>
-                        <input type="text" id="number_of_days" name="number_of_days">
+                        <input type="text" id="number_of_days" name="number_of_days" readonly>
                     </div>
                 {% endif %}
             {% endfor %}
@@ -212,6 +231,30 @@
             </div>
         </div>
     </form>
+    <script>
+        // Function to update the number of days between two dates
+        function updateNumberOfDays() {
+            var startDate = new Date(document.getElementById('date').value);
+            var endDate = new Date(document.getElementById('date_of_closing').value);
+            var numberOfDays = document.getElementById('number_of_days');
+
+            // Check if both dates are valid
+            if (!isNaN(startDate) && !isNaN(endDate)) {
+                // Calculate the difference in time
+                var timeDiff = endDate - startDate;
+                // Calculate the number of days (time difference / milliseconds per day)
+                var daysDiff = Math.ceil(timeDiff / (1000 * 3600 * 24));
+                // Set the number of days to the input field
+                numberOfDays.value = daysDiff >= 0 ? daysDiff : '0';
+            } else {
+                // Clear the number of days field if dates are invalid
+                numberOfDays.value = '';
+            }
+        }
+        // Event listeners for date input fields
+        document.getElementById('date').addEventListener('change', updateNumberOfDays);
+        document.getElementById('date_of_closing').addEventListener('change', updateNumberOfDays);
+    </script>
 </div>
 </header>
 </body>

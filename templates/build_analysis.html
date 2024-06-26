@@ -332,8 +332,8 @@
                 </div>
             </div>
         </nav>
-        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
+        <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
         <script>
             $(document).ready(function() {
                 // Function to handle form submission and filtering logic
@@ -451,8 +451,6 @@
                             </div>
                         </div>
                     </div>
-            
-                
                     <div class="dropdown">
                         <div class="sidebar-item">
                             <a href="#" class="filter-option" id="dropdownToggle">Status</a>
@@ -562,7 +560,7 @@
             return cookieValue;
         }
     
-        $(document).ready(function() {
+        {% comment %} $(document).ready(function() {
             $('.start_end_date').on('submit', function(event) {
                 event.preventDefault();
                 var start_date = $('#start_date').val();
@@ -592,7 +590,7 @@
                 $('.start_end_date button[type="submit"]').click();
             }, 0);
         });
-    
+     {% endcomment %}
         function updateCharts(response) {
             updateWeeklyBarChart(response.results1);
             updateStatusPieChart(response.results2);

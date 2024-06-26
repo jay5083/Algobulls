@@ -102,14 +102,9 @@
                 border: 1px solid #ddd; /* Optional: border */
                 display: flex; /* Flexbox for layout adjustments */
                 flex-direction: column; /* Vertical stacking of children */
-            }
-        
-            
-            /* Adjust other styles as needed */
+            }     
             
         </style>
-    
-    
 
     <style>
         .hidden {
@@ -682,7 +677,7 @@
                     category: [],
                     risk_appetite: [],
                     status: [],
-                    employee_id: []
+                    sales_employee_id: []
                 };
             
                 $('.filter-checkbox:checked').each(function() {
@@ -692,6 +687,11 @@
                         filters[filter].push(value);
                     }
                 });
+
+                // Debugging
+                console.log('Start Date:', start_date);
+                console.log('End Date:', end_date);
+                console.log('Filters:', filters);
             
                 $.ajax({
                     url: '/sales_analysis_data/',
@@ -726,7 +726,7 @@
                     category: [],
                     risk_appetite: [],
                     status: [],
-                    employee_id: []
+                    sales_employee_id: []
                 };
     
                 document.querySelectorAll('.filter-checkbox:checked').forEach(function(checkbox) {
