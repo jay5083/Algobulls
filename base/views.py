@@ -127,6 +127,9 @@ def generate_qr_code_base64(uri):
     qr.save(buffered, 'PNG')
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
+from django.utils import timezone
+from datetime import datetime, timedelta
+
 @login_required
 def auth(request):
     print("User email from session:", request.session.get("email"))
@@ -139,7 +142,10 @@ def auth(request):
     
     if last_login_time_str:
         last_login_time = datetime.fromisoformat(last_login_time_str)
-        last_login_time = timezone.make_aware(last_login_time)  # Ensure aware datetime
+        
+        # Check if last_login_time is naive or aware
+        if timezone.is_naive(last_login_time):
+            last_login_time = timezone.make_aware(last_login_time)
         
         print("Parsed last login time:", last_login_time)
         
@@ -678,7 +684,7 @@ def add_support(request):
             division_assigned_to=division_assigned_to,
         )
 
-        return redirect('/accounts/profile/')
+        return redirect('/support/')
 
     else:
         # Fetch user groups
@@ -728,7 +734,7 @@ def add_strategies(request):
             client_id=client_id,
         )
 
-        return redirect('/accounts/profile/')
+        return redirect('/strategies/')
 
     else:
         # Fetch user groups
@@ -1614,7 +1620,7 @@ def add_rms(request):
             employee=employee,
         )
 
-        return redirect('/accounts/profile/')
+        return redirect('/rms/')
 
     else:
         # Fetch user groups
