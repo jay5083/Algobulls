@@ -122,7 +122,7 @@
                 {% if permission.name == "Can view the Build ID field of Build" %}
                     <div class="col-md-3">
                         <label for="build_id">Build ID:</label>
-                        <input type="text" id="build_id" name="build_id" required>
+                        <input type="text" id="build_id" name="build_id" value="{{new_build_id}}" required>
                     </div>
                 {% endif %}
             {% endfor %}

@@ -116,7 +116,7 @@
                 {% if permission.name == "Can view the Task ID field of Tech Task" %}
                     <div class="col-md-3">
                         <label for="task_id">Task ID:</label>
-                        <input type="text" id="task_id" name="task_id" required>
+                        <input type="text" id="task_id" name="task_id" value="{{new_task_id}}" required>
                     </div>
                 {% endif %}
             {% endfor %}

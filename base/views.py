@@ -426,9 +426,25 @@ def add_sales_leads(request):
         sales_employees = AlgobullsEmployee.objects.all()
         today_date = date.today()
         
-        # max_lead_id = Sales.objects.aggregate(max_lead_id=Max('lead_id'))['max_lead_id']
-        # max_lead_id = int(max_lead_id)
-        # new_lead_id = max_lead_id + 1
+        lead_ids = Sales.objects.values_list('lead_id', flat=True)
+
+        # Step 2: Convert all values to integers, handling any exceptions
+        lead_ids_int = []
+        for lead_id in lead_ids:
+            try:
+                lead_ids_int.append(int(lead_id))
+            except (ValueError, TypeError):
+                print(f"Skipping non-integer lead_id: {lead_id}")
+
+        # Step 3: Find the maximum lead_id from the converted list
+        if lead_ids_int:
+            max_lead_id = max(lead_ids_int)
+        else:
+            max_lead_id = 0  # If no valid lead_ids are found, start from 0
+
+        # Step 4: Calculate the new lead_id
+        new_lead_id = max_lead_id + 1
+        
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -442,7 +458,7 @@ def add_sales_leads(request):
             'branch_employees': branch_employees,
             'sales_employees' : sales_employees,
             'today_date': today_date,
-            # 'new_lead_id': new_lead_id,
+            'new_lead_id': new_lead_id,
         }
 
         return render(request, 'add_sales_leads.html', context)
@@ -527,7 +543,26 @@ def add_build(request):
         user_groups = request.user.groups.all()
         sales_employees = AlgobullsEmployee.objects.all()
         
+                # Step 1: Fetch all build_ids
+        build_ids = Build.objects.values_list('build_id', flat=True)
 
+        # Step 2: Convert all values to integers, handling any exceptions
+        build_ids_int = []
+        for build_id in build_ids:
+            try:
+                build_ids_int.append(int(build_id))
+            except (ValueError, TypeError):
+                print(f"Skipping non-integer build_id: {build_id}")
+
+        # Step 3: Find the maximum build_id from the converted list
+        if build_ids_int:
+            max_build_id = max(build_ids_int)
+        else:
+            max_build_id = 0  # If no valid build_ids are found, start from 0
+
+        # Step 4: Calculate the new build_id
+        new_build_id = max_build_id + 1
+        
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -536,7 +571,7 @@ def add_build(request):
         context = {
             'user_permissions': user_permissions,
             'sales_employees' : sales_employees,
-            
+            'new_build_id': new_build_id,
         }
 
         return render(request, 'add_build.html', context)
@@ -592,6 +627,26 @@ def add_tech_task(request):
         user_groups = request.user.groups.all()
         sales_employees = AlgobullsEmployee.objects.all()
 
+                # Step 1: Fetch all task_ids
+        task_ids = TechTask.objects.values_list('task_id', flat=True)
+
+        # Step 2: Convert all values to integers, handling any exceptions
+        task_ids_int = []
+        for task_id in task_ids:
+            try:
+                task_ids_int.append(int(task_id))
+            except (ValueError, TypeError):
+                print(f"Skipping non-integer task_id: {task_id}")
+
+        # Step 3: Find the maximum task_id from the converted list
+        if task_ids_int:
+            max_task_id = max(task_ids_int)
+        else:
+            max_task_id = 0  # If no valid task_ids are found, start from 0
+
+        # Step 4: Calculate the new task_id
+        new_task_id = max_task_id + 1
+        
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -600,6 +655,8 @@ def add_tech_task(request):
         context = {
             'user_permissions': user_permissions,
             'sales_employees': sales_employees,
+            'new_task_id': new_task_id,
+
         }
 
         return render(request, 'add_tech_task.html', context)
@@ -692,6 +749,26 @@ def add_support(request):
         branch_employees = BranchEmployee.objects.all()
         sales_employees = AlgobullsEmployee.objects.all()
         
+                # Step 1: Fetch all ticket_numbers
+        ticket_numbers = Support.objects.values_list('ticket_number', flat=True)
+
+        # Step 2: Convert all values to integers, handling any exceptions
+        ticket_numbers_int = []
+        for ticket_number in ticket_numbers:
+            try:
+                ticket_numbers_int.append(int(ticket_number))
+            except (ValueError, TypeError):
+                print(f"Skipping non-integer ticket_number: {ticket_number}")
+
+        # Step 3: Find the maximum ticket_number from the converted list
+        if ticket_numbers_int:
+            max_ticket_number = max(ticket_numbers_int)
+        else:
+            max_ticket_number = 0  # If no valid ticket_numbers are found, start from 0
+
+        # Step 4: Calculate the new ticket_number
+        new_ticket_number = max_ticket_number + 1
+        
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -701,6 +778,8 @@ def add_support(request):
             'user_permissions': user_permissions,
             'branch_employees': branch_employees,
             'sales_employees' : sales_employees,
+            'new_ticket_number': new_ticket_number,
+
         }
 
         return render(request, 'add_support.html', context)
@@ -741,6 +820,26 @@ def add_strategies(request):
         user_groups = request.user.groups.all()
         sales_employees = AlgobullsEmployee.objects.all()
         
+                # Step 1: Fetch all strategy_ids
+        strategy_ids = Strategies.objects.values_list('strategy_id', flat=True)
+
+        # Step 2: Convert all values to integers, handling any exceptions
+        strategy_ids_int = []
+        for strategy_id in strategy_ids:
+            try:
+                strategy_ids_int.append(int(strategy_id))
+            except (ValueError, TypeError):
+                print(f"Skipping non-integer strategy_id: {strategy_id}")
+
+        # Step 3: Find the maximum strategy_id from the converted list
+        if strategy_ids_int:
+            max_strategy_id = max(strategy_ids_int)
+        else:
+            max_strategy_id = 0  # If no valid strategy_ids are found, start from 0
+
+        # Step 4: Calculate the new strategy_id
+        new_strategy_id = max_strategy_id + 1
+        
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -749,6 +848,8 @@ def add_strategies(request):
         context = {
             'user_permissions': user_permissions,
             'sales_employees' : sales_employees,
+            'new_strategy_id': new_strategy_id,
+
         }
 
         return render(request, 'add_strategies.html', context)
@@ -1628,6 +1729,26 @@ def add_rms(request):
         brokers = Broker.objects.all()
         employees = AlgobullsEmployee.objects.all()
         
+                # Step 1: Fetch all sr_nos
+        sr_nos = Rms.objects.values_list('sr_no', flat=True)
+
+        # Step 2: Convert all values to integers, handling any exceptions
+        sr_nos_int = []
+        for sr_no in sr_nos:
+            try:
+                sr_nos_int.append(int(sr_no))
+            except (ValueError, TypeError):
+                print(f"Skipping non-integer sr_no: {sr_no}")
+
+        # Step 3: Find the maximum sr_no from the converted list
+        if sr_nos_int:
+            max_sr_no = max(sr_nos_int)
+        else:
+            max_sr_no = 0  # If no valid sr_nos are found, start from 0
+
+        # Step 4: Calculate the new sr_no
+        new_sr_no = max_sr_no + 1
+        
         # Fetch user permissions
         user_permissions = []
         for group in user_groups:
@@ -1637,6 +1758,7 @@ def add_rms(request):
             'user_permissions': user_permissions,
             'brokers': brokers,
             'sales_employees': employees,
+            'new_sr_no': new_sr_no,
         }
 
         return render(request, 'add_rms.html', context)

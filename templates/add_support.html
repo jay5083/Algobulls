@@ -151,7 +151,7 @@
                             {% if permission.name == "Can view the Ticket Number field of Support" %}
                                 <div class="col-md-3 form-group">
                                     <label for="ticket_number">Ticket Number:</label>
-                                    <input type="text" id="ticket_number" name="ticket_number" required>
+                                    <input type="text" id="ticket_number" name="ticket_number" value="{{new_ticket_number}}" required>
                                 </div>
                             {% endif %}
                         {% endfor %}

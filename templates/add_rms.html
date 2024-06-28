@@ -121,7 +121,7 @@
                         {% if permission.name == "Can view the Sr No field of Rms" %}
                             <div class="col-md-3 form-group">
                                 <label for="sr_no">Sr No:</label>
-                                <input type="text" id="sr_no" name="sr_no" required>
+                                <input type="text" id="sr_no" name="sr_no" value="{{new_sr_no}}" required>
                             </div>
                         {% endif %}
                     {% endfor %}
@@ -305,7 +305,9 @@
                                 <label for="employee">Employee:</label>
                                 <select id="employee" name="employee">
                                     {% for employee in sales_employees %}
-                                        <option value="{{ employee.employee_id }}">{{ employee.name }}</option>
+                                        {% if employee.role_id.role_name == "Rms Employee" %}
+                                            <option value="{{ employee.employee_id }}">{{ employee.name }}</option>
+                                        {%endif%}
                                     {% endfor %}
                                 </select>
                             </div>

@@ -118,7 +118,7 @@
                     {% if permission.name == "Can view the Strategy ID field of Strategies" %}
                         <div class="col-md-3 form-group">
                             <label for="strategy_id">Strategy ID:</label>
-                            <input type="text" id="strategy_id" name="strategy_id" required>
+                            <input type="text" id="strategy_id" name="strategy_id" value="{{new_strategy_id}}" required>
                         </div>
                     {% endif %}
                 {% endfor %}
